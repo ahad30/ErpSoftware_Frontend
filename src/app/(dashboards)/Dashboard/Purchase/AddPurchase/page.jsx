@@ -8,7 +8,7 @@ import { useGetWarehousesQuery } from '@/redux/Feature/User/warehouses/warehouse
 import { useGetSuppliersQuery } from '@/redux/Feature/User/suppliers/suppliersApi';
 import { CiSearch } from 'react-icons/ci';
 
-const page = () => {
+const AddPurchase = () => {
   const [startDate, setStartDate] = useState(dayjs());
   const [productSearch , setProductSearch] = useState('')
   const { data: warehouseData, isLoading: wIsLoading } =
@@ -132,4 +132,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default AddPurchase;
