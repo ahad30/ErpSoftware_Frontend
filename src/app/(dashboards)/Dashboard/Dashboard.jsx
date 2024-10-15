@@ -74,7 +74,7 @@ const Dashboard = ({ view, toggle }) => {
     else if (pathName === "/Dashboard/Suppliers") {
       setActiveItem("suppliers");
     } 
-    else if (pathName === "/Dashboard/Purchase") {
+    else if (pathName === "/Dashboard/Purchase" || "/Dashboard/Purchase/AddPurchase") {
       setActiveItem("purchases");
     } 
 
