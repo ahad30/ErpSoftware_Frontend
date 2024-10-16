@@ -11,7 +11,7 @@ import { useGetProductsQuery } from "@/redux/Feature/Admin/product/productApi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "sonner";
 
-const { Search } = Input;
+const { Search , TextArea} = Input;
 const AddPurchase = () => {
   const [startDate, setStartDate] = useState(dayjs());
   const [productSearch, setProductSearch] = useState("");
@@ -291,27 +291,8 @@ const addedProductPrice = addedProducts?.reduce(
           </div>
         </div>
 
-        {/* <div className="lg:col-span-3">
-  <label htmlFor="">Product:*</label>
-  <div className="mt-3">
-    <Select
-      style={{ width: "100%" }}
-      virtual={true}
-      suffixIcon={<CiSearch size={20} />}
-      allowClear={true}
-      showSearch
-      onSearch={(value) => setProductSearch(value)}
-      onChange={handleAddProduct}
-      placeholder={"Search Product by Name"}
-      filterOption={filterOption}
-      options={productSearch ? pData : []}
-      loading={pIsLoading}
-      disabled={pIsLoading}
-    />
-  </div>
-</div> */}
 
-<div className='lg:col-span-3 relative'>
+      <div className='lg:col-span-3 relative'>
           <label htmlFor="">Product:*</label>
           <div className='mt-3'>
             <Search
@@ -346,6 +327,7 @@ const addedProductPrice = addedProducts?.reduce(
         </div>
 
 
+         {/* Product table */}
         <div className="lg:col-span-3">
           <label htmlFor="">Order Items:*</label>
           <div className="max-h-[30vh] overflow-y-scroll scrollbar-0 mt-3">
@@ -359,7 +341,7 @@ const addedProductPrice = addedProducts?.reduce(
                   <th className="py-2 text-center text-xs whitespace-nowrap">
                     Quantity
                   </th>
-                  <th className="py-2 text-center text-xs px-2">Price</th>
+                  <th className="py-2 text-center text-xs px-2">Subtotal</th>
                   <th className="py-2 text-xs text-center px-2">Action</th>
                 </tr>
               </thead>
@@ -421,26 +403,36 @@ const addedProductPrice = addedProducts?.reduce(
           </div>
         </div>
 
-        <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg">
-              <input
-                placeholder="Tax"
-                className="border-0  w-full focus:border-0 focus:ring-0 py-1 outline-none"
-                type="number"
-                value={Number(tax) == 0 ? "tax" : tax}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value >= 0) {
-                    setTax(value);
-                    handleTextAndDiscount(e.target?.value, "Tax");
-                  }
-                }}
-              />
 
-              <span>%</span>
-            </div>
+              {/* Tax */}
+        <div>
+        <label htmlFor="">Order Tax:*</label>
+
+        <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
+        
+        <input
+          placeholder="Tax"
+          className="border-0  w-full focus:border-0 focus:ring-0 py-1 outline-none"
+          type="number"
+          value={Number(tax) == 0 ? "Tax" : tax}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value >= 0) {
+              setTax(value);
+              handleTextAndDiscount(e.target?.value, "Tax");
+            }
+          }}
+        />
+
+        <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">%</span>
+      </div>
+        </div>
 
             {/*  Discount */}
-            <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg">
+            <div>
+        <label htmlFor="">Discount:*</label>
+
+            <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
               <input
                 placeholder="Discount"
                 className="border-0 focus:border-0 w-full focus:ring-0 py-1 outline-none"
@@ -460,11 +452,17 @@ const addedProductPrice = addedProducts?.reduce(
                   }
                 }}
               />
-              <span>%</span>
+        <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">%</span>
+              
             </div>
+           </div>
+
 
             {/*  shipping */}
-            <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg">
+            <div>
+        <label htmlFor="">Shipping:*</label>
+            
+            <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
               <input
                 placeholder="Shipping"
                 className="border-0 w-full focus:border-0 focus:ring-0 py-1 outline-none"
@@ -479,27 +477,108 @@ const addedProductPrice = addedProducts?.reduce(
                   }
                 }}
               />
-              <span>$</span>
+         <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">$</span>
+
             </div>
+       </div>
 
-
-           {/* Sale Status */}
-            <div className="">
-
+           {/* Purchase Status */}
+        <div>
+        <label htmlFor="">Status:*</label>
+            <div className="mt-3">
             <Select
             name="saleStatus"
             style={{ width: '100%'}}
             options={[
               { label: "Received", value: "Received" },
-              { label: "Delivered", value: "Delivered" },
+              { label: "Pending", value: "Pending" },
+              { label: "Ordered", value: "Ordered" },
             ]}
-            placeholder="Select Sale status"
+            placeholder="Select Purchase status"
             
           />
             </div>
+        </div>
+
+
 
 
       </div>
+            {/* Description */}
+            <div>
+           <label htmlFor="">Note:*</label>
+ 
+ <div className="mt-3 mb-5">
+
+   <TextArea  allowClear/>
+ </div>
+           </div>
+
+           {/* Order Summary */}
+     <div className="flex justify-end">
+     <div className="flex w-full lg:w-[35%]  flex-col  bg-white  space-y-4 divide-y border border-gray-300  lg:mt-5">
+	
+
+	<div className="pt-4 space-y-2">
+		<div>
+			<div className="flex justify-between px-5">
+				<span>Tax</span>
+				<span>{tax} $</span>
+			</div>
+		</div>
+
+	</div>
+	<div className="pt-4 space-y-2">
+		<div className="space-y-6">
+			<div className="flex justify-between px-5">
+				<span>Discount</span>
+				<span className="">{discount} %</span>
+			</div>
+
+		</div>
+	</div>
+	<div className="pt-4 space-y-2">
+		<div className="space-y-6">
+			<div className="flex justify-between px-5">
+				<span>Shipping</span>
+				<span className="">{shipping} $</span>
+			</div>
+
+		</div>
+	</div>
+	<div className="pt-4 pb-4 space-y-2">
+		<div className="space-y-6">
+			<div className="flex justify-between px-5">
+				<span className="text-[#6571FF]">Grand Total</span>
+				<span className="text-[#6571FF]"> $</span>
+			</div>
+
+		</div>
+	</div>
+   
+       </div>
+     </div>
+
+     {/* Submit button */}
+     <div className="flex justify-end mt-10 mb-8">
+     <div     
+            onClick={() => {
+              if (error === true) {
+                toast.error("you can't create pos");
+              } else {
+                createPos();
+              }
+            }}
+            className={`bg-primary w-full lg:w-[20%] py-1 lg:py-2  rounded-lg flex justify-center items-center gap-x-2 text-base font-medium text-white ${
+              error === true
+                ? "disabled:cursor-none bg-green-200"
+                : "cursor-pointer bg-[#2FC989] "
+            }`}
+          >
+            <p>Submit</p>
+          </div>
+     </div>
+
     </>
   );
 };

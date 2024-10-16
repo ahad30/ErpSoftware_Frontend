@@ -12,7 +12,6 @@ const BreadCrumb = () => {
     .filter((c) => c !== "")
     .map((item, index) => {
       currentLinks += `/${item}`;
-      // Special case for "Dashboard" to link to "/Dashboard/AdminHome"
       const linkPath = 
       item === "Dashboard" 
         ? "/Dashboard/AdminHome" 
