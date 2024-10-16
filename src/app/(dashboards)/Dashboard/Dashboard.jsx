@@ -14,9 +14,10 @@ import {
   UserCircleIcon,
   InboxIcon,
   ShoppingBagIcon,
+  ChevronLeftIcon,
 } from "@heroicons/react/24/solid";
 import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { BiSolidBusiness, BiSolidCategory, BiSolidPurchaseTag } from "react-icons/bi";
+import { BiLeftArrow, BiSolidBusiness, BiSolidCategory, BiSolidPurchaseTag } from "react-icons/bi";
 import Logo from "../../../../public/sf-logo.png";
 import Logo2 from "../../../../public/sf-logo-2.png";
 import Image from "next/image";
@@ -26,7 +27,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaCodeBranch } from "react-icons/fa";
 import { MdBrandingWatermark, MdOutlineImportContacts, MdShoppingCart, MdViewModule } from "react-icons/md";
-import { FaAddressCard } from "react-icons/fa6";
+import { FaAddressCard, FaLeftLong } from "react-icons/fa6";
 import { RiCustomerServiceFill } from "react-icons/ri";
 import { LuWarehouse } from "react-icons/lu";
 import { IoIosArrowForward } from "react-icons/io";
@@ -74,11 +75,13 @@ const Dashboard = ({ view, toggle }) => {
     else if (pathName === "/Dashboard/Suppliers") {
       setActiveItem("suppliers");
     } 
-    else if (pathName === "/Dashboard/Purchase" || "/Dashboard/Purchase/AddPurchase") {
+    else if (pathName === "/Dashboard/Purchase" ||
+      pathName === "/Dashboard/Purchase/AddPurchase") {
       setActiveItem("purchases");
     } 
-
-
+    else if (pathName === "/Dashboard/Purchase-return" || pathName === "/Dashboard/Purchase-return/AddPurchaseReturn") {
+      setActiveItem("purchase-return");
+    } 
 
     else if (pathName === "/Dashboard/Customers") {
       setActiveItem("customers");
@@ -128,6 +131,9 @@ const Dashboard = ({ view, toggle }) => {
 
   const getActiveClass = (item) =>
     activeItem === item && "!bg-[#6c5ce7] text-white";
+
+  const getActiveClass2 = (item) =>
+    activeItem === item && "text-[#74b9ff]";
 
   return (
     <div
@@ -421,7 +427,7 @@ const Dashboard = ({ view, toggle }) => {
                 </ListItemPrefix>
                 <Typography
                   color="white"
-                  className={`mr-auto font-normal ${hidden}`}
+                  className={`mr-auto font-normal ${hidden} ${getActiveClass2("purchase-return")} ${getActiveClass2("purchases")}`}
                 >
                Purchases
                 </Typography>
@@ -437,7 +443,7 @@ const Dashboard = ({ view, toggle }) => {
             onClick={() => handleItemClick("purchases")}
           >
             <ListItemPrefix>
-              <ChevronRightIcon className="h-4 w-4 text-white" />
+              <BiSolidPurchaseTag className="h-5 w-5 text-white ms-2" />
             </ListItemPrefix>
            <Typography color="white" className={hidden}>
              Purchases
@@ -445,16 +451,16 @@ const Dashboard = ({ view, toggle }) => {
           </ListItem>
           </Link>
 
-          <Link href={'/Dashboard/Brand'}>
+          <Link href={'/Dashboard/Purchase-return'}>
                 <ListItem 
-                className={`hover:bg-[#6c5ce7]  ${getActiveClass("brands")}`}
-                selected={activeItem === "brands"}
-                onClick={() => handleItemClick("brands")}
+                className={`hover:bg-[#6c5ce7]  ${getActiveClass("purchase-return")}`}
+                selected={activeItem === "purchase-return"}
+                onClick={() => handleItemClick("purchase-return")}
                 >
                   <ListItemPrefix>
-                    <ChevronRightIcon 
+                    <FaLeftLong 
               
-                      className="h-4 w-4 text-white"
+                      className="h-5 w-4 text-white ms-2"
                       />
                   </ListItemPrefix>
                   <Typography color="white" className={hidden}>
@@ -462,12 +468,7 @@ const Dashboard = ({ view, toggle }) => {
                   </Typography>
                 </ListItem>
           </Link>
-
-
-
-          
-
-              </List>
+      </List>
             </AccordionBody>
             
           </Accordion>
@@ -495,7 +496,7 @@ const Dashboard = ({ view, toggle }) => {
               >
                 <ListItemPrefix>
                   <div className="flex items-center gap-x-[2px]">
-                    <MdShoppingCart  className="h-5 w-5 text-white" />
+                    <MdShoppingCart   className="h-5 w-5 text-white" />
                     <div>
                       {toggle && (
                         <IoIosArrowForward 
@@ -510,7 +511,7 @@ const Dashboard = ({ view, toggle }) => {
                 </ListItemPrefix>
                 <Typography
                   color="white"
-                  className={`mr-auto font-normal ${hidden}`}
+                  className={`mr-auto font-normal ${hidden} `}
                 >
                Sales
                 </Typography>
@@ -519,14 +520,14 @@ const Dashboard = ({ view, toggle }) => {
 
             <AccordionBody className="py-1">
               <List className="p-0">
-              <Link href={'/Dashboard/ErpCategory'}>
+              <Link href={'/Dashboard/Purchase'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7]   ${getActiveClass("erp-category")}`}
-            selected={activeItem === "erp-category"}
-            onClick={() => handleItemClick("erp-category")}
+            className={`hover:bg-[#6c5ce7]   ${getActiveClass("purchases")}`}
+            selected={activeItem === "purchases"}
+            onClick={() => handleItemClick("purchases")}
           >
             <ListItemPrefix>
-              <ChevronRightIcon className="h-4 w-4 text-white" />
+              <MdShoppingCart className="h-5 w-5 text-white ms-2" />
             </ListItemPrefix>
            <Typography color="white" className={hidden}>
              Sales
@@ -534,16 +535,16 @@ const Dashboard = ({ view, toggle }) => {
           </ListItem>
           </Link>
 
-          <Link href={'/Dashboard/Brand'}>
+          <Link href={'/Dashboard/Purchase-return'}>
                 <ListItem 
-                className={`hover:bg-[#6c5ce7]  ${getActiveClass("brands")}`}
-                selected={activeItem === "brands"}
-                onClick={() => handleItemClick("brands")}
+                className={`hover:bg-[#6c5ce7]  ${getActiveClass("purchase-return")}`}
+                selected={activeItem === "purchase-return"}
+                onClick={() => handleItemClick("purchase-return")}
                 >
                   <ListItemPrefix>
-                    <ChevronRightIcon 
+                    <FaLeftLong 
               
-                      className="h-4 w-4 text-white"
+                      className="h-5 w-4 text-white ms-2"
                       />
                   </ListItemPrefix>
                   <Typography color="white" className={hidden}>
@@ -551,16 +552,10 @@ const Dashboard = ({ view, toggle }) => {
                   </Typography>
                 </ListItem>
           </Link>
-
-
-
-          
-
-              </List>
+      </List>
             </AccordionBody>
             
           </Accordion>
-
 
 
 
