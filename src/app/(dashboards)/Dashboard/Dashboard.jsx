@@ -133,7 +133,7 @@ const Dashboard = ({ view, toggle }) => {
     activeItem === item && "!bg-[#6c5ce7] text-white";
 
   const getActiveClass2 = (item) =>
-    activeItem === item && "text-[#74b9ff]";
+    activeItem === item && "text-[#81ecec]";
 
   return (
     <div
