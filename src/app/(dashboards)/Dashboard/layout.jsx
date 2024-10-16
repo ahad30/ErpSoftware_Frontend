@@ -21,7 +21,7 @@ const DashboardLayout = ({children}) => {
             <div className="md:flex md:flex-row justify-start h-screen relative">
               <div
                 className={`${
-                toggle ? "max-w-[4.5%]" : "w-[22%]"
+                toggle ? "max-w-[4.5%]" : "w-[20%]"
                 }  duration-500 transition ${pathName === '/Dashboard/pos' && "hidden"}`}
               >
                 <Dashboard toggle={toggle}/>

@@ -12,7 +12,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "sonner";
 
 const { Search , TextArea} = Input;
-const AddPurchase = () => {
+const AddPurchaseReturn = () => {
   const [startDate, setStartDate] = useState(dayjs());
   const [productSearch, setProductSearch] = useState("");
   const [addedProducts, setAddedProducts] = useState([]);
@@ -490,7 +490,7 @@ const addedProductPrice = addedProducts?.reduce(
             name="saleStatus"
             style={{ width: '100%'}}
             options={[
-              { label: "Received", value: "Received" },
+              { label: "Completed", value: "Completed" },
               { label: "Pending", value: "Pending" },
               { label: "Ordered", value: "Ordered" },
             ]}
@@ -583,4 +583,4 @@ const addedProductPrice = addedProducts?.reduce(
   );
 };
 
-export default AddPurchase;
+export default AddPurchaseReturn;
