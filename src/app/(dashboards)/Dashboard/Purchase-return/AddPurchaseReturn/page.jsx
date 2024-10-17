@@ -494,7 +494,7 @@ const addedProductPrice = addedProducts?.reduce(
               { label: "Pending", value: "Pending" },
               { label: "Ordered", value: "Ordered" },
             ]}
-            placeholder="Select Purchase status"
+            placeholder="Select Purchase return status"
             
           />
             </div>

@@ -133,7 +133,7 @@ const Dashboard = ({ view, toggle }) => {
     activeItem === item && "!bg-[#6c5ce7] text-white";
 
   const getActiveClass2 = (item) =>
-    activeItem === item && "text-[#74b9ff]";
+    activeItem === item && "text-[#81ecec]";
 
   return (
     <div
@@ -220,7 +220,8 @@ const Dashboard = ({ view, toggle }) => {
           </ListItem>
           </Link>
 
-
+           
+         {/* Product */}
  
           <Accordion
             open={open === 1}
@@ -257,7 +258,7 @@ const Dashboard = ({ view, toggle }) => {
                 </ListItemPrefix>
                 <Typography
                   color="white"
-                  className={`mr-auto font-normal ${hidden}`}
+                  className={`mr-auto font-normal ${hidden} ${getActiveClass2("erp-category")} ${getActiveClass2("brands")} ${getActiveClass2("product-type")} ${getActiveClass2("products")} ${getActiveClass2("product-unit")}`}
                 >
                Products
                 </Typography>
@@ -273,7 +274,7 @@ const Dashboard = ({ view, toggle }) => {
             onClick={() => handleItemClick("erp-category")}
           >
             <ListItemPrefix>
-              <ChevronRightIcon className="h-4 w-4 text-white" />
+              <ChevronRightIcon className="h-4 w-4  ms-2 text-white" />
             </ListItemPrefix>
            <Typography color="white" className={hidden}>
              Categories
@@ -290,7 +291,7 @@ const Dashboard = ({ view, toggle }) => {
                   <ListItemPrefix>
                     <ChevronRightIcon 
               
-                      className="h-4 w-4 text-white"
+                      className="h-4 w-4 ms-2 text-white"
                       />
                   </ListItemPrefix>
                   <Typography color="white" className={hidden}>
@@ -308,7 +309,7 @@ const Dashboard = ({ view, toggle }) => {
                   <ListItemPrefix>
                     <ChevronRightIcon 
               
-                      className="h-4 w-4 text-white"
+                      className="h-4 w-4 ms-2 text-white"
                       />
                   </ListItemPrefix>
                   <Typography color="white" className={hidden}>
@@ -327,7 +328,7 @@ const Dashboard = ({ view, toggle }) => {
                   <ListItemPrefix>
                     <ChevronRightIcon 
               
-                      className="h-4 w-4 text-white"
+                      className="h-4 w-4 ms-2 text-white"
                       />
                   </ListItemPrefix>
                   <Typography color="white" className={hidden}>
@@ -343,9 +344,9 @@ const Dashboard = ({ view, toggle }) => {
                 onClick={() => handleItemClick("products")}
                 >
                   <ListItemPrefix>
-                    <ChevronRightIcon 
+                    <ShoppingBagIcon 
               
-                      className="h-4 w-4 text-white"
+                      className="h-4 w-4 ms-2 text-white"
                       />
                   </ListItemPrefix>
                   <Typography color="white" className={hidden}>
