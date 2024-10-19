@@ -12,7 +12,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "sonner";
 
 const { Search , TextArea} = Input;
-const AddPurchase = () => {
+const AddSale = () => {
   const [startDate, setStartDate] = useState(dayjs());
   const [productSearch, setProductSearch] = useState("");
   const [addedProducts, setAddedProducts] = useState([]);
@@ -31,6 +31,9 @@ const AddPurchase = () => {
     IDiscount: 0,
     ITax: 0,
   });
+  const [paymentStatus, setPaymentStatus] = useState(null);
+
+
   const { data: warehouseData, isLoading: wIsLoading } =
     useGetWarehousesQuery();
   const { data: supplierData, isLoading: sIsLoading } = useGetSuppliersQuery();
@@ -51,6 +54,10 @@ const AddPurchase = () => {
     label: product.productTitle,
     value: product.productID,
   }));
+
+  const handlePaymentStatusChange = (value) => {
+    setPaymentStatus(value);
+  };
 
   useEffect(() => {
     if (productSearch && productData) {
@@ -482,23 +489,61 @@ const addedProductPrice = addedProducts?.reduce(
             </div>
        </div>
 
-           {/* Purchase Status */}
+           {/* Sale Status */}
         <div>
         <label htmlFor="">Status:*</label>
             <div className="mt-3">
             <Select
-            name="purchaseStatus"
+            name="saleStatus"
             style={{ width: '100%'}}
             options={[
-              { label: "Received", value: "Received" },
+              { label: "Completed", value: "Completed" },
               { label: "Pending", value: "Pending" },
               { label: "Ordered", value: "Ordered" },
             ]}
-            placeholder="Select Purchase status"
+            placeholder="Select Sale status"
             
           />
             </div>
         </div>
+
+           {/* Payment Status */}
+        <div>
+        <label htmlFor="">Payment Status:*</label>
+            <div className="mt-3">
+            <Select
+            name="paymentStatus"
+            style={{ width: '100%'}}
+            options={[
+
+              { label: "Paid", value: "Paid" },
+              { label: "Unpaid", value: "Unpaid" },
+             
+            ]}
+            placeholder="Select Payment status"
+            onChange={handlePaymentStatusChange}
+            
+          />
+            </div>
+        </div>
+
+        {paymentStatus === 'Paid' && (
+          <div>
+          <label htmlFor="">Payment Method:</label>
+          <div className="mt-3">
+          <Select
+            name="paymentMethod"
+            style={{ width: '100%' }}
+            options={[
+              { label: 'Credit Card', value: 'Credit Card' },
+              { label: 'Bank Transfer', value: 'Bank Transfer' },
+              { label: 'PayPal', value: 'PayPal' },
+            ]}
+            placeholder="Select Payment Method"
+          />
+        </div>
+        </div>
+      )}
 
 
 
@@ -583,4 +628,4 @@ const addedProductPrice = addedProducts?.reduce(
   );
 };
 
-export default AddPurchase;
+export default AddSale;
