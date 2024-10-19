@@ -79,8 +79,18 @@ const Dashboard = ({ view, toggle }) => {
       pathName === "/Dashboard/Purchase/AddPurchase") {
       setActiveItem("purchases");
     } 
+
     else if (pathName === "/Dashboard/Purchase-return" || pathName === "/Dashboard/Purchase-return/AddPurchaseReturn") {
       setActiveItem("purchase-return");
+    } 
+
+    else if (pathName === "/Dashboard/Sale" ||
+      pathName === "/Dashboard/Sale/AddSale") {
+      setActiveItem("sales");
+    }
+
+  else if (pathName === "/Dashboard/Sale-return") {
+      setActiveItem("sale-return");
     } 
 
     else if (pathName === "/Dashboard/Customers") {
@@ -130,7 +140,7 @@ const Dashboard = ({ view, toggle }) => {
   };
 
   const getActiveClass = (item) =>
-    activeItem === item && "!bg-[#6c5ce7] text-white";
+    activeItem === item && "!bg-[#6c5ce7] text-white border-green-400 border-l-8 !rounded-none";
 
   const getActiveClass2 = (item) =>
     activeItem === item && "text-[#81ecec]";
@@ -172,7 +182,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/AdminHome'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7]   ${getActiveClass("dashboard")} `}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none   ${getActiveClass("dashboard")} `}
             selected={activeItem === "dashboard"}
             onClick={() => handleItemClick("dashboard")} 
             
@@ -188,7 +198,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Category'}>
                 <ListItem 
-                className={`hover:bg-[#6c5ce7]  ${getActiveClass("category")}`}
+                className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("category")}`}
                 selected={activeItem === "category"}
                 onClick={() => handleItemClick("category")}
                 >
@@ -207,7 +217,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Businesses'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7] ${getActiveClass("businesses")}`}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none ${getActiveClass("businesses")}`}
             selected={activeItem === "businesses"}
             onClick={() => handleItemClick("businesses")}
           >
@@ -235,7 +245,7 @@ const Dashboard = ({ view, toggle }) => {
             }
           >
             <ListItem
-              className={`p-0 hover:bg-[#6c5ce7] `}
+              className={`p-0 hover:bg-[#6c5ce7]  hover:!rounded-none `}
             >
               <AccordionHeader
                 onClick={() => handleOpen(1)}
@@ -269,7 +279,7 @@ const Dashboard = ({ view, toggle }) => {
               <List className="p-0">
               <Link href={'/Dashboard/ErpCategory'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7]   ${getActiveClass("erp-category")}`}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none   ${getActiveClass("erp-category")}`}
             selected={activeItem === "erp-category"}
             onClick={() => handleItemClick("erp-category")}
           >
@@ -284,7 +294,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Brand'}>
                 <ListItem 
-                className={`hover:bg-[#6c5ce7]  ${getActiveClass("brands")}`}
+                className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("brands")}`}
                 selected={activeItem === "brands"}
                 onClick={() => handleItemClick("brands")}
                 >
@@ -302,7 +312,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/product-type'}>
                 <ListItem 
-                className={`hover:bg-[#6c5ce7]  ${getActiveClass("product-type")}`}
+                className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("product-type")}`}
                 selected={activeItem === "product-type"}
                 onClick={() => handleItemClick("product-type")}
                 >
@@ -318,10 +328,10 @@ const Dashboard = ({ view, toggle }) => {
                 </ListItem>
           </Link>
 
-
+                      
           <Link href={'/Dashboard/product-unit'}>
                 <ListItem 
-                className={`hover:bg-[#6c5ce7]  ${getActiveClass("product-unit")}`}
+                className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("product-unit")}`}
                 selected={activeItem === "product-unit"}
                 onClick={() => handleItemClick("product-unit")}
                 >
@@ -339,7 +349,7 @@ const Dashboard = ({ view, toggle }) => {
           
           <Link href={'/Dashboard/Product'}>
                 <ListItem 
-                className={`hover:bg-[#6c5ce7]  ${getActiveClass("products")}`}
+                className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("products")}`}
                 selected={activeItem === "products"}
                 onClick={() => handleItemClick("products")}
                 >
@@ -362,7 +372,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Warehouses'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7]  ${getActiveClass("warehouses")}`}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("warehouses")}`}
             selected={activeItem === "warehouses"}
             onClick={() => handleItemClick("warehouses")}
           >
@@ -377,7 +387,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Suppliers'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7]  ${getActiveClass("suppliers")}`}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("suppliers")}`}
             selected={activeItem === "suppliers"}
             onClick={() => handleItemClick("suppliers")}
           >
@@ -405,7 +415,7 @@ const Dashboard = ({ view, toggle }) => {
             }
           >
             <ListItem
-              className={`p-0 hover:bg-[#6c5ce7] `}
+              className={`p-0 hover:bg-[#6c5ce7]  hover:!rounded-none `}
             >
               <AccordionHeader
                 onClick={() => handleOpen(2)}
@@ -439,7 +449,7 @@ const Dashboard = ({ view, toggle }) => {
               <List className="p-0">
               <Link href={'/Dashboard/Purchase'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7]   ${getActiveClass("purchases")}`}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none   ${getActiveClass("purchases")}`}
             selected={activeItem === "purchases"}
             onClick={() => handleItemClick("purchases")}
           >
@@ -454,7 +464,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Purchase-return'}>
                 <ListItem 
-                className={`hover:bg-[#6c5ce7]  ${getActiveClass("purchase-return")}`}
+                className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("purchase-return")}`}
                 selected={activeItem === "purchase-return"}
                 onClick={() => handleItemClick("purchase-return")}
                 >
@@ -489,7 +499,7 @@ const Dashboard = ({ view, toggle }) => {
             }
           >
             <ListItem
-              className={`p-0 hover:bg-[#6c5ce7] `}
+              className={`p-0 hover:bg-[#6c5ce7]  hover:!rounded-none`}
             >
               <AccordionHeader
                 onClick={() => handleOpen(3)}
@@ -512,7 +522,7 @@ const Dashboard = ({ view, toggle }) => {
                 </ListItemPrefix>
                 <Typography
                   color="white"
-                  className={`mr-auto font-normal ${hidden} `}
+                  className={`mr-auto font-normal ${hidden}  ${getActiveClass2("sale-return")} ${getActiveClass2("sales")}`}
                 >
                Sales
                 </Typography>
@@ -521,11 +531,11 @@ const Dashboard = ({ view, toggle }) => {
 
             <AccordionBody className="py-1">
               <List className="p-0">
-              <Link href={'/Dashboard/Purchase'}>
+              <Link href={'/Dashboard/Sale'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7]   ${getActiveClass("purchases")}`}
-            selected={activeItem === "purchases"}
-            onClick={() => handleItemClick("purchases")}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none   ${getActiveClass("sales")}`}
+            selected={activeItem === "sales"}
+            onClick={() => handleItemClick("sales")}
           >
             <ListItemPrefix>
               <MdShoppingCart className="h-5 w-5 text-white ms-2" />
@@ -536,11 +546,11 @@ const Dashboard = ({ view, toggle }) => {
           </ListItem>
           </Link>
 
-          <Link href={'/Dashboard/Purchase-return'}>
+          <Link href={'/Dashboard/Sale-return'}>
                 <ListItem 
-                className={`hover:bg-[#6c5ce7]  ${getActiveClass("purchase-return")}`}
-                selected={activeItem === "purchase-return"}
-                onClick={() => handleItemClick("purchase-return")}
+                className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("sale-return")}`}
+                selected={activeItem === "sale-return"}
+                onClick={() => handleItemClick("sale-return")}
                 >
                   <ListItemPrefix>
                     <FaLeftLong 
@@ -562,7 +572,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Customers'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7]  ${getActiveClass("customers")}`}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("customers")}`}
             selected={activeItem === "customers"}
             onClick={() => handleItemClick("customers")}
           >
@@ -578,7 +588,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Module'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7]  ${getActiveClass("module")}`}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("module")}`}
             selected={activeItem === "module"}
             onClick={() => handleItemClick("module")}
           >
@@ -594,7 +604,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Addresses'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7] ${getActiveClass("addresses")}`}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none ${getActiveClass("addresses")}`}
             selected={activeItem === "addresses"}
             onClick={() => handleItemClick("addresses")}
           >
@@ -610,7 +620,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Branch'}>
           <ListItem
-            className={`hover:bg-[#6c5ce7]  ${getActiveClass("branch")}`}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("branch")}`}
             selected={activeItem === "branch"}
             onClick={() => handleItemClick("branch")}
           >
@@ -626,7 +636,7 @@ const Dashboard = ({ view, toggle }) => {
 
           <Link href={'/Dashboard/Users'}>
            <ListItem
-            className={`hover:bg-[#6c5ce7]  ${getActiveClass("user")}`}
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("user")}`}
             selected={activeItem === "user"}
             onClick={() => handleItemClick("user")}
           >
