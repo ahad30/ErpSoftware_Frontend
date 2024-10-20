@@ -1,12 +1,12 @@
+import { useAppSelector } from "@/redux/Hook/Hook";
 import { Form, Radio } from "antd";
 import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-// import { useAppSelector } from "../../Redux/hook";
 
 const ZRadio = ({ name, label, options, defaultValue }) => {
   const { control } = useFormContext();
   const [value, setValue] = useState("");
-  // const { isEditModalOpen } = useAppSelector((state) => state.modal);
+  const { isEditModalOpen } = useAppSelector((state) => state.modal);
 
   const onChange = (value) => {
     console.log(value)
@@ -14,9 +14,7 @@ const ZRadio = ({ name, label, options, defaultValue }) => {
   };
 
   useEffect(() => {
-    if (defaultValue
-      //  || isEditModalOpen
-      ) {
+    if (defaultValue || isEditModalOpen) {
       setValue(defaultValue);
     }
   }, [defaultValue]);
