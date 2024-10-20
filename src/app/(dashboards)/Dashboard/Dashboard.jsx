@@ -49,6 +49,10 @@ const Dashboard = ({ view, toggle }) => {
     else if (pathName === "/Dashboard/Brand") {
       setActiveItem("brands")
     }
+    else if (pathName === "/Dashboard/Variation") {
+      setActiveItem("variations")
+    }
+
     else if (pathName === "/Dashboard/product-unit") {
       setActiveItem("product-unit")
     }
@@ -268,7 +272,7 @@ const Dashboard = ({ view, toggle }) => {
                 </ListItemPrefix>
                 <Typography
                   color="white"
-                  className={`mr-auto font-normal ${hidden} ${getActiveClass2("erp-category")} ${getActiveClass2("brands")} ${getActiveClass2("product-type")} ${getActiveClass2("products")} ${getActiveClass2("product-unit")}`}
+                  className={`mr-auto font-normal ${hidden} ${getActiveClass2("erp-category")} ${getActiveClass2("brands")} ${getActiveClass2("product-type")} ${getActiveClass2("products")} ${getActiveClass2("product-unit")} ${getActiveClass2("variations")}`}
                 >
                Products
                 </Typography>
@@ -306,6 +310,23 @@ const Dashboard = ({ view, toggle }) => {
                   </ListItemPrefix>
                   <Typography color="white" className={hidden}>
                    Brands
+                  </Typography>
+                </ListItem>
+          </Link>
+          <Link href={'/Dashboard/Variation'}>
+                <ListItem 
+                className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("variations")}`}
+                selected={activeItem === "variations"}
+                onClick={() => handleItemClick("variations")}
+                >
+                  <ListItemPrefix>
+                    <ChevronRightIcon 
+              
+                      className="h-4 w-4 ms-2 text-white"
+                      />
+                  </ListItemPrefix>
+                  <Typography color="white" className={hidden}>
+                   Variations
                   </Typography>
                 </ListItem>
           </Link>
