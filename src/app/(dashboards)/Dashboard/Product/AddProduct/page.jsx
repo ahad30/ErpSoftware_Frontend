@@ -59,7 +59,9 @@ const AddProduct = () => {
 
   return (
     <div className="">
-      {/* <BreadCrumb /> */}
+     <div className={`${pathName === "/Dashboard/pos" ? "hidden" : ""}`}>
+     <BreadCrumb />
+     </div>
       <ZFormTwo
         isLoading={CIsloading}
         isSuccess={CIsSuccess}
