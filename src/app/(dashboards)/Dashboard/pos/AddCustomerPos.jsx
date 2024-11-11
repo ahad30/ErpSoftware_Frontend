@@ -25,8 +25,8 @@ const AddCustomerPos = () => {
         title={"Add new customer"}
         centered
         open={isCustomerModalOpen}
-        width={700}
         onCancel={handleCancel}
+        width={700}
         okButtonProps={{ style: { display: "none" } }}
         cancelButtonProps={{ style: { display: "none" } }}
       >
