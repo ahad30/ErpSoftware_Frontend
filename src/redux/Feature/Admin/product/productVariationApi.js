@@ -1,4 +1,4 @@
-import baseApi from '../../../Api/baseApi';
+import baseApi from "@/redux/Api/baseApi";
 import { getTagsByModuleName } from "@/redux/Tag/Tag";
 
 const productVariationApi = baseApi.injectEndpoints({

@@ -7,13 +7,15 @@ import { useAppDispatch, useAppSelector } from "@/redux/Hook/Hook";
 import { setIsAddModalOpen } from "@/redux/Modal/ModalSlice";
 import { useAddProductVariationApiMutation } from "@/redux/Feature/Admin/product/productVariationApi";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import BreadCrumb from "@/components/BreadCrumb/BreadCrumb";
+import ZCheckbox from "@/components/Form/ZCheckbox";
 
 const AddVariation = () => {
   const dispatch = useAppDispatch();
   const [createProductVariation, { isLoading, isError, error, isSuccess, data }] =
     useAddProductVariationApiMutation();
   const { isAddModalOpen } = useAppSelector((state) => state.modal);
-  const [serialNumbers, setSerialNumbers] = useState([1]); // Dynamic serial number input
+  const [serialNumbers, setSerialNumbers] = useState([1]);
 
   useEffect(() => {
     if (!isAddModalOpen) {
@@ -23,11 +25,12 @@ const AddVariation = () => {
 
   // Handle form submission
   const handleSubmit = (formData) => {
-    const formattedData = {
-      ...formData,
-      // serialNumbers: serialNumbers.map((_, index) => formData[`serialNumbers.${index}`]),
-    };
-    createProductVariation(formattedData);
+    // const formattedData = {
+    //   ...formData,
+    //   // serialNumbers: serialNumbers.map((_, index) => formData[`serialNumbers.${index}`]),
+    // };
+    console.log(formData)
+    // createProductVariation(formData);
   };
 
   const handleAddSerial = () => {
@@ -45,18 +48,18 @@ const AddVariation = () => {
 
   return (
     <div>
+      <BreadCrumb/>
       <ZFormTwo
         isLoading={isLoading}
         isSuccess={isSuccess}
         isError={isError}
         error={error}
         submit={handleSubmit}
-        closeModal={handleCloseAndOpen}
         formType="create"
         data={data}
-        buttonName="Create Product Variation"
+        buttonName="Create"
       >
-        <div className="grid grid-cols-1 gap-3 mt-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-5">
           <ZInputTwo
             name="productID"
             type="number"
@@ -94,6 +97,12 @@ const AddVariation = () => {
             placeholder="Enter Sale Price"
           />
           <ZInputTwo
+            name="serialNo"
+            type="number"
+            label="Serial No"
+            placeholder="Enter Serial No"
+          />
+          <ZInputTwo
             name="purchasePrice"
             type="number"
             label="Purchase Price"
@@ -127,26 +136,31 @@ const AddVariation = () => {
             label="Product Image URL"
             placeholder="Enter Product Image URL"
           />
-          <ZInputTwo
-            name="is_warranty"
-            type="checkbox"
-            label="Warranty Available"
-          />
-          <ZInputTwo
-            name="is_guaranty"
-            type="checkbox"
-            label="Guaranty Available"
-          />
-          <ZInputTwo
+         <ZCheckbox
+            isSuccess={isSuccess}
+            // checkedAttributed={true}
+            label={"Is Download"}
             name="is_downloadable"
-            type="checkbox"
-            label="Is Downloadable"
           />
-          <ZInputTwo
+
+          <ZCheckbox
+            isSuccess={isSuccess}
+            // checkedAttributed={true}
+            label={"Is Virtual"}
             name="is_virtual"
-            type="checkbox"
-            label="Is Virtual"
           />
+           <ZCheckbox
+            isSuccess={isSuccess}
+            // checkedAttributed={true}
+            label={"Is Warranty"}
+            name="is_warranty"
+          />
+           <ZCheckbox
+            isSuccess={isSuccess}
+            // checkedAttributed={true}
+            label={"Is Guarantee"}
+            name="is_guaranty"
+          />        
 
           {/* Dynamic Serial Numbers Input */}
           {/* <div className="mb-3">
