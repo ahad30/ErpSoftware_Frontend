@@ -71,6 +71,10 @@ export const tags = [
     name: 'Warehouses',
     tag: 'warehouses'
   },
+  {
+    name: 'Attributes',
+    tag: 'attributes'
+  },
 
 ];
 

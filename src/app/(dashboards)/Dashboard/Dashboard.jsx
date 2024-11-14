@@ -116,6 +116,9 @@ const Dashboard = ({ view, toggle }) => {
     else if (pathName ==="/Dashboard/Users") {
       setActiveItem("user");
     }
+    else if (pathName ==="/Dashboard/Attributes") {
+      setActiveItem("attributes");
+    }
     else {
       setActiveItem("");
     }
@@ -417,6 +420,21 @@ const Dashboard = ({ view, toggle }) => {
             </ListItemPrefix>
             <Typography color="white" className={hidden}>
             Suppliers
+            </Typography>
+          </ListItem>
+          </Link>
+
+          <Link href={'/Dashboard/Attributes'}>
+          <ListItem
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("suppliers")}`}
+            selected={activeItem === "attributes"}
+            onClick={() => handleItemClick("attributes")}
+          >
+            <ListItemPrefix>
+              <MdOutlineImportContacts   className="h-5 w-5 text-white" />
+            </ListItemPrefix>
+            <Typography color="white" className={hidden}>
+            Attributes
             </Typography>
           </ListItem>
           </Link>
