@@ -12,7 +12,7 @@ import DeleteModal from "@/components/Modal/DeleteModal";
 import {
   useGetAttributesQuery,
   useDeleteAttributesMutation,
-} from "@/redux/Feature/Admin/attributes/attributes";
+} from "@/redux/Feature/Admin/product/attributes";
 
 import { setIsAddModalOpen, setIsEditModalOpen, setIsDeleteModalOpen } from "@/redux/Modal/ModalSlice";
 import AddAttributes from "./AddAttributes/page";
@@ -33,7 +33,7 @@ const Attributes = () => {
   // Mapping fetched data
   const attributeData = data?.data?.map((attribute, index) => ({
     key: index,
-    id: attribute.id,
+    id: attribute.attributeID,
     name: attribute.attributeName,
     businessID: attribute.businessID,
     branchID: attribute.branchID,

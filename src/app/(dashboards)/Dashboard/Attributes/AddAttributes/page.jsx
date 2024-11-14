@@ -4,7 +4,7 @@ import ZFormTwo from "@/components/Form/ZFormTwo";
 import ZInputTwo from "@/components/Form/ZInputTwo";
 import { useAppDispatch } from "@/redux/Hook/Hook";
 import { setIsAddModalOpen } from "@/redux/Modal/ModalSlice";
-import { useAddAttributesMutation } from "@/redux/Feature/Admin/attributes/attributes";
+import { useAddAttributesMutation } from "@/redux/Feature/Admin/product/attributes";
 
 const AddAttributes = () => {
   const dispatch = useAppDispatch();
