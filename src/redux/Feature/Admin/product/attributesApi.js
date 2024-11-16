@@ -17,6 +17,20 @@ const attributesApi = baseApi.injectEndpoints({
       invalidatesTags: getTagsByModuleName('Attributes'),
     }),
 
+    addAttributesValue: builder.mutation({
+      query: (data) => ({
+        url: "/attributes-value/create",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: data,
+      }),
+      // invalidatesTags: getTagsByModuleName('Attributes'),
+    }),
+
+
+
     // Get Attributes
     getAttributes: builder.query({
       query: () => ({
@@ -51,6 +65,7 @@ const attributesApi = baseApi.injectEndpoints({
 
 export const {
   useAddAttributesMutation,
+  useAddAttributesValueMutation,
   useGetAttributesQuery,
   useUpdateAttributesMutation,
   useDeleteAttributesMutation,

@@ -60,12 +60,7 @@ const AddVariation = () => {
         buttonName="Create"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-5">
-          <ZInputTwo
-            name="productID"
-            type="number"
-            label="Product ID"
-            placeholder="Enter Product ID"
-          />
+         
           <ZInputTwo
             name="sku"
             type="text"
@@ -126,17 +121,17 @@ const AddVariation = () => {
             label="Expiry Date"
             placeholder="Enter Expiry Date"
           />
-          <ZInputTextArea
+          {/* <ZInputTextArea
             name="qrCode"
             label="QR Code"
             placeholder="Enter QR Code Data"
-          />
+          /> */}
           <ZInputTextArea
             name="productImage"
             label="Product Image URL"
             placeholder="Enter Product Image URL"
           />
-         <ZCheckbox
+         {/* <ZCheckbox
             isSuccess={isSuccess}
             // checkedAttributed={true}
             label={"Is Download"}
@@ -160,7 +155,7 @@ const AddVariation = () => {
             // checkedAttributed={true}
             label={"Is Guarantee"}
             name="is_guaranty"
-          />        
+          />         */}
 
           {/* Dynamic Serial Numbers Input */}
           {/* <div className="mb-3">

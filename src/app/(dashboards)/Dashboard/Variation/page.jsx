@@ -125,7 +125,7 @@ const Variation = () => {
         <BreadCrumb />
       </div>
       <div className="flex flex-col lg:flex-row items-center gap-x-2 justify-end my-5">
-        <ButtonWithModal title="Add  Variation" path={"Dashboard/Variation/AddVariation"}></ButtonWithModal>
+        <ButtonWithModal title="Add  Variation" path={"/Dashboard/Variation/AddVariation"}></ButtonWithModal>
       </div>
 
       <DashboardTable columns={columns} data={variationData} loading={variationIsLoading} />

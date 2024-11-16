@@ -12,7 +12,7 @@ import DeleteModal from "@/components/Modal/DeleteModal";
 import {
   useGetAttributesQuery,
   useDeleteAttributesMutation,
-} from "@/redux/Feature/Admin/product/attributes";
+} from "@/redux/Feature/Admin/product/attributesApi";
 
 import { setIsAddModalOpen, setIsEditModalOpen, setIsDeleteModalOpen } from "@/redux/Modal/ModalSlice";
 import AddAttributes from "./AddAttributes/page";
@@ -28,15 +28,15 @@ const Attributes = () => {
   const [selectedAttribute, setSelectedAttribute] = useState({});
 
   // Mutation hook for deleting attribute
-  const [deleteAttribute, { isLoading: deleteIsLoading, isSuccess, isError }] = useDeleteAttributesMutation();
+  const [deleteAttribute, { isLoading: deleteIsLoading, isSuccess, isError , data : dData }] = useDeleteAttributesMutation();
 
   // Mapping fetched data
   const attributeData = data?.data?.map((attribute, index) => ({
     key: index,
     id: attribute.attributeID,
     name: attribute.attributeName,
-    businessID: attribute.businessID,
-    branchID: attribute.branchID,
+    // businessID: attribute.businessID,
+    // branchID: attribute.branchID,
   }));
 
   // Handlers
@@ -61,16 +61,16 @@ const Attributes = () => {
       dataIndex: "name",
       key: "name",
     },
-    {
-      title: "Business ID",
-      dataIndex: "businessID",
-      key: "businessID",
-    },
-    {
-      title: "Branch ID",
-      dataIndex: "branchID",
-      key: "branchID",
-    },
+    // {
+    //   title: "Business ID",
+    //   dataIndex: "businessID",
+    //   key: "businessID",
+    // },
+    // {
+    //   title: "Branch ID",
+    //   dataIndex: "branchID",
+    //   key: "branchID",
+    // },
     {
       title: "Action",
       key: "action",
@@ -121,6 +121,7 @@ const Attributes = () => {
         isLoading={deleteIsLoading}
         isSuccess={isSuccess}
         isError={isError}
+        data={dData}
         description="Are you sure you want to delete this attribute?"
       />
     </>
