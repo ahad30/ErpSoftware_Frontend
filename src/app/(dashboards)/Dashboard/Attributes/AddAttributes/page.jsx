@@ -78,7 +78,7 @@ const AddAttributes = () => {
   
       // Extract the attribute ID from the response
       const attributeID = result?.data?.attributeID;
-      console.log(result)
+      // console.log(result)
       if (!attributeID) {
         throw new Error("Attribute ID not found in response");
       }

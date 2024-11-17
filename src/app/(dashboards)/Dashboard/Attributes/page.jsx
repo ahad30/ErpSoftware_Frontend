@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Space, Tooltip, message, Button, Image } from "antd";
+import { Space, Tooltip, message, Button, Table } from "antd";
 import { CiEdit } from "react-icons/ci";
 import { AiOutlineDelete } from "react-icons/ai";
 import BreadCrumb from "@/components/BreadCrumb/BreadCrumb";
@@ -13,8 +13,11 @@ import {
   useGetAttributesQuery,
   useDeleteAttributesMutation,
 } from "@/redux/Feature/Admin/product/attributesApi";
-
-import { setIsAddModalOpen, setIsEditModalOpen, setIsDeleteModalOpen } from "@/redux/Modal/ModalSlice";
+import {
+  setIsAddModalOpen,
+  setIsEditModalOpen,
+  setIsDeleteModalOpen,
+} from "@/redux/Modal/ModalSlice";
 import AddAttributes from "./AddAttributes/page";
 import EditAttributes from "./EditAttributes/page";
 import ButtonWithModal from "@/components/Button/ButtonWithModal";
@@ -28,25 +31,28 @@ const Attributes = () => {
   const [selectedAttribute, setSelectedAttribute] = useState({});
 
   // Mutation hook for deleting attribute
-  const [deleteAttribute, { isLoading: deleteIsLoading, isSuccess, isError , data : dData }] = useDeleteAttributesMutation();
+  const [deleteAttribute, { isLoading: deleteIsLoading, isSuccess, isError, data: dData }] = useDeleteAttributesMutation();
 
-  // Mapping fetched data
-  const attributeData = data?.data?.map((attribute, index) => ({
-    key: index,
+  // Map fetched data
+  const attributeData = data?.data?.map((attribute) => ({
+    key: attribute.attributeID,
     id: attribute.attributeID,
     name: attribute.attributeName,
-    // businessID: attribute.businessID,
-    // branchID: attribute.branchID,
+    values: attribute.values.map((value) => ({
+      id: value.attributeValueID,
+      name: value.attributeValue,
+    })),
   }));
 
+
   // Handlers
-  const handleEditAttribute = (attribute) => {
-    setSelectedAttribute(attribute);
+  const handleEditAttribute = (attributeData) => {
+    setSelectedAttribute(attributeData);
     dispatch(setIsEditModalOpen());
   };
 
-  const handleDeleteAttribute = (attribute) => {
-    setSelectedAttribute(attribute);
+  const handleDeleteAttribute = (attributeData) => {
+    setSelectedAttribute(attributeData);
     dispatch(setIsDeleteModalOpen());
   };
 
@@ -61,16 +67,22 @@ const Attributes = () => {
       dataIndex: "name",
       key: "name",
     },
-    // {
-    //   title: "Business ID",
-    //   dataIndex: "businessID",
-    //   key: "businessID",
-    // },
-    // {
-    //   title: "Branch ID",
-    //   dataIndex: "branchID",
-    //   key: "branchID",
-    // },
+    {
+      title: "Values",
+      dataIndex: "values",
+      key: "values",
+      render: (values) =>
+        values.length ? (
+          <ul className="flex justify-center gap-2">
+            {values.map((value) => (
+              <li key={value.id}>{value.name}</li>
+            ))}
+          </ul>
+        ) : (
+          <span>No values</span>
+        ),
+    },
+    
     {
       title: "Action",
       key: "action",

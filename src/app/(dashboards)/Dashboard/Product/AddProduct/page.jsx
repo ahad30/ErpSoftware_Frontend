@@ -12,6 +12,7 @@ import { useGetBusinessesQuery } from "@/redux/Feature/Admin/businesses/business
 import { useAddProductMutation } from "@/redux/Feature/Admin/product/productApi";
 import ZInputTextArea from "@/components/Form/ZInputTextArea";
 import { useGetProductVariationApiQuery } from "@/redux/Feature/Admin/product/productVariationApi";
+import { useGetBranchesQuery } from "@/redux/Feature/Admin/branch/branchesApi";
 
 const AddProduct = () => {
   const router = useRouter();
@@ -31,6 +32,8 @@ const AddProduct = () => {
   const { data: bData, isLoading: bLoading } = useGetBrandQuery();
   const { data: businessData, isLoading: businessLoading } =
     useGetBusinessesQuery();
+  const { data: allBranchData, error, isLoading: branchIsLoading } = useGetBranchesQuery();
+
   const { data:vData, isLoading: variationIsLoading } = useGetProductVariationApiQuery();
 
 
@@ -54,7 +57,12 @@ const AddProduct = () => {
     value: variation.productVariantID,
   }));
 
+  const branchData = allBranchData?.data?.map((branch) => ({
+    label: branch.branchName,
+    value: branch.branchID,
+  }));
 
+ 
 
 
 
@@ -115,6 +123,15 @@ const AddProduct = () => {
             options={businessOptions}
             isLoading={businessLoading}
           />
+           <ZSelect
+            name="branchIDs"
+            mode={"multiple"}
+            label="Branch Name"
+            placeholder="Select Available Branch"
+            options={branchData}
+            isLoading={branchIsLoading}
+          />
+
           <ZSelect
             name="erpCategoryID"
             isLoading={eLoading}
@@ -129,6 +146,10 @@ const AddProduct = () => {
             options={brandData}
             placeholder="Select brand"
           />
+
+
+
+
           <ZInputTextArea
             name="description"
             type="text"
@@ -139,12 +160,7 @@ const AddProduct = () => {
 </>)
 
            :(<>
-            {/* <ZInputTwo
-            name="productID"
-            type="number"
-            label="Product Id"
-            placeholder="Enter product Id"
-          /> */}
+       
           <ZSelect
             name="businessID"
             label="Business Name"
@@ -167,7 +183,24 @@ const AddProduct = () => {
             placeholder="Select brand"
           /> */}
 
-<ZSelect
+       <ZSelect
+            name="branchIDs"
+            mode={"multiple"}
+            label="Branch Name"
+            placeholder="Select Available Branch"
+            options={branchData}
+            isLoading={branchIsLoading}
+          />
+       <ZSelect
+            name="notAvailableBranchIDs"
+            mode={"multiple"}
+            label="Not available Branch Name"
+            placeholder="Select Not Available Branch"
+            options={branchData}
+            isLoading={branchIsLoading}
+          />
+
+        <ZSelect
             name="variationID"
             label="Variation Name"
             placeholder="Select Variation"

@@ -52,6 +52,22 @@ const attributesApi = baseApi.injectEndpoints({
       invalidatesTags: getTagsByModuleName('Attributes'),
     }),
 
+    updateAttributesValue: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/attributes-value/update/${id}`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PATCH",
+        body: data,
+      }),
+      // invalidatesTags: getTagsByModuleName('Attributes'),
+    }),
+
+
+
+
+
     // Delete Attributes
     deleteAttributes: builder.mutation({
       query: (id) => ({
@@ -68,5 +84,6 @@ export const {
   useAddAttributesValueMutation,
   useGetAttributesQuery,
   useUpdateAttributesMutation,
+  useUpdateAttributesValueMutation,
   useDeleteAttributesMutation,
 } = attributesApi;
