@@ -37,7 +37,7 @@ const ZCheckbox = ({
       render={({ field, fieldState: { error } }) => {
         const handleChange = (e) => {
           const isChecked = e.target.checked;
-          console.log(isChecked)
+          // console.log(isChecked)
           setIsChecked(isChecked);
           field.onChange(isChecked); 
         };

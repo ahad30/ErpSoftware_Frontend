@@ -116,6 +116,9 @@ const Dashboard = ({ view, toggle }) => {
     else if (pathName ==="/Dashboard/Users") {
       setActiveItem("user");
     }
+    else if (pathName ==="/Dashboard/Attributes") {
+      setActiveItem("attributes");
+    }
     else {
       setActiveItem("");
     }
@@ -182,6 +185,7 @@ const Dashboard = ({ view, toggle }) => {
             </div>
           )}
         </div>
+        
         <List className="mt-2">
 
           <Link href={'/Dashboard/AdminHome'}>
@@ -272,7 +276,7 @@ const Dashboard = ({ view, toggle }) => {
                 </ListItemPrefix>
                 <Typography
                   color="white"
-                  className={`mr-auto font-normal ${hidden} ${getActiveClass2("erp-category")} ${getActiveClass2("brands")} ${getActiveClass2("product-type")} ${getActiveClass2("products")} ${getActiveClass2("product-unit")} ${getActiveClass2("variations")}`}
+                  className={`mr-auto font-normal ${hidden} ${getActiveClass2("erp-category")} ${getActiveClass2("brands")} ${getActiveClass2("product-type")} ${getActiveClass2("products")} ${getActiveClass2("product-unit")} ${getActiveClass2("variations")}  ${getActiveClass2("attributes")}`}
                 >
                Products
                 </Typography>
@@ -281,6 +285,7 @@ const Dashboard = ({ view, toggle }) => {
 
             <AccordionBody className="py-1">
               <List className="p-0">
+
               <Link href={'/Dashboard/ErpCategory'}>
           <ListItem
             className={`hover:bg-[#6c5ce7]  hover:!rounded-none   ${getActiveClass("erp-category")}`}
@@ -313,6 +318,24 @@ const Dashboard = ({ view, toggle }) => {
                   </Typography>
                 </ListItem>
           </Link>
+
+          <Link href={'/Dashboard/Attributes'}>
+          <ListItem
+            className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("attributes")}`}
+            selected={activeItem === "attributes"}
+            onClick={() => handleItemClick("attributes")}
+          >
+            <ListItemPrefix>
+              <ChevronRightIcon    className="h-4 w-4 ms-2 text-white" />
+            </ListItemPrefix>
+            <Typography color="white" className={hidden}>
+            Attributes
+            </Typography>
+          </ListItem>
+          </Link>
+
+
+
           <Link href={'/Dashboard/Variation'}>
                 <ListItem 
                 className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("variations")}`}
@@ -385,6 +408,10 @@ const Dashboard = ({ view, toggle }) => {
                   </Typography>
                 </ListItem>
           </Link>
+
+
+
+
               </List>
             </AccordionBody>
             
@@ -420,6 +447,8 @@ const Dashboard = ({ view, toggle }) => {
             </Typography>
           </ListItem>
           </Link>
+
+
 
 
         {/* Purchase */}

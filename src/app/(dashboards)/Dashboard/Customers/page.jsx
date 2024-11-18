@@ -22,6 +22,7 @@ const Customer = () => {
   const { isAddModalOpen, isEditModalOpen, isDeleteModalOpen } = useAppSelector((state) => state.modal);
   const [selectedCustomer, setSelectedCustomer] = useState({});
   const [deleteCustomer, { isLoading: dCIsloading, isError, isSuccess, data: dCData, error: dCError }] = useDeleteCustomerMutation(); 
+    
   // Mapping customer data
   const customerData = data?.data?.map((customer, index) => ({
     key: index,
@@ -45,7 +46,7 @@ const Customer = () => {
     branchID: customer.branchID // Added branchID
   }));
   
-  console.log(data)
+  // console.log(data)
 
   const handleEditCustomer = (customerData) => {
     setSelectedCustomer(customerData);

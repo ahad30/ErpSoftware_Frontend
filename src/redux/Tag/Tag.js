@@ -34,6 +34,10 @@ export const tags = [
     name: 'ProductUnit',
     tag: 'productUnits',
   },
+  {
+    name: 'ProductVariationApi',
+    tag: 'productVariationApi',
+  },
 
   {
     name: 'ErpBusinesses',
@@ -66,6 +70,10 @@ export const tags = [
   {
     name: 'Warehouses',
     tag: 'warehouses'
+  },
+  {
+    name: 'Attributes',
+    tag: 'attributes'
   },
 
 ];

@@ -130,7 +130,13 @@ const Product = () => {
     },
   ];
 
-  if (error) return <p>Error loading products</p>;
+ 
+ if( data?.data?.length === 0){
+  return <div className="text-red-600 font-bold text-center">No Product Found</div>
+ }
+
+//  if (error) return <p>Error loading products</p>;
+
 
   return (
     <>

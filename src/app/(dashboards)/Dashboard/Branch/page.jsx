@@ -87,6 +87,7 @@ const Branches = () => {
       branchID,
     };
   });
+  
 // console.log(branchData);
 
   const handledl = (branchData) => {
