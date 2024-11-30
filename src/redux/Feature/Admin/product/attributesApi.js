@@ -76,6 +76,15 @@ const attributesApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: getTagsByModuleName('Attributes'),
     }),
+
+    // Delete Attributes Values
+    deleteAttributesValues: builder.mutation({
+      query: (id) => ({
+        url: `/attributes-value/delete/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: getTagsByModuleName('Attributes'),
+    }),
   }),
 });
 
@@ -86,4 +95,6 @@ export const {
   useUpdateAttributesMutation,
   useUpdateAttributesValueMutation,
   useDeleteAttributesMutation,
+  useDeleteAttributesValuesMutation,
+
 } = attributesApi;
