@@ -66,6 +66,23 @@ const EditAttributes = ({ selectedAttribute }) => {
           name: item.name,
         })),
       };
+
+
+      // const valuesData = data?.values?.filter(
+      //   (item) => item !== undefined && item !== ""
+      // );
+  
+     
+      // const formData = {
+      //   name: data.name,
+      //   values: valuesData || [], 
+      //   value_ids: deletedIds || [],
+      // };
+
+
+
+
+
   
       console.log("Updated Data to Submit:", updatedData);
   
