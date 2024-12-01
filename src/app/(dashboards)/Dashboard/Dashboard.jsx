@@ -49,7 +49,7 @@ const Dashboard = ({ view, toggle }) => {
     else if (pathName === "/Dashboard/Brand") {
       setActiveItem("brands")
     }
-    else if (pathName === "/Dashboard/Variation") {
+    else if (pathName === "/Dashboard/Variation" || pathName === "/Dashboard/Variation/AddVariation"  ) {
       setActiveItem("variations")
     }
 
@@ -354,7 +354,7 @@ const Dashboard = ({ view, toggle }) => {
                 </ListItem>
           </Link>
 
-          <Link href={'/Dashboard/product-type'}>
+          {/* <Link href={'/Dashboard/product-type'}>
                 <ListItem 
                 className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("product-type")}`}
                 selected={activeItem === "product-type"}
@@ -389,7 +389,7 @@ const Dashboard = ({ view, toggle }) => {
                    Products-Unit
                   </Typography>
                 </ListItem>
-          </Link>
+          </Link> */}
           
           <Link href={'/Dashboard/Product'}>
                 <ListItem 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import ZFormTwo from "@/components/Form/ZFormTwo";
 import ZInputTwo from "@/components/Form/ZInputTwo";
@@ -13,10 +13,11 @@ import { useAddProductMutation } from "@/redux/Feature/Admin/product/productApi"
 import ZInputTextArea from "@/components/Form/ZInputTextArea";
 import { useGetProductVariationApiQuery } from "@/redux/Feature/Admin/product/productVariationApi";
 import { useGetBranchesQuery } from "@/redux/Feature/Admin/branch/branchesApi";
+import ZRadio from "@/components/Form/ZRadio";
 
 const AddProduct = () => {
-  const router = useRouter();
-  const pathName = usePathname()
+  const [productType, setProductType] = useState("");
+ 
   const [
     createProduct,
     {
@@ -33,8 +34,9 @@ const AddProduct = () => {
   const { data: businessData, isLoading: businessLoading } =
     useGetBusinessesQuery();
   const { data: allBranchData, error, isLoading: branchIsLoading } = useGetBranchesQuery();
-
   const { data:vData, isLoading: variationIsLoading } = useGetProductVariationApiQuery();
+  const router = useRouter();
+  const pathName = usePathname()
 
 
   const businessOptions = businessData?.data?.map((business) => ({
@@ -68,8 +70,8 @@ const AddProduct = () => {
 
 
   const handleSubmit = (data) => {
-    //  console.log(data)
-    createProduct(data);
+     console.log(data)
+    // createProduct(data);
   };
 
   // useEffect(() => {
@@ -160,63 +162,8 @@ const AddProduct = () => {
 </>)
 
            :(<>
-       
-          <ZSelect
-            name="businessID"
-            label="Business Name"
-            placeholder="Select business"
-            options={businessOptions}
-            isLoading={businessLoading}
-          />
-          {/* <ZSelect
-            name="erpCategoryID"
-            isLoading={eLoading}
-            label="Product Category"
-            options={categoryData}
-            placeholder="Select category"
-          />
-          <ZSelect
-            name="brandID"
-            isLoading={bLoading}
-            label="Product Brand"
-            options={brandData}
-            placeholder="Select brand"
-          /> */}
 
-       <ZSelect
-            name="branchIDs"
-            mode={"multiple"}
-            label="Branch Name"
-            placeholder="Select Available Branch"
-            options={branchData}
-            isLoading={branchIsLoading}
-          />
-       <ZSelect
-            name="notAvailableBranchIDs"
-            mode={"multiple"}
-            label="Not available Branch Name"
-            placeholder="Select Not Available Branch"
-            options={branchData}
-            isLoading={branchIsLoading}
-          />
-
-        <ZSelect
-            name="variationID"
-            label="Variation Name"
-            placeholder="Select Variation"
-            options={variationData}
-            isLoading={variationIsLoading}
-          />
-          <ZSelect
-            name="isActive"
-            label="Status"
-            options={[
-              { label: "Active", value: true },
-              { label: "Inactive", value: false },
-            ]}
-            placeholder="Select status"
-          />
-          <ZInputTwo
+           <ZInputTwo
             name="productTitle"
             type="text"
             label="Product Title"
@@ -228,19 +175,160 @@ const AddProduct = () => {
             label="Subtitle"
             placeholder="Enter product subtitle"
           />
-          <ZInputTextArea
+           <ZInputTwo
+            name="sku"
+            type="text"
+            label="SKU"
+            placeholder="Enter SKU"
+          />     
+
+          <ZSelect
+            name="erpCategoryID"
+            isLoading={eLoading}
+            label="Product Category"
+            options={categoryData}
+            placeholder="Select category"
+          />
+
+          <ZSelect
+            name="brandID"
+            isLoading={bLoading}
+            label="Product Brand"
+            options={brandData}
+            placeholder="Select brand"
+          />
+
+         <ZSelect
+            name="businessID"
+            label="Business Name"
+            placeholder="Select business"
+            options={businessOptions}
+            isLoading={businessLoading}
+          />
+
+         <ZSelect
+            name="branchIDs"
+            mode={"multiple"}
+            label="Branch Name"
+            placeholder="Select Available Branch"
+            options={branchData}
+            isLoading={branchIsLoading}
+          />
+         <ZSelect
+            name="notAvailableBranchIDs"
+            mode={"multiple"}
+            label="Not available Branch Name"
+            placeholder="Select Not Available Branch"
+            options={branchData}
+            isLoading={branchIsLoading}
+          />
+
+               
+       <div className="col-span-2">
+       <ZInputTextArea
             name="productDescription"
             type="text"
             label="Description"
             placeholder="Enter product description"
           />
-          <ZInputTwo
-            name="sku"
-            type="text"
-            label="SKU"
-            placeholder="Enter SKU"
+       </div>
+       <ZInputTwo
+            name="expiryDate"
+            type="date"
+            label="Expiry Date"
+            placeholder="Enter Expiry Date"
           />
-          <ZCheckbox
+          <ZSelect
+            name="isActive"
+            label="Status"
+            options={[
+              { label: "Active", value: true },
+              { label: "Inactive", value: false },
+            ]}
+            placeholder="Select status"
+          />
+
+        <div className="mt-7 lg:col-span-2">
+          <h5 className="text-xl  pb-2 mb-2  ">Type of products</h5>
+          <ZRadio
+            options={[
+              {
+                name: "Single",
+                value: "1",
+              },
+              {
+                name: "Variant",
+                value: "0",
+              },
+            ]}
+            name={"is_single_product"}
+            label={"Product type"}
+            setProductType={setProductType}
+          ></ZRadio>
+        </div>
+
+
+         {productType === "1" &&
+          (
+            <>
+            
+            <ZInputTwo
+            name="stock"
+            type="number"
+            label="Stock Quantity"
+            placeholder="Enter Stock Quantity"
+            />
+          
+          <ZInputTwo
+            name="min_stock"
+            type="number"
+            label="Minimum Stock"
+            placeholder="Enter Minimum Stock"
+          />
+          <ZInputTwo
+            name="max_stock"
+            type="number"
+            label="Maximum Stock"
+            placeholder="Enter Maximum Stock"
+          />
+          <ZInputTwo
+            name="salePrice"
+            type="number"
+            label="Sale Price"
+            placeholder="Enter Sale Price"
+          />
+          <ZInputTwo
+            name="serialNo"
+            type="number"
+            label="Serial No"
+            placeholder="Enter Serial No"
+          />
+          <ZInputTwo
+            name="purchasePrice"
+            type="number"
+            label="Purchase Price"
+            placeholder="Enter Purchase Price"
+          />
+          <ZInputTwo
+            name="wholeSalePrice"
+            type="number"
+            label="Wholesale Price"
+            placeholder="Enter Wholesale Price"
+          />
+          <ZInputTwo
+            name="retailPrice"
+            type="number"
+            label="Retail Price"
+            placeholder="Enter Retail Price"
+          />
+            </>
+          )
+         }
+      
+
+
+
+          {/* <ZCheckbox
             isSuccess={CIsSuccess}
             checkedAttribute={true}
             label="Is All Branch"
@@ -264,6 +352,7 @@ const AddProduct = () => {
             label="Is Delivery Available"
             name="isDeliveryAvailable"
           />
+
           <ZCheckbox
             isSuccess={CIsSuccess}
             checkedAttribute={false}
@@ -288,7 +377,7 @@ const AddProduct = () => {
             checkedAttribute={false}
             label="Is SD Applicable"
             name="isSDApplicable"
-          />
+          /> */}
            </>)
           }
         </div>

@@ -3,14 +3,17 @@ import { Form, Radio } from "antd";
 import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
-const ZRadio = ({ name, label, options, defaultValue }) => {
+const ZRadio = ({ name, label, options, defaultValue, setProductType}) => {
   const { control } = useFormContext();
   const [value, setValue] = useState("");
   const { isEditModalOpen } = useAppSelector((state) => state.modal);
 
   const onChange = (value) => {
-    console.log(value)
+    // console.log(value)
     setValue(value);
+    if (setProductType) {
+      setProductType(value);
+    }
   };
 
   useEffect(() => {

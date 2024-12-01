@@ -9,11 +9,13 @@ import {
   useAddAttributesValueMutation,
 } from "@/redux/Feature/Admin/product/attributesApi";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import { useRouter } from "next/navigation";
 
 const AddAttributes = () => {
   const dispatch = useAppDispatch();
   const [addonPages, setAddonPages] = useState([1]);
   const { isAddModalOpen } = useAppSelector((state) => state.modal);
+  // const router = useRouter();
 
   const [
     createAttribute,
@@ -21,7 +23,7 @@ const AddAttributes = () => {
   ] = useAddAttributesMutation();
 
   // Hook for second API call
-  const [addAttributesValue , {  isVSuccess, isLoading: valueIsLoading, data: Vdata }] = useAddAttributesValueMutation();
+  const [addAttributesValue , {  isVSuccess, isLoading: valueIsLoading, data: vData }] = useAddAttributesValueMutation();
 
 
  
@@ -29,8 +31,10 @@ const AddAttributes = () => {
     if (!isAddModalOpen) {
       setAddonPages([1]);
     }
+    // if(isSuccess){
+    //   router.push("/Dashboard/Variation")
+    // }
     
-
   }, [isAddModalOpen]);
   
   
@@ -81,8 +85,6 @@ const AddAttributes = () => {
     setAddonPages(updatedPages);
   };
   
-  
-  
   const handleCloseAndOpen = () => {
     dispatch(setIsAddModalOpen());
   };
@@ -97,7 +99,8 @@ const AddAttributes = () => {
         submit={handleSubmit}
         closeModal={handleCloseAndOpen}
         formType="create"
-        data={data}
+        data={data || vData
+        }
         buttonName="Create Attribute"
       >
         <div className="grid grid-cols-1 gap-3 mt-10">

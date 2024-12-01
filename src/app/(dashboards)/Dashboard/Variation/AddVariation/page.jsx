@@ -10,41 +10,37 @@ import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import BreadCrumb from "@/components/BreadCrumb/BreadCrumb";
 import ZCheckbox from "@/components/Form/ZCheckbox";
 
+
+function generateUniqueId(length = 8) {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+
 const AddVariation = () => {
   const dispatch = useAppDispatch();
   const [createProductVariation, { isLoading, isError, error, isSuccess, data }] =
     useAddProductVariationApiMutation();
   const { isAddModalOpen } = useAppSelector((state) => state.modal);
-  const [serialNumbers, setSerialNumbers] = useState([1]);
 
   useEffect(() => {
     if (!isAddModalOpen) {
-      setSerialNumbers([1]);
+      // setSerialNumbers([1]);
     }
   }, [isAddModalOpen]);
 
-  // Handle form submission
+
   const handleSubmit = (formData) => {
-    // const formattedData = {
-    //   ...formData,
-    //   // serialNumbers: serialNumbers.map((_, index) => formData[`serialNumbers.${index}`]),
-    // };
-    console.log(formData)
-    // createProductVariation(formData);
+      console.log(formData)
+      createProductVariation({...formData, productID : 1});
   };
 
-  const handleAddSerial = () => {
-    setSerialNumbers([...serialNumbers, serialNumbers.length + 1]);
-  };
 
-  const handleRemoveSerial = (index) => {
-    const updatedSerials = serialNumbers.filter((_, i) => i !== index);
-    setSerialNumbers(updatedSerials);
-  };
-
-  const handleCloseAndOpen = () => {
-    dispatch(setIsAddModalOpen());
-  };
 
   return (
     <div>
