@@ -14,10 +14,55 @@ import ZInputTextArea from "@/components/Form/ZInputTextArea";
 import { useGetProductVariationApiQuery } from "@/redux/Feature/Admin/product/productVariationApi";
 import { useGetBranchesQuery } from "@/redux/Feature/Admin/branch/branchesApi";
 import ZRadio from "@/components/Form/ZRadio";
+import ZImageInput from "@/components/Form/ZImageInput";
+import { useGetAttributesQuery } from "@/redux/Feature/Admin/product/attributesApi";
+import { Button, Spin } from "antd";
+import ZNumber from "@/components/Form/ZNumber";
 
 const AddProduct = () => {
+   // attribute State - 1 from db
+   const [attributeValue, setAttributeValue] = useState([]);
+
+   // selected attribute State - 2
+   const [selectedAttribute, setSelectedAttribute] = useState([]);
+   // attribute options for selected options state-3
+   const [attributeOptions, setAttributeOptions] = useState([]);
+     //  product type state - 4
   const [productType, setProductType] = useState("");
+    // selectedAttribute UnderTheValue - 5
+  const [selectedAttributeUnderTheValue, setSelectedAttributeUnderTheValue] =useState([]);
+   // per sku - 6
+  const [perSku, setPerSku] = useState([]);
+   //  skus - 7
+  const [skus, setSkus] = useState([]);
+
+  //  refresh state for variant
+  const [refresh, setRefresh] = useState(false);
  
+
+    // image file , price , quantity - 8 for vairant product
+    const [priceQuantityImage, setPriceQuantityImage] = useState({
+      price: "",
+      image: "",
+      quantity: "",
+    });
+  
+    // single -----> image file , price , quantity - 9
+    const [singlePriceQuantityImage, singleSetPriceQuantityImage] = useState({
+      singlePrice: "",
+      images: "",
+      singleQuantity: "",
+    });
+
+  const router = useRouter();
+  const pathName = usePathname()
+
+  const { data: eData, isLoading: eLoading } = useGetErpCategoryQuery();
+  const { data: bData, isLoading: bLoading } = useGetBrandQuery();
+  const { data: businessData, isLoading: businessLoading } =
+    useGetBusinessesQuery();
+  const { data: allBranchData, error, isLoading: branchIsLoading } = useGetBranchesQuery();
+  const { data: attributeWithValue, isLoading: attributeIsLoading  } = useGetAttributesQuery();
   const [
     createProduct,
     {
@@ -29,15 +74,7 @@ const AddProduct = () => {
     },
   ] = useAddProductMutation();
 
-  const { data: eData, isLoading: eLoading } = useGetErpCategoryQuery();
-  const { data: bData, isLoading: bLoading } = useGetBrandQuery();
-  const { data: businessData, isLoading: businessLoading } =
-    useGetBusinessesQuery();
-  const { data: allBranchData, error, isLoading: branchIsLoading } = useGetBranchesQuery();
-  const { data:vData, isLoading: variationIsLoading } = useGetProductVariationApiQuery();
-  const router = useRouter();
-  const pathName = usePathname()
-
+  //  console.log(attributeWithValue);
 
   const businessOptions = businessData?.data?.map((business) => ({
     label: business.businessName,
@@ -54,31 +91,78 @@ const AddProduct = () => {
     value: brand.brandID,
   }));
 
-  const variationData = vData?.data?.map((variation) => ({
-    label: variation.sku,
-    value: variation.productVariantID,
-  }));
-
   const branchData = allBranchData?.data?.map((branch) => ({
     label: branch.branchName,
     value: branch.branchID,
   }));
 
- 
+
+  useEffect(() => {
+    if (
+      Array.isArray(attributeWithValue?.data) &&
+      attributeWithValue?.data?.length > 0
+    ) {
+      const attributeOptions = attributeWithValue?.data?.map((item) => ({
+        label: item.attributeName,
+        value: item.attributeName,
+      }));
+      setAttributeOptions([...attributeOptions]);
+      setAttributeValue([...attributeWithValue.data]);
+    }
+  }, [attributeWithValue, attributeWithValue?.data]);
 
 
+  useEffect(() => {
+    if (selectedAttribute) {
+      const arr = [];
+      for (let index = 0; index < selectedAttribute.length; index++) {
+        const element = selectedAttribute[index];
+        const findTheAttributeWithValue = attributeValue?.find(
+          (item) => item.attributeName == element
+        );
+
+        if (findTheAttributeWithValue) {
+          arr.push({ ...findTheAttributeWithValue });
+        }
+      }
+      setSelectedAttributeUnderTheValue([...(arr || [])]);
+    }
+  }, [selectedAttribute.length, selectedAttribute, attributeValue]);
+
+  useEffect(() => {
+    setSkus([]);
+  }, [productType]);
+
+
+  useEffect(() => {
+    if (CIsSuccess) {
+      router.push("/Dashboard/Product");
+    }
+  }, [CIsSuccess, router]);
+
+  const handleRefreshVariantState = () => {
+    setPerSku([]);
+    // setPriceQuantityImage({
+    //   price: "",
+    //   image: "",
+    //   quantity: "",
+    // });
+    setRefresh(!refresh);
+  };
 
 
   const handleSubmit = (data) => {
-     console.log(data)
-    // createProduct(data);
-  };
+    console.log(data)
+   // createProduct(data);
+ };
 
-  // useEffect(() => {
-  //   if (CIsSuccess) {
-  //     router.push("/Dashboard/Product");
-  //   }
-  // }, [CIsSuccess, router]);
+  if (eLoading || bLoading || attributeIsLoading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <p><Spin size="large"/></p>
+      </div>
+    );
+  }
 
   return (
     <div className="">
@@ -95,10 +179,11 @@ const AddProduct = () => {
         data={data}
         buttonName="Create"
       >
-        <div className="grid md:grid-cols-2 grid-cols-1 gap-3 mt-10">
+       
           {
             pathName === "/Dashboard/pos" ? 
 (<>
+   <div className="grid md:grid-cols-2 grid-cols-1 gap-3 mt-10">
   <ZInputTwo
             name="productTitle"
             type="text"
@@ -158,10 +243,14 @@ const AddProduct = () => {
             label="Description"
             placeholder="Enter product description"
           />
+      </div>
 
 </>)
 
-           :(<>
+           :(
+           <>
+
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-3 mt-10">
 
            <ZInputTwo
             name="productTitle"
@@ -237,7 +326,10 @@ const AddProduct = () => {
             type="date"
             label="Expiry Date"
             placeholder="Enter Expiry Date"
-          />
+        />
+
+       <ZImageInput label="Product Image" name="productImage"></ZImageInput>
+
           <ZSelect
             name="isActive"
             label="Status"
@@ -253,77 +345,213 @@ const AddProduct = () => {
           <ZRadio
             options={[
               {
-                name: "Single",
+                name: "Without Variant",
                 value: "1",
               },
               {
-                name: "Variant",
+                name: "With Variant",
                 value: "0",
               },
             ]}
-            name={"is_single_product"}
+            name={"isVariation"}
             label={"Product type"}
             setProductType={setProductType}
           ></ZRadio>
         </div>
 
 
+
+        {/* single Product type start */}
+         
          {productType === "1" &&
           (
             <>
             
-            <ZInputTwo
+            <ZNumber
             name="stock"
+            type="number"
+            label="Stock Quantity"
+            placeholder="Enter Stock Quantity"
+            refresh={refresh}
+            />
+          
+          <ZNumber
+            name="min_stock"
+            type="number"
+            label="Minimum Stock"
+            placeholder="Enter Minimum Stock"
+            refresh={refresh}
+
+          />
+          <ZNumber
+            name="max_stock"
+            type="number"
+            label="Maximum Stock"
+            placeholder="Enter Maximum Stock"
+            refresh={refresh}
+
+          />
+          <ZNumber
+            name="salePrice"
+            type="number"
+            label="Sale Price"
+            placeholder="Enter Sale Price"
+            refresh={refresh}
+
+          />
+          <ZNumber
+            name="serialNo"
+            type="number"
+            label="Serial No"
+            placeholder="Enter Serial No"
+            refresh={refresh}
+
+          />
+          <ZNumber
+            name="purchasePrice"
+            type="number"
+            label="Purchase Price"
+            placeholder="Enter Purchase Price"
+            refresh={refresh}
+
+          />
+          <ZNumber
+            name="wholeSalePrice"
+            type="number"
+            label="Wholesale Price"
+            placeholder="Enter Wholesale Price"
+            refresh={refresh}
+
+          />
+          <ZNumber
+            name="retailPrice"
+            type="number"
+            label="Retail Price"
+            placeholder="Enter Retail Price"
+            refresh={refresh}
+
+          />
+            </>
+          )
+         }
+         </div>
+
+           {/* variant Product type start */}
+           {productType === "0" && (
+          <div className="mb-3">
+            {/* per sku  */}
+
+            {/* multiple attribute */}
+            <ZSelect
+              setSelectedAttributes={setSelectedAttribute}
+              options={attributeOptions}
+              isLoading={attributeIsLoading}
+              mode={"multiple"}
+              label={"Select Attributes"}
+              name={"attribute-selected"}
+              defaultKey="product"
+              placeholder={"Select Variant Name"}
+              refresh={refresh}
+            ></ZSelect>
+
+            {/* selected attribute underTheValue */}
+            <div className="border border-gray-400 p-3">
+              {/* attribute value */}
+              <div className="mt-12 grid lg:grid-cols-5 gap-5">
+                {selectedAttributeUnderTheValue.map((item) => {
+                  return (
+                    <ZSelect
+                      key={item?.id}
+                      options={item?.values?.map((option) => ({
+                        value: `${item?.attributeName}-${option?.attributeValue}`,
+                        label: option?.attributeValue,
+                      }))}
+                      isLoading={attributeIsLoading}
+                      mode={undefined}
+                      label={`${item.attributeName} value`}
+                      name={`${item.attributeName}`}
+                      setPerSku={setPerSku}
+                      defaultKey="product"
+                      selectedAttribute={selectedAttribute}
+                      refresh={refresh}
+                      placeholder={`Select ${item.attributeName} value`}
+                    ></ZSelect>
+                  );
+                })}
+              </div>
+              {/* image, quantity, price*/}
+              <div className="grid grid-cols-1 items-center gap-x-2 lg:grid-cols-3">
+              <>
+            
+            <ZNumber
+            name="variationStock"
             type="number"
             label="Stock Quantity"
             placeholder="Enter Stock Quantity"
             />
           
-          <ZInputTwo
-            name="min_stock"
+          <ZNumber
+            name="variation_min_stock"
             type="number"
             label="Minimum Stock"
             placeholder="Enter Minimum Stock"
           />
-          <ZInputTwo
-            name="max_stock"
+          <ZNumber
+            name="variation_max_stock"
             type="number"
             label="Maximum Stock"
             placeholder="Enter Maximum Stock"
           />
-          <ZInputTwo
-            name="salePrice"
+          <ZNumber
+            name="variationSalePrice"
             type="number"
             label="Sale Price"
             placeholder="Enter Sale Price"
           />
-          <ZInputTwo
-            name="serialNo"
+          <ZNumber
+            name="variationSerialNo"
             type="number"
             label="Serial No"
             placeholder="Enter Serial No"
           />
-          <ZInputTwo
-            name="purchasePrice"
+          <ZNumber
+            name="variationPurchasePrice"
             type="number"
             label="Purchase Price"
             placeholder="Enter Purchase Price"
           />
-          <ZInputTwo
-            name="wholeSalePrice"
+          <ZNumber
+            name="variationWholeSalePrice"
             type="number"
             label="Wholesale Price"
             placeholder="Enter Wholesale Price"
           />
-          <ZInputTwo
-            name="retailPrice"
+          <ZNumber
+            name="variationRetailPrice"
             type="number"
             label="Retail Price"
             placeholder="Enter Retail Price"
           />
             </>
-          )
-         }
+              </div>
+
+              {/* button */}
+              <div className="flex justify-end">
+                <Button
+                  htmlType="button"
+                  // onClick={() => handleAddPerSkuInSkus()}
+     
+                  style={{ backgroundColor: "#162447", color: "white" }}
+          
+                >
+                  + Add Variant
+                </Button>
+              </div>
+            </div>
+            {/* per sku end */}
+          </div>
+        )}
+
       
 
 
@@ -380,7 +608,7 @@ const AddProduct = () => {
           /> */}
            </>)
           }
-        </div>
+        
       </ZFormTwo>
     </div>
   );

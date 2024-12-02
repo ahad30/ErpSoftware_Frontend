@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Form, Input } from "antd";
 import { useEffect } from "react";
@@ -8,15 +6,6 @@ import { Controller, useFormContext } from "react-hook-form";
 const numberRegex = /^[0-9]+$/;
 const fractionRegex = /^[0-9]*\.?[0-9]*$/;
 
-type TNumber = {
-  name: string;
-  label: string;
-  value?: string;
-  defaultKey?: "product" | "singleProduct";
-  refresh?: boolean;
-  setPriceQuantityImage?: React.Dispatch<React.SetStateAction<any>>;
-};
-
 const ZNumber = ({
   name,
   label,
@@ -24,7 +13,7 @@ const ZNumber = ({
   setPriceQuantityImage,
   defaultKey,
   refresh,
-}: TNumber) => {
+}) => {
   const { control, setValue, resetField } = useFormContext();
 
 
@@ -57,7 +46,7 @@ const ZNumber = ({
     }
   }, [refresh]);
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (event) => {
     const regex =
       name === "price" || name === "singlePrice" ? fractionRegex : numberRegex;
 
@@ -78,14 +67,14 @@ const ZNumber = ({
   // by default value will empty
   useEffect(() => {
     if (defaultKey === "singleProduct" && setPriceQuantityImage) {
-      setPriceQuantityImage((_prev: any) => ({
+      setPriceQuantityImage((_prev) => ({
         images: "",
         singleQuantity: "",
         singlePrice: "",
       }));
     }
     if (defaultKey === "product" && setPriceQuantityImage) {
-      setPriceQuantityImage((_prev: any) => ({
+      setPriceQuantityImage((_prev) => ({
         image: "",
         price: "",
         quantity: "",
@@ -93,15 +82,15 @@ const ZNumber = ({
     }
   }, []);
 
-  const handleChange = (val: any) => {
+  const handleChange = (val) => {
     if (defaultKey === "product" && setPriceQuantityImage) {
-      setPriceQuantityImage((prev: any) => ({
+      setPriceQuantityImage((prev) => ({
         ...prev,
         [name]: Number(val),
       }));
     }
     if (defaultKey === "singleProduct" && setPriceQuantityImage) {
-      setPriceQuantityImage((prev: any) => ({
+      setPriceQuantityImage((prev) => ({
         ...prev,
         [name]: Number(val),
       }));

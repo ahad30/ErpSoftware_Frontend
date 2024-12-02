@@ -47,7 +47,7 @@ const Product = () => {
       subtitle,
       description,
       sku,
-      isActive: isActive ? "Active" : "Inactive",
+      isActive,
     };
   });
   // console.log(productData);
