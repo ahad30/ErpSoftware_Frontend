@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Space, Tooltip, message, Button, Table } from "antd";
+import { Space, Tooltip, message, Button, Table, Alert } from "antd";
 import { CiEdit } from "react-icons/ci";
 import { AiOutlineDelete } from "react-icons/ai";
 import BreadCrumb from "@/components/BreadCrumb/BreadCrumb";
@@ -34,8 +34,8 @@ const Attributes = () => {
   const [deleteAttribute, { isLoading: deleteIsLoading, isSuccess, isError, data: dData }] = useDeleteAttributesMutation();
 
   // Map fetched data
-  const attributeData = data?.data?.map((attribute) => ({
-    key: attribute.attributeID,
+  const attributeData = data?.data?.map((attribute , index) => ({
+    key: index+ 1,
     id: attribute.attributeID,
     name: attribute.attributeName,
     values: attribute.values.map((value) => ({
@@ -63,6 +63,11 @@ const Attributes = () => {
   // Table columns
   const columns = [
     {
+      title: "SL",
+      dataIndex: "key",
+      key: "key",
+    },
+    {
       title: "Attribute Name",
       dataIndex: "name",
       key: "name",
@@ -71,16 +76,16 @@ const Attributes = () => {
       title: "Values",
       dataIndex: "values",
       key: "values",
-      render: (values) =>
-        values.length ? (
-          <ul className="flex justify-center gap-2">
-            {values.map((value) => (
-              <li key={value.id}>{value.name}</li>
-            ))}
-          </ul>
-        ) : (
-          <span>No values</span>
-        ),
+      render: (values) =>  
+        <div className="flex justify-center gap-2">
+      {values?.length > 0
+        ? values?.map((item) => (
+            <div key={item?.id} className="relative">
+              <Alert message={item?.name} type="info" />
+            </div>
+          ))
+        : "There are no previous values"}
+    </div>
     },
     
     {
@@ -109,7 +114,9 @@ const Attributes = () => {
         <BreadCrumb />
       </div>
       <div className="flex flex-col lg:flex-row items-center gap-x-2 justify-end my-5">
-        <ButtonWithModal title="Add Attribute"></ButtonWithModal>
+        <ButtonWithModal title="Add Attribute"
+        //  path={`/Dashboard/Attributes/AddAttributes`}
+         ></ButtonWithModal>
       </div>
 
       {/* Dashboard Table */}

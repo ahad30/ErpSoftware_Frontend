@@ -9,11 +9,13 @@ import {
   useAddAttributesValueMutation,
 } from "@/redux/Feature/Admin/product/attributesApi";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import { useRouter } from "next/navigation";
 
 const AddAttributes = () => {
   const dispatch = useAppDispatch();
   const [addonPages, setAddonPages] = useState([1]);
   const { isAddModalOpen } = useAppSelector((state) => state.modal);
+  // const router = useRouter();
 
   const [
     createAttribute,
@@ -21,57 +23,24 @@ const AddAttributes = () => {
   ] = useAddAttributesMutation();
 
   // Hook for second API call
-  const [addAttributesValue , {  isVSuccess, Vdata }] = useAddAttributesValueMutation();
-
-  // const handleSubmit = async (formData) => {
-  //   try {
-  //     // Check if the attribute name already exists in local storage
-  //     const storedAttributes = JSON.parse(localStorage.getItem("attributes")) || {};
-  //     let attributeID = storedAttributes[formData.attributeName];
-
-  //     // If not, create a new attribute
-  //     if (!attributeID) {
-  //       const result = await createAttribute({
-  //         attributeName: formData.attributeName,
-  //       });
-  //       console.log(result)
-  //       attributeID = result?.data?.data?.attributeID;
-
-  //       if (!attributeID) {
-  //         throw new Error("Failed to retrieve attributeID");
-  //       }
-
-  //       // Save the new attribute to local storage
-  //       storedAttributes[formData.attributeName] = attributeID;
-  //       localStorage.setItem("attributes", JSON.stringify(storedAttributes));
-  //     }
-
-  //     const valueResult = await addAttributesValue({
-  //       attributeID: attributeID,
-  //       attributeValue: formData.attributeValue,
-  //     }).unwrap();
-  
-
-  //     // console.log("Both APIs executed successfully!");
-  //   } catch (err) {
-  //     console.error("Error executing APIs:", err);
-  //   }
-  // };
+  const [addAttributesValue , {  isVSuccess, isLoading: valueIsLoading, data: vData }] = useAddAttributesValueMutation();
 
 
-
-  // Close the modal
-  
+ 
   useEffect(() => {
     if (!isAddModalOpen) {
       setAddonPages([1]);
     }
+    // if(isSuccess){
+    //   router.push("/Dashboard/Variation")
+    // }
+    
   }, [isAddModalOpen]);
   
   
   const handleSubmit = async (formData) => {
-    try {
-  
+
+    try {  
       const result = await createAttribute({
         attributeName: formData.attributeName,
       }).unwrap(); 
@@ -83,10 +52,7 @@ const AddAttributes = () => {
         throw new Error("Attribute ID not found in response");
       }
   
-
-      // localStorage.setItem("attributeID", attributeID);
   
-     
       for (const value of addonPages) {
         if (value) {
           await addAttributesValue({
@@ -96,7 +62,7 @@ const AddAttributes = () => {
         }
       }
       setAddonPages([""])
-      console.log("Both APIs executed successfully!");
+      // console.log("Both APIs executed successfully!");
     } catch (err) {
       console.error("Error executing APIs:", err);
     }
@@ -119,8 +85,6 @@ const AddAttributes = () => {
     setAddonPages(updatedPages);
   };
   
-  
-  
   const handleCloseAndOpen = () => {
     dispatch(setIsAddModalOpen());
   };
@@ -128,14 +92,15 @@ const AddAttributes = () => {
   return (
     <div className="">
       <ZFormTwo
-        isLoading={isLoading}
+        isLoading={isLoading || valueIsLoading}
         isSuccess={isSuccess || isVSuccess}
         isError={isError}
         error={error}
         submit={handleSubmit}
         closeModal={handleCloseAndOpen}
         formType="create"
-        data={data}
+        data={data || vData
+        }
         buttonName="Create Attribute"
       >
         <div className="grid grid-cols-1 gap-3 mt-10">

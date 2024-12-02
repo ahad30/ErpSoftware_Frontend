@@ -16,7 +16,7 @@ import EditVariation from "./EditVariation/page";
 
 const Variation = () => {
   const dispatch = useAppDispatch();
-  const { data, isLoading: variationIsLoading } = useGetProductVariationApiQuery();
+  const { data, isLoading: variationIsLoading , isError: vIsError,  error: vDataError } = useGetProductVariationApiQuery();
   const { isAddModalOpen, isEditModalOpen, isDeleteModalOpen } = useAppSelector((state) => state.modal);
   const [selectedVariation, setSelectedVariation] = useState({});
   const [deleteVariation, { isLoading: deleteLoading, isError, isSuccess, data: deleteData, error: deleteError }] = useDeleteProductVariationApiMutation();
@@ -49,6 +49,10 @@ const Variation = () => {
   const handleDeleteVariation = () => {
     deleteVariation(selectedVariation?.id);
   };
+
+  if(vDataError){
+    return <div>Error loading variation Data</div>
+  }
 
   const columns = [
     {

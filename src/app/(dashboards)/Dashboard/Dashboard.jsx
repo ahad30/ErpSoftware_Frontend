@@ -49,7 +49,7 @@ const Dashboard = ({ view, toggle }) => {
     else if (pathName === "/Dashboard/Brand") {
       setActiveItem("brands")
     }
-    else if (pathName === "/Dashboard/Variation") {
+    else if (pathName === "/Dashboard/Variation" || pathName === "/Dashboard/Variation/AddVariation"  ) {
       setActiveItem("variations")
     }
 
@@ -127,7 +127,7 @@ const Dashboard = ({ view, toggle }) => {
 
 
 
-  const hidden = toggle ? "hidden" : "";
+  const hidden = toggle ? "hidden" : "text-[14px] mt-1";
 
   useEffect(() => {
     const savedOpenState = localStorage.getItem("accordionOpenState");
@@ -159,7 +159,7 @@ const Dashboard = ({ view, toggle }) => {
        hamburger ? "left-0" : "left-[-30rem]"
      } md:left-0 z-[30] transition-all duration-500`}
     >
-      <Card className="h-screen no-scrollbar transition-all overflow-y-scroll py-2 shadow-xl shadow-blue-gray-900/5 bg-primary rounded-none">
+      <Card className="h-screen no-scrollbar transition-all overflow-y-scroll  shadow-xl shadow-blue-gray-900/5 bg-primary rounded-none p-0">
         <div className="flex items-center justify-between">
           <div className="mb-2 mt-3 pl-5">
             <Typography variant="h5" color="white">
@@ -336,7 +336,7 @@ const Dashboard = ({ view, toggle }) => {
 
 
 
-          <Link href={'/Dashboard/Variation'}>
+          {/* <Link href={'/Dashboard/Variation'}>
                 <ListItem 
                 className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("variations")}`}
                 selected={activeItem === "variations"}
@@ -352,9 +352,9 @@ const Dashboard = ({ view, toggle }) => {
                    Variations
                   </Typography>
                 </ListItem>
-          </Link>
+          </Link> */}
 
-          <Link href={'/Dashboard/product-type'}>
+          {/* <Link href={'/Dashboard/product-type'}>
                 <ListItem 
                 className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("product-type")}`}
                 selected={activeItem === "product-type"}
@@ -389,7 +389,7 @@ const Dashboard = ({ view, toggle }) => {
                    Products-Unit
                   </Typography>
                 </ListItem>
-          </Link>
+          </Link> */}
           
           <Link href={'/Dashboard/Product'}>
                 <ListItem 
