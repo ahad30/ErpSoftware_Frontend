@@ -1,4 +1,3 @@
-import { TPerSkus } from "../../Pages/Dashboard/Admin/Products/AddProduct";
 
 export const VariantProductTable = ({
   skus,
@@ -61,12 +60,12 @@ export const VariantProductTable = ({
                     </td>
                     <td className="p-4 border-b border-blue-gray-50">
                       <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                        {item.price}
+                        {/* {item.price} */}
                       </p>
                     </td>
                     <td className="p-4 border-b border-blue-gray-50">
                       <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                        {item.quantity}
+                        {/* {item.quantity} */}
                       </p>
                     </td>
                     <td className="p-4 border-b border-blue-gray-50">

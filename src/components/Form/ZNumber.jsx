@@ -13,74 +13,138 @@ const ZNumber = ({
   setPriceQuantityImage,
   defaultKey,
   refresh,
+  placeholder,
+  required
 }) => {
   const { control, setValue, resetField } = useFormContext();
 
 
   // by default reset
   useEffect(() => {
-    if (name === "price" && defaultKey === "product") {
-      resetField(name, { defaultValue: "" });
-    }
-    if (name === "quantity" && defaultKey === "product")
-      resetField(name, { defaultValue: "" });
-
-    if (name === "singlePrice" && defaultKey === "singleProduct") {
-      resetField(name, { defaultValue: "" });
-    }
-    if (name === "singleQuantity" && defaultKey === "singleProduct") {
-      resetField(name, { defaultValue: "" });
-    }
+    const singleProductFields = [
+      "stock",
+      "min_stock",
+      "max_stock",
+      "salePrice",
+      "serialNo",
+      "purchasePrice",
+      "wholeSalePrice",
+      "retailPrice",
+    ];
+  
+    const productFields = [
+      "variationStock",
+      "variation_min_stock",
+      "variation_max_stock",
+      "variationSalePrice",
+      "variationSerialNo",
+      "variationPurchasePrice",
+      "variationWholeSalePrice",
+      "variationRetailPrice",
+    ];
+  
+    const resetFields = (fields, key) => {
+      fields.forEach((field) => {
+        if (name === field && defaultKey === key) {
+          resetField(name, { defaultValue: "" });
+        }
+      });
+    };
+  
+    resetFields(singleProductFields, "singleProduct");
+    resetFields(productFields, "product");
   }, [resetField]);
+  
+
+
   useEffect(() => {
     if (value) {
       setValue(name, value);
     }
   }, [value, setValue]);
 
-  // when refresh the value will be reset
+ 
+useEffect(() => {
+  if (defaultKey === "product") {
+    const productFields = [
+      "variationStock",
+      "variation_min_stock",
+      "variation_max_stock",
+      "variationSalePrice",
+      "variationSerialNo",
+      "variationPurchasePrice",
+      "variationWholeSalePrice",
+      "variationRetailPrice",
+    ];
+
+    productFields.forEach((field) => resetField(field));
+  }
+}, [refresh]);
+
+const handleKeyPress = (event) => {
+  const regex = [
+    "salePrice",
+    "purchasePrice",
+    "wholeSalePrice",
+    "retailPrice",
+    "variationSalePrice",
+    "variationPurchasePrice",
+    "variationWholeSalePrice",
+    "variationRetailPrice",
+  ].includes(name)
+    ? fractionRegex
+    : numberRegex;
+
+  // Prevent multiple decimal points
+  if (
+    (event.key === "." || event.key === ",") &&
+    event.currentTarget.value.includes(".")
+  ) {
+    event.preventDefault();
+    return;
+  }
+
+  if (!regex.test(event.key)) {
+    event.preventDefault();
+  }
+};
+
+
+  
   useEffect(() => {
-    if (defaultKey === "product") {
-      resetField("price");
-      resetField("quantity");
-    }
-  }, [refresh]);
-
-  const handleKeyPress = (event) => {
-    const regex =
-      name === "price" || name === "singlePrice" ? fractionRegex : numberRegex;
-
-    // Prevent multiple decimal points
-    if (
-      (event.key === "." || event.key === ",") &&
-      event.currentTarget.value.includes(".")
-    ) {
-      event.preventDefault();
-      return;
-    }
-
-    if (!regex.test(event.key)) {
-      event.preventDefault();
-    }
-  };
-
-  // by default value will empty
-  useEffect(() => {
-    if (defaultKey === "singleProduct" && setPriceQuantityImage) {
-      setPriceQuantityImage((_prev) => ({
-        images: "",
-        singleQuantity: "",
-        singlePrice: "",
-      }));
-    }
-    if (defaultKey === "product" && setPriceQuantityImage) {
-      setPriceQuantityImage((_prev) => ({
-        image: "",
-        price: "",
-        quantity: "",
-      }));
+    if (setPriceQuantityImage) {
+      const resetValues = (key, values) => {
+        if (defaultKey === key) {
+          setPriceQuantityImage((_prev) => ({ ...values }));
+        }
+      };
+  
+      resetValues("singleProduct", {
+        // images: "",
+        stock: "",
+        min_stock: "",
+        max_stock: "",
+        salePrice: "",
+        serialNo: "",
+        purchasePrice: "",
+        wholeSalePrice: "",
+        retailPrice: "",
+      });
+  
+      resetValues("product", {
+        // image: "",
+        variationStock: "",
+        variation_min_stock: "",
+        variation_max_stock: "",
+        variationSalePrice: "",
+        variationSerialNo: "",
+        variationPurchasePrice: "",
+        variationWholeSalePrice: "",
+        variationRetailPrice: "",
+      });
     }
   }, []);
+  
 
   const handleChange = (val) => {
     if (defaultKey === "product" && setPriceQuantityImage) {
@@ -102,22 +166,68 @@ const ZNumber = ({
       name={name}
       control={control}
       rules={{
-        required: `${label} is required`,
+        // // ...(required && { 
+        //   required: `This ${label} field is required` 
+        // // })
+        // ,
         pattern: {
           value:
-            name === "price" || name === "singlePrice"
+            [
+              "salePrice",
+              "purchasePrice",
+              "wholeSalePrice",
+              "retailPrice",
+              "variationSalePrice",
+              "variationPurchasePrice",
+              "variationWholeSalePrice",
+              "variationRetailPrice",
+            ].includes(name)
               ? fractionRegex
               : numberRegex,
           message:
-            name === "price" || name === "singlePrice"
+            [
+              "salePrice",
+              "purchasePrice",
+              "wholeSalePrice",
+              "retailPrice",
+              "variationSalePrice",
+              "variationPurchasePrice",
+              "variationWholeSalePrice",
+              "variationRetailPrice",
+            ].includes(name)
               ? "Please enter a valid number, including fractions"
               : "Only digits 1 to 9 are allowed",
         },
         maxLength: {
-          value: name === "price" || name === "singlePrice" ? 10 : 5,
-          message: `Maximum length is ${name === "price" ? 10 : 5} digits`,
+          value: [
+            "salePrice",
+            "purchasePrice",
+            "wholeSalePrice",
+            "retailPrice",
+            "variationSalePrice",
+            "variationPurchasePrice",
+            "variationWholeSalePrice",
+            "variationRetailPrice",
+          ].includes(name)
+            ? 10
+            : 5,
+          message: `Maximum length is ${
+            [
+              "salePrice",
+              "purchasePrice",
+              "wholeSalePrice",
+              "retailPrice",
+              "variationSalePrice",
+              "variationPurchasePrice",
+              "variationWholeSalePrice",
+              "variationRetailPrice",
+            ].includes(name)
+              ? 10
+              : 5
+          } digits`,
         },
       }}
+      
       render={({ field, fieldState: { error } }) => (
         <Form.Item
           label={label}
@@ -131,9 +241,23 @@ const ZNumber = ({
               field.onChange(e.target.value);
               handleChange(e.target.value);
             }}
-            placeholder={label}
+            placeholder={placeholder}
             onKeyPress={handleKeyPress}
-            maxLength={name === "price" || name === "singlePrice" ? 10 : 5}
+            maxLength={
+              [
+                "salePrice",
+                "purchasePrice",
+                "wholeSalePrice",
+                "retailPrice",
+                "variationSalePrice",
+                "variationPurchasePrice",
+                "variationWholeSalePrice",
+                "variationRetailPrice",
+              ].includes(name)
+                ? 10
+                : 5
+            }
+            
           />
         </Form.Item>
       )}

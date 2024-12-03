@@ -127,7 +127,7 @@ const Dashboard = ({ view, toggle }) => {
 
 
 
-  const hidden = toggle ? "hidden" : "text-[14px] mt-1";
+  const hidden = toggle ? "hidden" : "text-[15px] mt-1";
 
   useEffect(() => {
     const savedOpenState = localStorage.getItem("accordionOpenState");
