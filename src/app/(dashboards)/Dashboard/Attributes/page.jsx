@@ -78,14 +78,14 @@ const Attributes = () => {
       key: "values",
       render: (values) =>  
         <div className="flex justify-center gap-2">
-      {values?.length > 0
-        ? values?.map((item) => (
+      { values?.map((item) => (
             <div key={item?.id} className="relative">
               <Alert message={item?.name} type="info" />
             </div>
           ))
-        : "There are no previous values"}
+      }
     </div>
+       
     },
     
     {
