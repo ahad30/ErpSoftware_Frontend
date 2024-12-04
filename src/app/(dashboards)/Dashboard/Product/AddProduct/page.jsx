@@ -22,10 +22,8 @@ import { VariantProductTable } from "@/components/VariantProductTable";
 import { toast } from "sonner";
 import { variantExists } from "@/components/helper/SameVariantExist";
 
-
 function generateUniqueId(length = 2) {
-  const chars =
-    "123456789";
+  const chars = "123456789";
   let result = "";
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -34,61 +32,66 @@ function generateUniqueId(length = 2) {
 }
 
 const AddProduct = () => {
-   // attribute State - 1 from db
-   const [attributeValue, setAttributeValue] = useState([]);
+  // attribute State - 1 from db
+  const [attributeValue, setAttributeValue] = useState([]);
 
-   // selected attribute State - 2
-   const [selectedAttribute, setSelectedAttribute] = useState([]);
-   // attribute options for selected options state-3
-   const [attributeOptions, setAttributeOptions] = useState([]);
-     //  product type state - 4
+  // selected attribute State - 2
+  const [selectedAttribute, setSelectedAttribute] = useState([]);
+  // attribute options for selected options state-3
+  const [attributeOptions, setAttributeOptions] = useState([]);
+  //  product type state - 4
   const [productType, setProductType] = useState("");
-    // selectedAttribute UnderTheValue - 5
-  const [selectedAttributeUnderTheValue, setSelectedAttributeUnderTheValue] =useState([]);
-   // per sku - 6
+  // selectedAttribute UnderTheValue - 5
+  const [selectedAttributeUnderTheValue, setSelectedAttributeUnderTheValue] =
+    useState([]);
+  // per sku - 6
   const [perSku, setPerSku] = useState([]);
-   //  skus - 7
+  //  skus - 7
   const [skus, setSkus] = useState([]);
 
   //  refresh state for variant
   const [refresh, setRefresh] = useState(false);
- 
 
-    // image file , price , quantity - 8 for vairant product
-    const [priceQuantityImage, setPriceQuantityImage] = useState({
-      // image:"",
-      variationStock:"",
-      variation_min_stock:"",
-      variation_max_stock:"",
-      variationSalePrice:"",
-      variationSerialNo:"",
-      variationPurchasePrice:"",
-      variationWholeSalePrice:"",
-      variationRetailPrice:"",
-    });
-  
-    // single -----> image file , price , quantity - 9
-    const [singlePriceQuantityImage, singleSetPriceQuantityImage] = useState({
-      // images:"",
-      stock:"",
-      min_stock:"",
-      max_stock:"",
-      salePrice:"",
-      serialNo:"",
-      purchasePrice:"",
-      wholeSalePrice:"",
-      retailPrice:"",
-    });
+  // image file , price , quantity - 8 for vairant product
+  const [priceQuantityImage, setPriceQuantityImage] = useState({
+    // image:"",
+    variationStock: "",
+    variation_min_stock: "",
+    variation_max_stock: "",
+    variationSalePrice: "",
+    variationSerialNo: "",
+    variationPurchasePrice: "",
+    variationWholeSalePrice: "",
+    variationRetailPrice: "",
+  });
+
+  // single -----> image file , price , quantity - 9
+  const [singlePriceQuantityImage, singleSetPriceQuantityImage] = useState({
+    // images:"",
+    stock: "",
+    min_stock: "",
+    max_stock: "",
+    salePrice: "",
+    serialNo: "",
+    purchasePrice: "",
+    wholeSalePrice: "",
+    retailPrice: "",
+  });
 
   const router = useRouter();
-  const pathName = usePathname()
+  const pathName = usePathname();
 
   const { data: eData, isLoading: eLoading } = useGetErpCategoryQuery();
   const { data: bData, isLoading: bLoading } = useGetBrandQuery();
   const { data: businessData, isLoading: businessLoading } =
     useGetBusinessesQuery();
-  const { data: allBranchData, error, isLoading: branchIsLoading } = useGetBranchesQuery();
-  const { data: attributeWithValue, isLoading: attributeIsLoading  } = useGetAttributesQuery();
+  const {
+    data: allBranchData,
+    error,
+    isLoading: branchIsLoading,
+  } = useGetBranchesQuery();
+  const { data: attributeWithValue, isLoading: attributeIsLoading } =
+    useGetAttributesQuery();
   const [
     createProduct,
     {
@@ -122,7 +125,6 @@ const AddProduct = () => {
     value: branch.branchID,
   }));
 
-
   useEffect(() => {
     if (
       Array.isArray(attributeWithValue?.data) &&
@@ -136,7 +138,6 @@ const AddProduct = () => {
       setAttributeValue([...attributeWithValue.data]);
     }
   }, [attributeWithValue, attributeWithValue?.data]);
-
 
   useEffect(() => {
     if (selectedAttribute) {
@@ -159,18 +160,16 @@ const AddProduct = () => {
     setSkus([]);
   }, [productType]);
 
-
   useEffect(() => {
     if (CIsSuccess) {
       router.push("/Dashboard/Product");
     }
   }, [CIsSuccess, router]);
 
-
   const handleAddPerSkuInSkus = () => {
     const attributes = {};
     const valuesName = [];
-  
+
     if (perSku.length === 0) {
       toast.error("Select minimum an attribute value", {
         id: 2,
@@ -202,7 +201,7 @@ const AddProduct = () => {
     if (priceQuantityImage.variationRetailPrice === "") {
       toast.error("Enter variation retail price", { id: 8 });
     }
-  
+
     if (
       perSku.length > 0 &&
       priceQuantityImage.variationStock &&
@@ -220,7 +219,7 @@ const AddProduct = () => {
         valuesName.push(proPertyValue);
         attributes[proPertyKey] = proPertyValue;
       });
-  
+
       const sku = {
         variationId: generateUniqueId(),
         sku: `${valuesName.join("-")}`,
@@ -235,13 +234,12 @@ const AddProduct = () => {
         attributes,
       };
 
-      console.log(sku)
-  
+      console.log(sku);
+
       if (skus.length === 0) {
         setSkus([...skus, { ...sku }]);
         handleRefreshVariantState();
-      }
-       else if (skus.length > 0) {
+      } else if (skus.length > 0) {
         const skusAttributes = skus.map((sku) => sku.attributes);
         const exist = variantExists(skusAttributes, sku.attributes);
         if (!exist) {
@@ -255,25 +253,21 @@ const AddProduct = () => {
       }
     }
   };
-  
-
-
 
   const handleRefreshVariantState = () => {
     setPerSku([]);
     setPriceQuantityImage({
-      variationStock:"",
-      variation_min_stock:"",
-      variation_max_stock:"",
-      variationSalePrice:"",
-      variationSerialNo:"",
-      variationPurchasePrice:"",
-      variationWholeSalePrice:"",
-      variationRetailPrice:"",
+      variationStock: "",
+      variation_min_stock: "",
+      variation_max_stock: "",
+      variationSalePrice: "",
+      variationSerialNo: "",
+      variationPurchasePrice: "",
+      variationWholeSalePrice: "",
+      variationRetailPrice: "",
     });
     setRefresh(!refresh);
   };
-
 
   const handleSubmit = (data) => {
     const modifiedData = {
@@ -290,114 +284,111 @@ const AddProduct = () => {
       productSubtitle: data.productSubtitle,
       productTitle: data.productTitle,
     };
-    
 
-    
-    
-     // Check if product is single
-  if (modifiedData.is_single_product === 1) {
-    // Validation for single product fields
-    if (data.salePrice === "") {
-      toast.error("Single product sale price required", {
-        id: 10,
-        duration: 1000,
-        position: "top-right",
-      });
-    }
-    if (data.stock === "") {
-      toast.error("Single product stock required", {
-        id: 2,
-        duration: 1000,
-        position: "top-right",
-      });
-    }
-    if (data.min_stock === "") {
-      toast.error("Single product min stock required", {
-        id: 2,
-        duration: 1000,
-        position: "top-right",
-      });
-    }
-    if (data.max_stock === "") {
-      toast.error("Single product max stock required", {
-        id: 2,
-        duration: 1000,
-        position: "top-right",
-      });
-    }
-    if (data.serialNo === "") {
-      toast.error("Single product serial number required", {
-        id: 3,
-        duration: 1000,
-        position: "top-right",
-      });
-    }
-    if (data.purchasePrice === "") {
-      toast.error("Single product purchase price required", {
-        id: 4,
-        duration: 1000,
-        position: "top-right",
-      });
-    }
-    if (data.wholeSalePrice === "") {
-      toast.error("Single product wholesale price required", {
-        id: 5,
-        duration: 1000,
-        position: "top-right",
-      });
-    }
-    if (data.retailPrice === "") {
-      toast.error("Single product retail price required", {
-        id: 6,
-        duration: 1000,
-        position: "top-right",
-      });
-    }
+    // Check if product is single
+    if (modifiedData.is_single_product === 1) {
+      // Validation for single product fields
+      if (data.salePrice === "") {
+        toast.error("Single product sale price required", {
+          id: 10,
+          duration: 1000,
+          position: "top-right",
+        });
+      }
+      if (data.stock === "") {
+        toast.error("Single product stock required", {
+          id: 2,
+          duration: 1000,
+          position: "top-right",
+        });
+      }
+      if (data.min_stock === "") {
+        toast.error("Single product min stock required", {
+          id: 2,
+          duration: 1000,
+          position: "top-right",
+        });
+      }
+      if (data.max_stock === "") {
+        toast.error("Single product max stock required", {
+          id: 2,
+          duration: 1000,
+          position: "top-right",
+        });
+      }
+      if (data.serialNo === "") {
+        toast.error("Single product serial number required", {
+          id: 3,
+          duration: 1000,
+          position: "top-right",
+        });
+      }
+      if (data.purchasePrice === "") {
+        toast.error("Single product purchase price required", {
+          id: 4,
+          duration: 1000,
+          position: "top-right",
+        });
+      }
+      if (data.wholeSalePrice === "") {
+        toast.error("Single product wholesale price required", {
+          id: 5,
+          duration: 1000,
+          position: "top-right",
+        });
+      }
+      if (data.retailPrice === "") {
+        toast.error("Single product retail price required", {
+          id: 6,
+          duration: 1000,
+          position: "top-right",
+        });
+      }
 
-    // Only proceed if all required fields are filled
-    if (
-      data.salePrice &&
-      data.stock &&
-      data.serialNo &&
-      data.purchasePrice &&
-      data.wholeSalePrice &&
-      data.retailPrice &&
-      data.min_stock &&
-      data.max_stock
-    ) {
-      const singleProductData = {
-        stock: data.stock,
-        min_stock: data.min_stock,
-        max_stock: data.max_stock,
-        salePrice: data.salePrice,
-        serialNo: data.serialNo,
-        purchasePrice: data.purchasePrice,
-        wholeSalePrice: data.wholeSalePrice,
-        retailPrice: data.retailPrice,
-      };
+      // Only proceed if all required fields are filled
+      if (
+        data.salePrice &&
+        data.stock &&
+        data.serialNo &&
+        data.purchasePrice &&
+        data.wholeSalePrice &&
+        data.retailPrice &&
+        data.min_stock &&
+        data.max_stock
+      ) {
+        const singleProductData = {
+          ...modifiedData,
+          stock: data.stock,
+          min_stock: data.min_stock,
+          max_stock: data.max_stock,
+          salePrice: data.salePrice,
+          serialNo: data.serialNo,
+          purchasePrice: data.purchasePrice,
+          wholeSalePrice: data.wholeSalePrice,
+          retailPrice: data.retailPrice,
+        };
 
-      console.log(singleProductData);
-      // createProduct(singleProductData);
+        console.log(singleProductData);
+        // createProduct(singleProductData);
+      }
     }
-  }
     // Check if the product is a variant product
     else if (modifiedData.is_single_product === 0) {
       if (skus.length > 0) {
-       
         const variantProductData = {
           ...modifiedData,
-          attribute_combination: 
-          skus.map((sku, index) => ({
-        attributes: sku.attributes,
-        variationId: sku?.variationId,
-        variationStock: sku.variationStock,
-        variation_min_stock: sku.variation_min_stock,
-        variation_max_stock: sku.variation_max_stock,
-        variationSalePrice: sku.variationSalePrice,
-        variationSerialNo: sku.variationSerialNo,
-        variationPurchasePrice: sku.variationPurchasePrice,
-        variationWholeSalePrice: sku.variationWholeSalePrice,
-        variationRetailPrice: sku?.variationRetailPrice,
+            attribute_combination: skus.map((sku, index) => ({
+            attributes: sku.attributes,
+            sku: sku.sku,
+            variationId: JSON.parse(sku?.variationId),
+            variationStock: sku.variationStock,
+            variation_min_stock: sku.variation_min_stock,
+            variation_max_stock: sku.variation_max_stock,
+            variationSalePrice: sku.variationSalePrice,
+            variationSerialNo: sku.variationSerialNo,
+            variationPurchasePrice: sku.variationPurchasePrice,
+            variationWholeSalePrice: sku.variationWholeSalePrice,
+            variationRetailPrice: sku?.variationRetailPrice,
           })),
         };
         console.log(variantProductData);
@@ -411,21 +402,22 @@ const AddProduct = () => {
       }
     }
   };
-  
 
   if (eLoading || bLoading || attributeIsLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
-        <p><Spin size="large"/></p>
+        <p>
+          <Spin size="large" />
+        </p>
       </div>
     );
   }
 
   return (
     <div className="">
-     <div className={`${pathName === "/Dashboard/pos" ? "hidden" : ""}`}>
-     <BreadCrumb />
-     </div>
+      <div className={`${pathName === "/Dashboard/pos" ? "hidden" : ""}`}>
+        <BreadCrumb />
+      </div>
       <ZFormTwo
         isLoading={CIsloading}
         isSuccess={CIsSuccess}
@@ -434,440 +426,389 @@ const AddProduct = () => {
         submit={handleSubmit}
         formType="create"
         data={data}
-        buttonName="Create"
+        buttonName="Submit"
       >
-       
-          {
-            pathName === "/Dashboard/pos" ? 
-(<>
-   <div className="grid md:grid-cols-2 grid-cols-1 gap-3 mt-10">
-  <ZInputTwo
-            name="productTitle"
-            type="text"
-            label="Product Title"
-            placeholder="Enter product title"
-          />
-          <ZInputTwo
-            name="sku"
-            type="text"
-            label="SKU"
-            placeholder="Enter SKU"
-          />
-           <ZSelect
-            name="variationID"
-            label="Variation Name"
-            placeholder="Select Variation"
-            options={variationData}
-            isLoading={variationIsLoading}
-          />
-           <ZSelect
-            name="businessID"
-            label="Business Name"
-            placeholder="Select business"
-            options={businessOptions}
-            isLoading={businessLoading}
-          />
-           <ZSelect
-            name="branchIDs"
-            mode={"multiple"}
-            label="Branch Name"
-            placeholder="Select Available Branch"
-            options={branchData}
-            isLoading={branchIsLoading}
-          />
+        {pathName === "/Dashboard/pos" ? (
+          <>
+            <div className="grid md:grid-cols-2 grid-cols-1 gap-3 mt-10">
+              <ZInputTwo
+                name="productTitle"
+                type="text"
+                label="Product Title"
+                placeholder="Enter product title"
+              />
 
-          <ZSelect
-            name="erpCategoryID"
-            isLoading={eLoading}
-            label="Product Category"
-            options={categoryData}
-            placeholder="Select category"
-          />
-          <ZSelect
-            name="brandID"
-            isLoading={bLoading}
-            label="Product Brand"
-            options={brandData}
-            placeholder="Select brand"
-          />
+              <ZInputTwo
+                name="productSubtitle"
+                type="text"
+                label="Subtitle"
+                placeholder="Enter product subtitle"
+              />
 
+              <ZSelect
+                name="businessID"
+                label="Business Name"
+                placeholder="Select business"
+                options={businessOptions}
+                isLoading={businessLoading}
+              />
+              <ZSelect
+                name="branchIDs"
+                mode={"multiple"}
+                label="Branch Name"
+                placeholder="Select Available Branch"
+                options={branchData}
+                isLoading={branchIsLoading}
+              />
 
+              <ZSelect
+                name="erpCategoryID"
+                isLoading={eLoading}
+                label="Product Category"
+                options={categoryData}
+                placeholder="Select category"
+              />
+              <ZSelect
+                name="brandID"
+                isLoading={bLoading}
+                label="Product Brand"
+                options={brandData}
+                placeholder="Select brand"
+              />
 
+              <div className="lg:col-span-2">
+                <ZInputTextArea
+                  name="description"
+                  type="text"
+                  label="Description"
+                  placeholder="Enter product description"
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="grid md:grid-cols-2 grid-cols-1 gap-3 mt-10">
+              <ZInputTwo
+                name="productTitle"
+                type="text"
+                label="Product Title"
+                placeholder="Enter product title"
+              />
+              <ZInputTwo
+                name="productSubtitle"
+                type="text"
+                label="Subtitle"
+                placeholder="Enter product subtitle"
+              />
 
-          <ZInputTextArea
-            name="description"
-            type="text"
-            label="Description"
-            placeholder="Enter product description"
-          />
-      </div>
-
-</>)
-
-           :(
-           <>
-
-          <div className="grid md:grid-cols-2 grid-cols-1 gap-3 mt-10">
-
-           <ZInputTwo
-            name="productTitle"
-            type="text"
-            label="Product Title"
-            placeholder="Enter product title"
-          />
-          <ZInputTwo
-            name="productSubtitle"
-            type="text"
-            label="Subtitle"
-            placeholder="Enter product subtitle"
-          />
-
-           {/* <ZInputTwo
+              {/* <ZInputTwo
             name="sku"
             type="text"
             label="SKU"
             placeholder="Enter SKU"
           />      */}
 
-          <ZSelect
-            name="erpCategoryID"
-            isLoading={eLoading}
-            label="Product Category"
-            options={categoryData}
-            placeholder="Select category"
-          />
+              <ZSelect
+                name="erpCategoryID"
+                isLoading={eLoading}
+                label="Product Category"
+                options={categoryData}
+                placeholder="Select category"
+              />
 
-          <ZSelect
-            name="brandID"
-            isLoading={bLoading}
-            label="Product Brand"
-            options={brandData}
-            placeholder="Select brand"
-          />
+              <ZSelect
+                name="brandID"
+                isLoading={bLoading}
+                label="Product Brand"
+                options={brandData}
+                placeholder="Select brand"
+              />
 
-         <ZSelect
-            name="businessID"
-            label="Business Name"
-            placeholder="Select business"
-            options={businessOptions}
-            isLoading={businessLoading}
-          />
+              <ZSelect
+                name="businessID"
+                label="Business Name"
+                placeholder="Select business"
+                options={businessOptions}
+                isLoading={businessLoading}
+              />
 
-         <ZSelect
-            name="branchIDs"
-            mode={"multiple"}
-            label="Branch Name"
-            placeholder="Select Available Branch"
-            options={branchData}
-            isLoading={branchIsLoading}
-          />
+              <ZSelect
+                name="branchIDs"
+                mode={"multiple"}
+                label="Branch Name"
+                placeholder="Select Available Branch"
+                options={branchData}
+                isLoading={branchIsLoading}
+              />
 
-
-      <div className="col-span-2">
-       <ZInputTextArea
-            name="productDescription"
-            type="text"
-            label="Description"
-            placeholder="Enter product description"
-          />
-       </div>
-
-         <ZSelect
-            name="notAvailableBranchIDs"
-            mode={"multiple"}
-            label="Not available Branch Name"
-            placeholder="Select Not Available Branch"
-            options={branchData}
-            isLoading={branchIsLoading}
-          />
-
-               
- 
-       <ZInputTwo
-            name="expiryDate"
-            type="date"
-            label="Expiry Date"
-            placeholder="Enter Expiry Date"
-        />
-
-       <ZImageInput label="Product Image" name="productImage"></ZImageInput>
-
-          <ZSelect
-            name="isActive"
-            label="Status"
-            options={[
-              { label: "Active", value: true },
-              { label: "Inactive", value: false },
-            ]}
-            placeholder="Select status"
-          />
-
-        <div className="mt-7 lg:col-span-2">
-          <h5 className="text-xl  pb-2 mb-2  ">Type of products</h5>
-          <ZRadio
-            options={[
-              {
-                name: "Without Variant",
-                value: "1",
-              },
-              {
-                name: "With Variant",
-                value: "0",
-              },
-            ]}
-            name={"is_single_product"}
-            label={"Product type"}
-            setProductType={setProductType}
-          ></ZRadio>
-        </div>
-
-
-
-        {/* single Product type start */}
-         
-         {productType === "1" &&
-          (
-            <>
-            
-            <ZNumber
-            name="stock"
-            label="Stock Quantity"
-            placeholder="Enter Stock Quantity"
-            refresh={refresh}
-            defaultKey = "singleProduct"
-            setPriceQuantityImage={singleSetPriceQuantityImage}
-
-            />
-          
-          <ZNumber
-            name="min_stock"
-            label="Minimum Stock"
-            placeholder="Enter Minimum Stock"
-            refresh={refresh}
-            defaultKey = "singleProduct"
-            setPriceQuantityImage={singleSetPriceQuantityImage}
-
-
-
-          />
-          <ZNumber
-            name="max_stock"
-            label="Maximum Stock"
-            placeholder="Enter Maximum Stock"
-            refresh={refresh}
-            defaultKey = "singleProduct"
-            setPriceQuantityImage={singleSetPriceQuantityImage}
-
-
-
-          />
-          <ZNumber
-            name="salePrice"
-            label="Sale Price"
-            placeholder="Enter Sale Price"
-            refresh={refresh}
-            defaultKey = "singleProduct"
-            setPriceQuantityImage={singleSetPriceQuantityImage}
-
-
-
-          />
-
-          <ZNumber
-            name="serialNo"
-            label="Serial No"
-            placeholder="Enter Serial No"
-            refresh={refresh}
-            defaultKey = "singleProduct"
-            setPriceQuantityImage={singleSetPriceQuantityImage}
-
-          />
-
-          <ZNumber
-            name="purchasePrice"
-            label="Purchase Price"
-            placeholder="Enter Purchase Price"
-            refresh={refresh}
-            defaultKey = "singleProduct"
-            setPriceQuantityImage={singleSetPriceQuantityImage}
-
-          />
-          <ZNumber
-            name="wholeSalePrice"
-            label="Wholesale Price"
-            placeholder="Enter Wholesale Price"
-            refresh={refresh}
-            defaultKey = "singleProduct"
-            setPriceQuantityImage={singleSetPriceQuantityImage}
-            
-
-          />
-          <ZNumber
-            name="retailPrice"
-            label="Retail Price"
-            placeholder="Enter Retail Price"
-            refresh={refresh}
-            defaultKey = "singleProduct"
-            setPriceQuantityImage={singleSetPriceQuantityImage}
-
-
-          />
-            </>
-          )
-         }
-         </div>
-
-           {/* variant Product type start */}
-           {productType === "0" && (
-          <div className="mb-3">
-            {/* per sku  */}
-
-            {/* multiple attribute */}
-            <ZSelect
-              setSelectedAttributes={setSelectedAttribute}
-              options={attributeOptions}
-              isLoading={attributeIsLoading}
-              mode={"multiple"}
-              label={"Select Variations"}
-              name={"attribute-selected"}
-              defaultKey="product"
-              placeholder={"Select Variant Name"}
-              refresh={refresh}
-            ></ZSelect>
-
-            {/* selected attribute underTheValue */}
-            <div className="border border-gray-400 p-3">
-              {/* attribute value */}
-              <div className="mt-12 grid lg:grid-cols-5 gap-5">
-                {selectedAttributeUnderTheValue.map((item) => {
-                  return (
-                    <ZSelect
-                      key={item?.id}
-                      options={item?.values?.map((option) => ({
-                        value: `${item?.attributeName}-${option?.attributeValue}`,
-                        label: option?.attributeValue,
-                      }))}
-                      isLoading={attributeIsLoading}
-                      mode={undefined}
-                      label={`${item.attributeName} value`}
-                      name={`${item.attributeName}`}
-                      setPerSku={setPerSku}
-                      defaultKey="product"
-                      selectedAttribute={selectedAttribute}
-                      refresh={refresh}
-                      placeholder={`Select ${item.attributeName} value`}
-                    ></ZSelect>
-                  );
-                })}
-              </div>
-              {/* image, quantity, price*/}
-              <div className="grid grid-cols-1 items-center gap-x-2 lg:grid-cols-3">
-              <>
-            
-            <ZNumber
-            name="variationStock"
-            label="Stock Quantity"
-            placeholder="Enter Stock Quantity"
-            defaultKey = "product"
-            setPriceQuantityImage={setPriceQuantityImage}
-            refresh={refresh}
-            
-            />
-          
-          <ZNumber
-            name="variation_min_stock"
-            label="Minimum Stock"
-            placeholder="Enter Minimum Stock"
-            defaultKey = "product"
-            setPriceQuantityImage={setPriceQuantityImage}
-            refresh={refresh}
-
-
-          />
-          <ZNumber
-            name="variation_max_stock"
-            label="Maximum Stock"
-            placeholder="Enter Maximum Stock"
-            defaultKey = "product"
-            setPriceQuantityImage={setPriceQuantityImage}
-            refresh={refresh}
-
-
-          />
-          <ZNumber
-            name="variationSalePrice"
-            label="Sale Price"
-            placeholder="Enter Sale Price"
-            defaultKey = "product"
-            setPriceQuantityImage={setPriceQuantityImage}
-            refresh={refresh}
-
-          />
-
-          <ZNumber
-            name="variationSerialNo"    
-            label="Serial No"
-            placeholder="Enter Serial No"
-            defaultKey = "product"
-            setPriceQuantityImage={setPriceQuantityImage}
-            refresh={refresh}
-
-
-          />
-          <ZNumber
-            name="variationPurchasePrice"
-            label="Purchase Price"
-            placeholder="Enter Purchase Price"
-            defaultKey ="product"
-            setPriceQuantityImage={setPriceQuantityImage}
-            refresh={refresh}
-
-          />
-          <ZNumber
-            name="variationWholeSalePrice"
-            type="number"
-            label="Wholesale Price"
-            placeholder="Enter Wholesale Price"
-            defaultKey ="product"
-            setPriceQuantityImage={setPriceQuantityImage}
-            refresh={refresh}
-
-          />
-          <ZNumber
-            name="variationRetailPrice"
-            type="number"
-            label="Retail Price"
-            placeholder="Enter Retail Price"
-            defaultKey="product"
-            setPriceQuantityImage={setPriceQuantityImage}
-            refresh={refresh}
-
-          />
-            </>
+              <div className="col-span-2">
+                <ZInputTextArea
+                  name="productDescription"
+                  type="text"
+                  label="Description"
+                  placeholder="Enter product description"
+                />
               </div>
 
-              {/* button */}
-              <div className="flex justify-end">
-                <Button
-                  htmlType="button"
-                  onClick={() => handleAddPerSkuInSkus()}
-     
-                  style={{ backgroundColor: "#162447", color: "white" }}
-          
-                >
-                  + Add Variant
-                </Button>
+              <ZSelect
+                name="notAvailableBranchIDs"
+                mode={"multiple"}
+                label="Not available Branch Name"
+                placeholder="Select Not Available Branch"
+                options={branchData}
+                isLoading={branchIsLoading}
+              />
+
+              <ZInputTwo
+                name="expiryDate"
+                type="date"
+                label="Expiry Date"
+                placeholder="Enter Expiry Date"
+              />
+
+              <ZImageInput
+                label="Product Image"
+                name="productImage"
+              ></ZImageInput>
+
+              <ZSelect
+                name="isActive"
+                label="Status"
+                options={[
+                  { label: "Active", value: true },
+                  { label: "Inactive", value: false },
+                ]}
+                placeholder="Select status"
+              />
+
+              <div className="mt-7 lg:col-span-2">
+                <h5 className="text-xl  pb-2 mb-2  ">Type of products</h5>
+                <ZRadio
+                  options={[
+                    {
+                      name: "Without Variant",
+                      value: "1",
+                    },
+                    {
+                      name: "With Variant",
+                      value: "0",
+                    },
+                  ]}
+                  name={"is_single_product"}
+                  label={"Product type"}
+                  setProductType={setProductType}
+                ></ZRadio>
               </div>
+
+              {/* single Product type start */}
+
+              {productType === "1" && (
+                <>
+                  <ZNumber
+                    name="stock"
+                    label="Stock Quantity"
+                    placeholder="Enter Stock Quantity"
+                    refresh={refresh}
+                    defaultKey="singleProduct"
+                    setPriceQuantityImage={singleSetPriceQuantityImage}
+                  />
+
+                  <ZNumber
+                    name="min_stock"
+                    label="Minimum Stock"
+                    placeholder="Enter Minimum Stock"
+                    refresh={refresh}
+                    defaultKey="singleProduct"
+                    setPriceQuantityImage={singleSetPriceQuantityImage}
+                  />
+                  <ZNumber
+                    name="max_stock"
+                    label="Maximum Stock"
+                    placeholder="Enter Maximum Stock"
+                    refresh={refresh}
+                    defaultKey="singleProduct"
+                    setPriceQuantityImage={singleSetPriceQuantityImage}
+                  />
+                  <ZNumber
+                    name="salePrice"
+                    label="Sale Price"
+                    placeholder="Enter Sale Price"
+                    refresh={refresh}
+                    defaultKey="singleProduct"
+                    setPriceQuantityImage={singleSetPriceQuantityImage}
+                  />
+
+                  <ZNumber
+                    name="serialNo"
+                    label="Serial No"
+                    placeholder="Enter Serial No"
+                    refresh={refresh}
+                    defaultKey="singleProduct"
+                    setPriceQuantityImage={singleSetPriceQuantityImage}
+                  />
+
+                  <ZNumber
+                    name="purchasePrice"
+                    label="Purchase Price"
+                    placeholder="Enter Purchase Price"
+                    refresh={refresh}
+                    defaultKey="singleProduct"
+                    setPriceQuantityImage={singleSetPriceQuantityImage}
+                  />
+                  <ZNumber
+                    name="wholeSalePrice"
+                    label="Wholesale Price"
+                    placeholder="Enter Wholesale Price"
+                    refresh={refresh}
+                    defaultKey="singleProduct"
+                    setPriceQuantityImage={singleSetPriceQuantityImage}
+                  />
+                  <ZNumber
+                    name="retailPrice"
+                    label="Retail Price"
+                    placeholder="Enter Retail Price"
+                    refresh={refresh}
+                    defaultKey="singleProduct"
+                    setPriceQuantityImage={singleSetPriceQuantityImage}
+                  />
+                </>
+              )}
             </div>
-            {/* per sku end */}
-          </div>
-        )}
 
-      
+            {/* variant Product type start */}
+            {productType === "0" && (
+              <div className="mb-3">
+                {/* per sku  */}
 
+                {/* multiple attribute */}
+                <ZSelect
+                  setSelectedAttributes={setSelectedAttribute}
+                  options={attributeOptions}
+                  isLoading={attributeIsLoading}
+                  mode={"multiple"}
+                  label={"Select Variations"}
+                  name={"attribute-selected"}
+                  defaultKey="product"
+                  placeholder={"Select Variant Name"}
+                  refresh={refresh}
+                ></ZSelect>
 
+                {/* selected attribute underTheValue */}
+                <div className="border border-gray-400 p-3">
+                  {/* attribute value */}
+                  <div className="mt-12 grid lg:grid-cols-5 gap-5">
+                    {selectedAttributeUnderTheValue.map((item) => {
+                      return (
+                        <ZSelect
+                          key={item?.id}
+                          options={item?.values?.map((option) => ({
+                            value: `${item?.attributeName}-${option?.attributeValue}`,
+                            label: option?.attributeValue,
+                          }))}
+                          isLoading={attributeIsLoading}
+                          mode={undefined}
+                          label={`${item.attributeName} value`}
+                          name={`${item.attributeName}`}
+                          setPerSku={setPerSku}
+                          defaultKey="product"
+                          selectedAttribute={selectedAttribute}
+                          refresh={refresh}
+                          placeholder={`Select ${item.attributeName} value`}
+                        ></ZSelect>
+                      );
+                    })}
+                  </div>
+                  {/* image, quantity, price*/}
+                  <div className="grid grid-cols-1 items-center gap-x-2 lg:grid-cols-3">
+                    <>
+                      <ZNumber
+                        name="variationStock"
+                        label="Stock Quantity"
+                        placeholder="Enter Stock Quantity"
+                        defaultKey="product"
+                        setPriceQuantityImage={setPriceQuantityImage}
+                        refresh={refresh}
+                      />
 
-          {/* <ZCheckbox
+                      <ZNumber
+                        name="variation_min_stock"
+                        label="Minimum Stock"
+                        placeholder="Enter Minimum Stock"
+                        defaultKey="product"
+                        setPriceQuantityImage={setPriceQuantityImage}
+                        refresh={refresh}
+                      />
+                      <ZNumber
+                        name="variation_max_stock"
+                        label="Maximum Stock"
+                        placeholder="Enter Maximum Stock"
+                        defaultKey="product"
+                        setPriceQuantityImage={setPriceQuantityImage}
+                        refresh={refresh}
+                      />
+                      <ZNumber
+                        name="variationSalePrice"
+                        label="Sale Price"
+                        placeholder="Enter Sale Price"
+                        defaultKey="product"
+                        setPriceQuantityImage={setPriceQuantityImage}
+                        refresh={refresh}
+                      />
+
+                      <ZNumber
+                        name="variationSerialNo"
+                        label="Serial No"
+                        placeholder="Enter Serial No"
+                        defaultKey="product"
+                        setPriceQuantityImage={setPriceQuantityImage}
+                        refresh={refresh}
+                      />
+                      <ZNumber
+                        name="variationPurchasePrice"
+                        label="Purchase Price"
+                        placeholder="Enter Purchase Price"
+                        defaultKey="product"
+                        setPriceQuantityImage={setPriceQuantityImage}
+                        refresh={refresh}
+                      />
+                      <ZNumber
+                        name="variationWholeSalePrice"
+                        type="number"
+                        label="Wholesale Price"
+                        placeholder="Enter Wholesale Price"
+                        defaultKey="product"
+                        setPriceQuantityImage={setPriceQuantityImage}
+                        refresh={refresh}
+                      />
+                      <ZNumber
+                        name="variationRetailPrice"
+                        type="number"
+                        label="Retail Price"
+                        placeholder="Enter Retail Price"
+                        defaultKey="product"
+                        setPriceQuantityImage={setPriceQuantityImage}
+                        refresh={refresh}
+                      />
+                    </>
+                  </div>
+
+                  {/* button */}
+                  <div className="flex justify-end">
+                    <Button
+                      htmlType="button"
+                      onClick={() => handleAddPerSkuInSkus()}
+                      style={{ backgroundColor: "#162447", color: "white" }}
+                    >
+                      + Add Variant
+                    </Button>
+                  </div>
+                </div>
+                {/* per sku end */}
+              </div>
+            )}
+
+            {/* <ZCheckbox
             isSuccess={CIsSuccess}
             checkedAttribute={true}
             label="Is All Branch"
@@ -917,12 +858,10 @@ const AddProduct = () => {
             label="Is SD Applicable"
             name="isSDApplicable"
           /> */}
-           </>)
-          }
-        
+          </>
+        )}
       </ZFormTwo>
       <VariantProductTable skus={skus} setSkus={setSkus}></VariantProductTable>
-
     </div>
   );
 };
