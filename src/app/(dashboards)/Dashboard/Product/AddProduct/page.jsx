@@ -28,7 +28,7 @@ function generateUniqueId(length = 2) {
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return result;
+  return parseInt(result, 10); 
 }
 
 const AddProduct = () => {
@@ -221,7 +221,7 @@ const AddProduct = () => {
       });
 
       const sku = {
-        variationId: generateUniqueId(),
+        variationId:generateUniqueId(),
         sku: `${valuesName.join("-")}`,
         variationStock: priceQuantityImage.variationStock,
         variation_min_stock: priceQuantityImage.variation_min_stock,
@@ -378,9 +378,10 @@ const AddProduct = () => {
         const variantProductData = {
           ...modifiedData,
             attribute_combination: skus.map((sku, index) => ({
+            key: index,
             attributes: sku.attributes,
             sku: sku.sku,
-            variationId: JSON.parse(sku?.variationId),
+            variationId: sku?.variationId,
             variationStock: sku.variationStock,
             variation_min_stock: sku.variation_min_stock,
             variation_max_stock: sku.variation_max_stock,

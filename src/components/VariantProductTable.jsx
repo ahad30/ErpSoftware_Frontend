@@ -4,7 +4,7 @@ export const VariantProductTable = ({
   setSkus,
 }) => {
   const handleDeleteTheVariant = (id) => {
-    const filterTheVariant = skus.filter((item) => item.id !== id);
+    const filterTheVariant = skus.filter((item) => item.variationId !== id);
     setSkus([...filterTheVariant]);
   };
 
@@ -49,7 +49,7 @@ export const VariantProductTable = ({
             <tbody>
               {skus.map((item, index) => {
                 return (
-                  <tr key={item.id} className="">
+                  <tr key={item?.variationId} className="">
                     <td className="p-4 border-b border-blue-gray-50">
                       <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
                         {index + 1}
@@ -57,22 +57,22 @@ export const VariantProductTable = ({
                     </td>
                     <td className="p-4 border-b border-blue-gray-50">
                       <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                        {item.sku}
+                        {item?.sku}
                       </p>
                     </td>
                     <td className="p-4 border-b border-blue-gray-50">
                       <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                        {item.variationPurchasePrice}
+                        {item?.variationPurchasePrice}
                       </p>
                     </td>
                     <td className="p-4 border-b border-blue-gray-50">
                       <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                        {item.variationStock}
+                        {item?.variationStock}
                       </p>
                     </td>
                     <td className="p-4  border-b border-blue-gray-50">
                       <p
-                        onClick={() => handleDeleteTheVariant(item.id)}
+                        onClick={() => handleDeleteTheVariant(item.variationId)}
                         className="block cursor-pointer bg-red-500 text-white px-1 py-2  mx-auto text-center font-sans text-sm antialiased font-normal leading-normal rounded-md"
                       >
                         Delete
