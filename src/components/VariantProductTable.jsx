@@ -7,14 +7,16 @@ export const VariantProductTable = ({
     const filterTheVariant = skus.filter((item) => item.id !== id);
     setSkus([...filterTheVariant]);
   };
+
+  // console.log(skus)
   return (
     skus.length > 0 && (
       <div>
-        <h1 className="text-center mb-5">
+        <h1 className="text-center lg:text-xl mt-9 mb-5 font-bold">
           Check your added Variant of The Product
         </h1>
         <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-xl bg-clip-border">
-          <table className="w-full text-left table-auto min-w-max">
+          <table className="w-full text-center table-auto min-w-max">
             <thead>
               <tr>
                 <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
@@ -29,12 +31,12 @@ export const VariantProductTable = ({
                 </th>
                 <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
                   <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    price
+                   Purchase Price
                   </p>
                 </th>
                 <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
                   <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    Quantity
+                    Stock
                   </p>
                 </th>
                 <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
@@ -47,7 +49,7 @@ export const VariantProductTable = ({
             <tbody>
               {skus.map((item, index) => {
                 return (
-                  <tr key={item.id}>
+                  <tr key={item.id} className="">
                     <td className="p-4 border-b border-blue-gray-50">
                       <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
                         {index + 1}
@@ -60,15 +62,15 @@ export const VariantProductTable = ({
                     </td>
                     <td className="p-4 border-b border-blue-gray-50">
                       <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                        {/* {item.price} */}
+                        {item.variationPurchasePrice}
                       </p>
                     </td>
                     <td className="p-4 border-b border-blue-gray-50">
                       <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                        {/* {item.quantity} */}
+                        {item.variationStock}
                       </p>
                     </td>
-                    <td className="p-4 border-b border-blue-gray-50">
+                    <td className="p-4  border-b border-blue-gray-50">
                       <p
                         onClick={() => handleDeleteTheVariant(item.id)}
                         className="block cursor-pointer bg-red-500 text-white px-1 py-2  mx-auto text-center font-sans text-sm antialiased font-normal leading-normal rounded-md"
@@ -87,9 +89,4 @@ export const VariantProductTable = ({
   );
 };
 
-// const = [
-//   {color: "black", size: "xl" , storage : "128"},
-//   {color: "Black", size: "5xl" , storage : "128"},
-//   { storage : "128" , color: "Black", size: "5xl" ,},
 
-// ]
