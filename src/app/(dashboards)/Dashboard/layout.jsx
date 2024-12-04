@@ -8,12 +8,16 @@ import { usePathname } from 'next/navigation';
 
 const DashboardLayout = ({children}) => {
   const [toggle , setToggle] = useState(false);
-  const { hamburger} = useContext(HomeContextProvider);
+  const { hamburger, setHamburger} = useContext(HomeContextProvider);
   const pathName = usePathname()
 
   const handleClick = () => {
   setToggle(!toggle);
 }
+
+const handleClick2 = () => {if(hamburger){
+  setHamburger(!hamburger)
+}}
   return (
     <>
      <HomeProvider>
@@ -39,8 +43,10 @@ const DashboardLayout = ({children}) => {
           <div className="relative w-[100%]">
           <div className={` text-gray-900 h-screen overflow-y-scroll scrollbar-0`}>
            <Navbar handleClick={handleClick} toggle={toggle}/>
-           <div className={`
-           ${ pathName === "/Dashboard/pos" ? "w-full lg:w-[98%] mx-auto lg:max-w-[100vw]" : "py-5 w-[88%] lg:max-w-[90%] mx-auto "} py-0 lg:py-2`}>
+           <div  
+           onClick={handleClick2}
+           className={`
+           ${ pathName === "/Dashboard/pos" ? "w-full lg:w-[98%] mx-auto lg:max-w-[100vw]" : " px-5 py-0 lg:py-12 bg-[#F3F5F7]"} w-full py-5`}>
             {children}
           </div>
           </div>

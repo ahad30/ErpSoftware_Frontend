@@ -20,7 +20,7 @@ const Navbar = ({handleClick,toggle}) => {
     
     <div className={`bg-primary text-sm px-3 py-2 sticky top-0 z-[15] text-white ${pathName === '/Dashboard/pos' && "hidden"}`}>
     <div className='flex justify-between items-center'>
-    <div
+      <div
           className="lg:hidden focus:ring-1 cursor-pointer"
           onClick={() => setHamburger(!hamburger)}
         >

@@ -543,7 +543,7 @@ const AddProduct = () => {
                 isLoading={branchIsLoading}
               />
 
-              <div className="col-span-2">
+              <div className="lg:col-span-2">
                 <ZInputTextArea
                   name="productDescription"
                   type="text"
