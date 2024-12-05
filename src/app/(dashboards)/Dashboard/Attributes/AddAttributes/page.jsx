@@ -91,6 +91,8 @@ const AddAttributes = () => {
     dispatch(setIsAddModalOpen());
   };
 
+  
+
   return (
     <div className="">
          <div>

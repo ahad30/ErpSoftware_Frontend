@@ -21,12 +21,14 @@ import {
 import AddAttributes from "./AddAttributes/page";
 import EditAttributes from "./EditAttributes/page";
 import ButtonWithModal from "@/components/Button/ButtonWithModal";
+import LoadingPage from "@/components/LoadingPage";
+import { toast } from "sonner";
 
 const Attributes = () => {
   const dispatch = useAppDispatch();
 
   // Fetch attributes data
-  const { data, error, isLoading: attributesIsLoading } = useGetAttributesQuery();
+  const { data, error, isLoading: attributesIsLoading , isFetching } = useGetAttributesQuery();
   const { isAddModalOpen, isEditModalOpen, isDeleteModalOpen } = useAppSelector((state) => state.modal);
   const [selectedAttribute, setSelectedAttribute] = useState({});
 
@@ -60,6 +62,8 @@ const Attributes = () => {
     deleteAttribute(selectedAttribute?.id);
   };
 
+
+
   // Table columns
   const columns = [
     {
@@ -78,11 +82,13 @@ const Attributes = () => {
       key: "values",
       render: (values) =>  
         <div className="flex justify-center gap-2">
-      { values?.map((item) => (
-            <div key={item?.id} className="relative">
-              <Alert message={item?.name} type="info" />
-            </div>
-          ))
+      {
+        values?.map((item) => (
+          <div key={item?.id} className="relative">
+            <Alert message={item?.name} type="info" />
+          </div>
+        ))
+             
       }
     </div>
        
