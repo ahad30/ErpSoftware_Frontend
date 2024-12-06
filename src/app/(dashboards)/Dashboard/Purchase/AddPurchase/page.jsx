@@ -48,9 +48,11 @@ const AddPurchase = () => {
   }));
 
   const pData = productData?.data?.map((product) => ({
-    label: product.productTitle,
-    value: product.productID,
+    label: product?.productTitle,
+    value: product?.productID,
+    attribute_combination: product?.attribute_combination ? product?.attribute_combination : "This is a without variation product"
   }));
+  console.log(addedProducts);
 
   useEffect(() => {
     if (productSearch && productData) {
@@ -314,7 +316,7 @@ const addedProductPrice = addedProducts?.reduce(
              {searchedProducts.map((product) => (
                <li className="hover:bg-[#6571FF] px-3 py-1 hover:text-white text-base" 
                key={product.productID} onClick={() => handleAddProduct(product.productID)}>
-             {product.productTitle}
+                {product.productTitle}
                </li>
              ))}
            </ul>

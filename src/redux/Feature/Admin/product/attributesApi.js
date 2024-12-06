@@ -26,7 +26,7 @@ const attributesApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      // invalidatesTags: getTagsByModuleName('Attributes'),
+      invalidatesTags: getTagsByModuleName('Attributes'),
     }),
 
 

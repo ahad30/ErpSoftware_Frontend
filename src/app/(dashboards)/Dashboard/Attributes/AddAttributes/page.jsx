@@ -10,6 +10,8 @@ import {
 } from "@/redux/Feature/Admin/product/attributesApi";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { useRouter } from "next/navigation";
+import { Button } from "antd";
+import BreadCrumb from "@/components/BreadCrumb/BreadCrumb";
 
 const AddAttributes = () => {
   const dispatch = useAppDispatch();
@@ -89,8 +91,13 @@ const AddAttributes = () => {
     dispatch(setIsAddModalOpen());
   };
 
+  
+
   return (
     <div className="">
+         <div>
+        {/* <BreadCrumb /> */}
+      </div>
       <ZFormTwo
         isLoading={isLoading || valueIsLoading}
         isSuccess={isSuccess || isVSuccess}
@@ -99,9 +106,8 @@ const AddAttributes = () => {
         submit={handleSubmit}
         closeModal={handleCloseAndOpen}
         formType="create"
-        data={data || vData
-        }
-        buttonName="Create Attribute"
+        data={data || vData}
+        buttonName={`Create`}
       >
         <div className="grid grid-cols-1 gap-3 mt-10">
           {/* Attribute Name */}
@@ -161,6 +167,16 @@ const AddAttributes = () => {
             </div>
           </div>
         </div>
+        {/* <div className="flex justify-end">
+                   
+                   <Button
+                      htmlType="submit"
+                      style={{ backgroundColor: "#162447", color: "white" }}
+                    >
+                      Submit
+                    </Button>
+
+                  </div> */}
       </ZFormTwo>
     </div>
   );
