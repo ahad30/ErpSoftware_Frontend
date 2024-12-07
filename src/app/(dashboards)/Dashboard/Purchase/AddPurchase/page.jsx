@@ -11,9 +11,12 @@ import { useGetProductsQuery } from "@/redux/Feature/Admin/product/productApi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "sonner";
 
+
+
 const { Search , TextArea} = Input;
-const AddPurchase = () => {
+const AddPurchase =  () => {
   const [startDate, setStartDate] = useState(dayjs());
+  const [productData, setProductData] = useState([]);
   const [productSearch, setProductSearch] = useState("");
   const [addedProducts, setAddedProducts] = useState([]);
   const [searchedProducts, setSearchedProducts] = useState([]);
@@ -34,7 +37,17 @@ const AddPurchase = () => {
   const { data: warehouseData, isLoading: wIsLoading } =
     useGetWarehousesQuery();
   const { data: supplierData, isLoading: sIsLoading } = useGetSuppliersQuery();
-  const { data: productData, isLoading: pIsLoading } = useGetProductsQuery();
+  // const { data: productData, isLoading: pIsLoading } = useGetProductsQuery();
+
+  useEffect(() => {
+    async function fetchProducts() {
+      const res = await fetch("https://b137cd07-c1f9-4016-801c-109f5e326aeb.mock.pstmn.io/product")
+      const data = await res.json()
+      console.log(data);
+      setProductData(data)
+    }
+    fetchProducts()
+  }, [])
 
 
   const wData = warehouseData?.data?.map((warehouse) => ({
@@ -89,7 +102,8 @@ const AddPurchase = () => {
         setProductSearch("");  
         setSearchedProducts([]);
         // toast.success("Product added to table");
-      } else {
+      } 
+      else {
         toast.error("Product is already added");
       }
     }
@@ -123,7 +137,7 @@ const AddPurchase = () => {
     );
   };
 
-const addedProductPrice = addedProducts?.reduce(
+  const addedProductPrice = addedProducts?.reduce(
     (accumulator, currentValue) => {
       return accumulator + Number(currentValue?.product_sale_price);
     },
@@ -213,6 +227,12 @@ const addedProductPrice = addedProducts?.reduce(
       }
     }
   };
+
+ 
+  if (!productData) return <div>Loading...</div>
+
+
+
 
   // const [
   //   createNewPos,
@@ -304,7 +324,7 @@ const addedProductPrice = addedProducts?.reduce(
               onChange={(e) => setProductSearch(e.target.value)}
               allowClear
               enterButton={<CiSearch size={20} />}
-              loading={pIsLoading}
+              // loading={pIsLoading}
             />
           </div>
 
@@ -343,7 +363,13 @@ const addedProductPrice = addedProducts?.reduce(
                   <th className="py-2 text-center text-xs whitespace-nowrap">
                     Quantity
                   </th>
-                  <th className="py-2 text-center text-xs px-2">Subtotal</th>
+                  <th className="py-2 text-center text-xs whitespace-nowrap">
+                    Discount
+                  </th>
+                  <th className="py-2 text-center text-xs whitespace-nowrap px-4">
+                    Tax
+                  </th>
+                  <th className="py-2 text-center text-xs px-2 ">Subtotal</th>
                   <th className="py-2 text-xs text-center px-2">Action</th>
                 </tr>
               </thead>
@@ -353,7 +379,7 @@ const addedProductPrice = addedProducts?.reduce(
                     <td className="text-center py-2 text-sm text-gray-500">
                       {index + 1}
                     </td>
-                    <td className="text-center py-2 px-2 text-sm text-gray-500">
+                    <td className="text-center py-2 px-2 text-sm text-gray-500 font-bold">
                       {product.label}
                     </td>
                     <td className="text-center py-2 px-2 text-sm text-gray-500">
@@ -393,7 +419,7 @@ const addedProductPrice = addedProducts?.reduce(
                 {addedProducts.length === 0 && (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={7}
                       className="text-center w-full text-xl mt-12 py-4 text-red-500 font-bold"
                     >
                       No data Found
