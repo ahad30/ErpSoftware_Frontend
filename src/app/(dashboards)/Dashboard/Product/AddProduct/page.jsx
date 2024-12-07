@@ -270,13 +270,7 @@ const AddProduct = () => {
   };
 
   const handleSubmit = (data) => {
-    if (data.sku === "") {
-      toast.error("Single product sku is required", {
-        id: 10,
-        duration: 2000,
-        position: "top-right",
-      });
-    }
+
     const modifiedData = {
       is_single_product: Number(data.is_single_product),
       branchIDs: data.branchIDs,
@@ -296,6 +290,14 @@ const AddProduct = () => {
     // Check if product is single
     if (modifiedData.is_single_product === 1) {
       // Validation for single product fields
+      if (data.sku === "") {
+        toast.error("Single product sku is required", {
+          id: 10,
+          duration: 2000,
+          position: "top-right",
+        });
+      }
+
       if (data.salePrice === "") {
         toast.error("Single product sale price required", {
           id: 10,
