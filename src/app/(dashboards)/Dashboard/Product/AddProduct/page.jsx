@@ -270,6 +270,7 @@ const AddProduct = () => {
   };
 
   const handleSubmit = (data) => {
+
     const modifiedData = {
       is_single_product: Number(data.is_single_product),
       branchIDs: data.branchIDs,
@@ -283,11 +284,20 @@ const AddProduct = () => {
       // productImage: data.productImage,
       productSubtitle: data.productSubtitle,
       productTitle: data.productTitle,
+
     };
 
     // Check if product is single
     if (modifiedData.is_single_product === 1) {
       // Validation for single product fields
+      if (data.sku === "") {
+        toast.error("Single product sku is required", {
+          id: 10,
+          duration: 2000,
+          position: "top-right",
+        });
+      }
+
       if (data.salePrice === "") {
         toast.error("Single product sale price required", {
           id: 10,
@@ -295,6 +305,7 @@ const AddProduct = () => {
           position: "top-right",
         });
       }
+
       if (data.stock === "") {
         toast.error("Single product stock required", {
           id: 2,
@@ -358,6 +369,7 @@ const AddProduct = () => {
       ) {
         const singleProductData = {
           ...modifiedData,
+          sku:data?.sku,
           stock: data.stock,
           min_stock: data.min_stock,
           max_stock: data.max_stock,
@@ -503,13 +515,15 @@ const AddProduct = () => {
                 placeholder="Enter product subtitle"
               />
 
-              {/* <ZInputTwo
-            name="sku"
-            type="text"
-            label="SKU"
-            placeholder="Enter SKU"
-          />      */}
-
+          { productType == 1 &&
+                 <ZInputTwo
+                 name="sku"
+                 type="text"
+                 label="SKU"
+                 placeholder="Enter SKU"
+               />     
+     
+        } 
               <ZSelect
                 name="erpCategoryID"
                 isLoading={eLoading}
