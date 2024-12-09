@@ -11,10 +11,8 @@ import { useGetProductsQuery } from "@/redux/Feature/Admin/product/productApi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "sonner";
 
-
-
-const { Search , TextArea} = Input;
-const AddPurchase =  () => {
+const { Search, TextArea } = Input;
+const AddPurchase = () => {
   const [startDate, setStartDate] = useState(dayjs());
   const [productData, setProductData] = useState([]);
   const [productSearch, setProductSearch] = useState("");
@@ -41,14 +39,15 @@ const AddPurchase =  () => {
 
   useEffect(() => {
     async function fetchProducts() {
-      const res = await fetch("https://b137cd07-c1f9-4016-801c-109f5e326aeb.mock.pstmn.io/product")
-      const data = await res.json()
+      const res = await fetch(
+        "https://b137cd07-c1f9-4016-801c-109f5e326aeb.mock.pstmn.io/product"
+      );
+      const data = await res.json();
       console.log(data);
-      setProductData(data)
+      setProductData(data);
     }
-    fetchProducts()
-  }, [])
-
+    fetchProducts();
+  }, []);
 
   const wData = warehouseData?.data?.map((warehouse) => ({
     label: warehouse.warehouseName,
@@ -63,7 +62,9 @@ const AddPurchase =  () => {
   const pData = productData?.data?.map((product) => ({
     label: product?.productTitle,
     value: product?.productID,
-    attribute_combination: product?.attribute_combination ? product?.attribute_combination : "This is a without variation product"
+    attribute_combination: product?.attribute_combination
+      ? product?.attribute_combination
+      : "This is a without variation product",
   }));
   console.log(addedProducts);
 
@@ -87,28 +88,27 @@ const AddPurchase =  () => {
 
   const handleAddProduct = (value) => {
     const selectedProduct = pData.find((product) => product.value === value);
-  
+
     if (selectedProduct) {
       // Check if the product is already in the addedProducts array
       const isProductAlreadyAdded = addedProducts.some(
         (product) => product.value === selectedProduct.value
       );
-  
+
       if (!isProductAlreadyAdded) {
         setAddedProducts((prevProducts) => [
           ...prevProducts,
           { ...selectedProduct, quantity: 1 },
         ]);
-        setProductSearch("");  
+        setProductSearch("");
         setSearchedProducts([]);
         // toast.success("Product added to table");
-      } 
-      else {
+      } else {
         toast.error("Product is already added");
       }
     }
   };
-  
+
   useEffect(() => {
     toast.dismiss(1);
   }, []);
@@ -228,11 +228,7 @@ const AddPurchase =  () => {
     }
   };
 
- 
-  if (!productData) return <div>Loading...</div>
-
-
-
+  if (!productData) return <div>Loading...</div>;
 
   // const [
   //   createNewPos,
@@ -259,8 +255,6 @@ const AddPurchase =  () => {
   //     setDiscount(0);
   //   }
   // }, [isSuccess]);
-
-
 
   return (
     <>
@@ -313,14 +307,13 @@ const AddPurchase =  () => {
           </div>
         </div>
 
-
-      <div className='lg:col-span-3 relative'>
+        <div className="lg:col-span-3 relative">
           <label htmlFor="">Product:*</label>
-          <div className='mt-3'>
+          <div className="mt-3">
             <Search
-              value={productSearch} 
+              value={productSearch}
               placeholder="Search Product by Code Name"
-              onSearch={(value) => setProductSearch(value)} 
+              onSearch={(value) => setProductSearch(value)}
               onChange={(e) => setProductSearch(e.target.value)}
               allowClear
               enterButton={<CiSearch size={20} />}
@@ -328,28 +321,30 @@ const AddPurchase =  () => {
             />
           </div>
 
-      {
-        productSearch &&   <div className="mt-3 absolute bg-white rounded-md w-full overflow-hidden text-left whitespace-nowrap border border-gray-200 z-40" >
-           
-           {searchedProducts?.length > 0 ? (
-           <ul className="text-[#6c757d]">
-             {searchedProducts.map((product) => (
-               <li className="hover:bg-[#6571FF] px-3 py-1 hover:text-white text-base" 
-               key={product.productID} onClick={() => handleAddProduct(product.productID)}>
-                {product.productTitle}
-               </li>
-             ))}
-           </ul>
-         ) : (
-           <p className="text-center text-red-500 font-bold py-2">No Product found</p>
-         )}
-       
-       </div>
-      }
+          {productSearch && (
+            <div className="mt-3 absolute bg-white rounded-md w-full overflow-hidden text-left whitespace-nowrap border border-gray-200 z-40">
+              {searchedProducts?.length > 0 ? (
+                <ul className="text-[#6c757d]">
+                  {searchedProducts.map((product) => (
+                    <li
+                      className="hover:bg-[#6571FF] px-3 py-1 hover:text-white text-base"
+                      key={product.productID}
+                      onClick={() => handleAddProduct(product.productID)}
+                    >
+                      {product.productTitle}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-center text-red-500 font-bold py-2">
+                  No Product found
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
-
-         {/* Product table */}
+        {/* Product table */}
         <div className="lg:col-span-3">
           <label htmlFor="">Order Items:*</label>
           <div className="max-h-[30vh] overflow-y-scroll scrollbar-0 mt-3">
@@ -404,7 +399,13 @@ const AddPurchase =  () => {
                       </button>
                     </td>
                     <td className="text-center py-2 text-sm text-gray-500 px-2">
-                      ${100 * product.quantity}
+                 
+                    </td>
+                    <td className="text-center py-2 text-sm text-gray-500 px-2">
+                    </td>
+                    <td className="text-center py-2 text-sm text-gray-500 px-2">
+                    ${100 * product.quantity}
+                    
                     </td>
                     <td className="flex justify-center py-2 text-sm text-gray-500">
                       <RiDeleteBin6Line
@@ -431,182 +432,163 @@ const AddPurchase =  () => {
           </div>
         </div>
 
-
-              {/* Tax */}
+        {/* Tax */}
         <div>
-        <label htmlFor="">Order Tax:*</label>
+          <label htmlFor="">Order Tax:*</label>
 
-        <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
-        
-        <input
-          placeholder="Tax"
-          className="border-0  w-full focus:border-0 focus:ring-0 py-1 outline-none"
-          type="number"
-          value={Number(tax) == 0 ? "Tax" : tax}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (value >= 0) {
-              setTax(value);
-              handleTextAndDiscount(e.target?.value, "Tax");
+          <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
+            <input
+              placeholder="Tax"
+              className="border-0  w-full focus:border-0 focus:ring-0 py-1 outline-none"
+              type="number"
+              value={Number(tax) == 0 ? "Tax" : tax}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value >= 0) {
+                  setTax(value);
+                  handleTextAndDiscount(e.target?.value, "Tax");
+                }
+              }}
+            />
+
+            <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2"> $</span>
+          </div>
+        </div>
+
+        {/*  Discount */}
+        <div>
+          <label htmlFor="">Discount:*</label>
+
+          <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
+            <input
+              placeholder="Discount"
+              className="border-0 focus:border-0 w-full focus:ring-0 py-1 outline-none"
+              type="number"
+              value={Number(discount) == 0 ? "Discount" : discount}
+              // value={Number(tax) == 0 ? "Discount" : discount}
+              // value={
+              //   Number(discount) > 100 || discount === 0
+              //     ? "Discount"
+              //     : discount
+              // }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value >= 0) {
+                  setDiscount(value);
+                  handleTextAndDiscount(value, "Discount");
+                }
+              }}
+            />
+            <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">%</span>
+          </div>
+        </div>
+
+        {/*  shipping */}
+        <div>
+          <label htmlFor="">Shipping:*</label>
+
+          <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
+            <input
+              placeholder="Shipping"
+              className="border-0 w-full focus:border-0 focus:ring-0 py-1 outline-none"
+              type="number"
+              value={Number(shipping) == 0 ? "Shipping" : shipping}
+              onChange={(e) => {
+                const value = e.target.value;
+
+                if (value >= 0) {
+                  setShipping(value);
+                  handleShipping(value);
+                }
+              }}
+            />
+            <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">$</span>
+          </div>
+        </div>
+
+        {/* Purchase Status */}
+        <div>
+          <label htmlFor="">Status:*</label>
+          <div className="mt-3">
+            <Select
+              name="purchaseStatus"
+              style={{ width: "100%" }}
+              options={[
+                { label: "Received", value: "Received" },
+                { label: "Pending", value: "Pending" },
+                { label: "Ordered", value: "Ordered" },
+              ]}
+              placeholder="Select Purchase status"
+            />
+          </div>
+        </div>
+      </div>
+      {/* Description */}
+      <div>
+        <label htmlFor="">Note:*</label>
+
+        <div className="mt-3 mb-5">
+          <TextArea allowClear />
+        </div>
+      </div>
+
+      {/* Order Summary */}
+      <div className="flex justify-end">
+        <div className="flex w-full lg:w-[35%]  flex-col  bg-white  space-y-4 divide-y border border-gray-300  lg:mt-5">
+          <div className="pt-4 space-y-2">
+            <div>
+              <div className="flex justify-between px-5">
+                <span>Tax</span>
+                <span>{tax} $</span>
+              </div>
+            </div>
+          </div>
+          <div className="pt-4 space-y-2">
+            <div className="space-y-6">
+              <div className="flex justify-between px-5">
+                <span>Discount</span>
+                <span className="">{discount} %</span>
+              </div>
+            </div>
+          </div>
+          <div className="pt-4 space-y-2">
+            <div className="space-y-6">
+              <div className="flex justify-between px-5">
+                <span>Shipping</span>
+                <span className="">{shipping} $</span>
+              </div>
+            </div>
+          </div>
+          <div className="pt-4 pb-4 space-y-2">
+            <div className="space-y-6">
+              <div className="flex justify-between px-5">
+                <span className="text-[#6571FF]">Grand Total</span>
+                <span className="text-[#6571FF]">{totalPrice} $</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Submit button */}
+      <div className="flex justify-end mt-10 mb-8">
+        <div
+          onClick={() => {
+            if (error === true) {
+              toast.error("you can't create pos");
+            } else {
+              createPos();
             }
           }}
-        />
-
-        <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2"> $</span>
-      </div>
+          className={`bg-primary w-full lg:w-[20%] py-1 lg:py-2  rounded-lg flex justify-center items-center gap-x-2 text-base font-medium text-white ${
+            error === true
+              ? "disabled:cursor-none bg-green-200"
+              : "cursor-pointer bg-[#2FC989] "
+          }`}
+        >
+          <p>Submit</p>
         </div>
-
-            {/*  Discount */}
-            <div>
-        <label htmlFor="">Discount:*</label>
-
-            <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
-              <input
-                placeholder="Discount"
-                className="border-0 focus:border-0 w-full focus:ring-0 py-1 outline-none"
-                type="number"
-                value={Number(discount) == 0 ? "Discount" : discount}
-                // value={Number(tax) == 0 ? "Discount" : discount}
-                // value={
-                //   Number(discount) > 100 || discount === 0
-                //     ? "Discount"
-                //     : discount
-                // }
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value >= 0) {
-                    setDiscount(value);
-                    handleTextAndDiscount(value, "Discount");
-                  }
-                }}
-              />
-        <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">%</span>
-              
-            </div>
-           </div>
-
-
-            {/*  shipping */}
-            <div>
-        <label htmlFor="">Shipping:*</label>
-            
-            <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
-              <input
-                placeholder="Shipping"
-                className="border-0 w-full focus:border-0 focus:ring-0 py-1 outline-none"
-                type="number"
-                value={Number(shipping) == 0 ? "Shipping" : shipping}
-                onChange={(e) => {
-                  const value = e.target.value;
-
-                  if (value >= 0) {
-                    setShipping(value);
-                    handleShipping(value);
-                  }
-                }}
-              />
-         <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">$</span>
-
-            </div>
-       </div>
-
-           {/* Purchase Status */}
-        <div>
-        <label htmlFor="">Status:*</label>
-            <div className="mt-3">
-            <Select
-            name="purchaseStatus"
-            style={{ width: '100%'}}
-            options={[
-              { label: "Received", value: "Received" },
-              { label: "Pending", value: "Pending" },
-              { label: "Ordered", value: "Ordered" },
-            ]}
-            placeholder="Select Purchase status"
-            
-          />
-            </div>
-        </div>
-
-
-
-
       </div>
-            {/* Description */}
-            <div>
-           <label htmlFor="">Note:*</label>
- 
- <div className="mt-3 mb-5">
-
-   <TextArea  allowClear/>
- </div>
-           </div>
-
-           {/* Order Summary */}
-     <div className="flex justify-end">
-     <div className="flex w-full lg:w-[35%]  flex-col  bg-white  space-y-4 divide-y border border-gray-300  lg:mt-5">
-	
-
-	<div className="pt-4 space-y-2">
-		<div>
-			<div className="flex justify-between px-5">
-				<span>Tax</span>
-				<span>{tax} $</span>
-			</div>
-		</div>
-
-	</div>
-	<div className="pt-4 space-y-2">
-		<div className="space-y-6">
-			<div className="flex justify-between px-5">
-				<span>Discount</span>
-				<span className="">{discount} %</span>
-			</div>
-
-		</div>
-	</div>
-	<div className="pt-4 space-y-2">
-		<div className="space-y-6">
-			<div className="flex justify-between px-5">
-				<span>Shipping</span>
-				<span className="">{shipping} $</span>
-			</div>
-
-		</div>
-	</div>
-	<div className="pt-4 pb-4 space-y-2">
-		<div className="space-y-6">
-			<div className="flex justify-between px-5">
-				<span className="text-[#6571FF]">Grand Total</span>
-				<span className="text-[#6571FF]">{totalPrice} $</span>
-			</div>
-
-		</div>
-	</div>
-   
-       </div>
-     </div>
-
-     {/* Submit button */}
-     <div className="flex justify-end mt-10 mb-8">
-     <div     
-            onClick={() => {
-              if (error === true) {
-                toast.error("you can't create pos");
-              } else {
-                createPos();
-              }
-            }}
-            className={`bg-primary w-full lg:w-[20%] py-1 lg:py-2  rounded-lg flex justify-center items-center gap-x-2 text-base font-medium text-white ${
-              error === true
-                ? "disabled:cursor-none bg-green-200"
-                : "cursor-pointer bg-[#2FC989] "
-            }`}
-          >
-            <p>Submit</p>
-          </div>
-     </div>
-
     </>
   );
 };
