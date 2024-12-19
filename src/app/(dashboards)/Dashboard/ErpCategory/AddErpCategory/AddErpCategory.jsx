@@ -48,7 +48,7 @@ const AddErpCategory = () => {
 
           />
             <ZInputTwo
-            required
+            // required
             name="erpCategoryImage"
             type="text"
             label="Category Image"
@@ -57,7 +57,7 @@ const AddErpCategory = () => {
           />
 
           <ZInputTextArea name="erpCategoryDesc" label={"Category Description"} 
-          required
+          // required
           placeholder={"Enter your description"}/>
         </div>
       </ZFormTwo>

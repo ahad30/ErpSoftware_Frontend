@@ -22,13 +22,19 @@ const Login = () => {
  
   const handleSubmit = async (data) => {
     try {
+    
+      // const payload = {
+      //   ...data,
+      //   adminPermissions: "", 
+      // };
+  
       const { data: loginData } = await login(data);
       if (loginData?.data?.token) {
-        localStorage.setItem("authToken", loginData?.data?.token); 
+        localStorage.setItem("authToken", loginData?.data?.token);
         Cookies.set("authToken", loginData?.data?.token, {
-          expires: 1, 
-          path: "/", 
-          secure: false
+          expires: 365,
+          path: "/",
+          secure: false, 
         });
         router.push("/Dashboard/AdminHome");
       }
@@ -36,6 +42,7 @@ const Login = () => {
       console.error("Login failed:", error);
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">

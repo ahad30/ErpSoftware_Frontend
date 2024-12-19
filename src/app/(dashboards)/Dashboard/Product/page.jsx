@@ -29,7 +29,7 @@ const Product = () => {
       productID,
       erpCategoryID,
       productTitle,
-      subtitle,
+      productSubtitle,
       description,
       sku,
       brandID,
@@ -44,7 +44,7 @@ const Product = () => {
       erpCategoryID,
       brandID,
       businessID,
-      subtitle,
+      productSubtitle,
       description,
       sku,
       isActive,
@@ -77,11 +77,11 @@ const Product = () => {
       dataIndex: "productTitle",
       key: "productTitle",
     },
-    // {
-    //   title: "Subtitle",
-    //   dataIndex: "subtitle",
-    //   key: "subtitle",
-    // },
+    {
+      title: "Subtitle",
+      dataIndex: "productSubtitle",
+      key: "productSubtitle",
+    },
     // {
     //   title: "Description",
     //   dataIndex: "description",
@@ -107,7 +107,9 @@ const Product = () => {
       dataIndex: "isActive",
       key: "isActive",
       render: (status) => (
-        <Tag color={status === 'Active' ? 'green' : 'red'}>{status}</Tag> // Display status with color
+        <Tag color={status === true ? 'green' : 'red'}>
+          {status === true ? "Active" : "Deactive"}
+          </Tag> 
       ),
     },,
     {
@@ -131,11 +133,11 @@ const Product = () => {
   ];
 
  
- if( data?.data?.length === 0){
-  return <div className="text-red-600 font-bold text-center">No Product Found</div>
- }
+//  if( data?.data?.length === 0){
+//   return <div className="text-red-600 font-bold text-center">No Product Found</div>
+//  }
 
-//  if (error) return <p>Error loading products</p>;
+ if (error) return <p>Error loading products</p>;
 
 
   return (

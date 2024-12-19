@@ -243,20 +243,20 @@ const handleKeyPress = (event) => {
             }}
             placeholder={placeholder}
             onKeyPress={handleKeyPress}
-            maxLength={
-              [
-                "salePrice",
-                "purchasePrice",
-                "wholeSalePrice",
-                "retailPrice",
-                "variationSalePrice",
-                "variationPurchasePrice",
-                "variationWholeSalePrice",
-                "variationRetailPrice",
-              ].includes(name)
-                ? 10
-                : 5
-            }
+            // maxLength={
+            //   [
+            //     "salePrice",
+            //     "purchasePrice",
+            //     "wholeSalePrice",
+            //     "retailPrice",
+            //     "variationSalePrice",
+            //     "variationPurchasePrice",
+            //     "variationWholeSalePrice",
+            //     "variationRetailPrice",
+            //   ].includes(name)
+            //     ? 10
+            //     : 5
+            // }
             
           />
         </Form.Item>

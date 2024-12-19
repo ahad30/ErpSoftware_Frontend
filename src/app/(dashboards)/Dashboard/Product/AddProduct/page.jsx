@@ -167,7 +167,7 @@ const AddProduct = () => {
   }, [CIsSuccess, router]);
 
   const handleAddPerSkuInSkus = () => {
-    const attributes = {};
+    const attributes = [];
     const valuesName = [];
 
     if (perSku.length === 0) {
@@ -214,10 +214,14 @@ const AddProduct = () => {
       priceQuantityImage.variationRetailPrice
     ) {
       perSku.forEach((element) => {
-        const proPertyKey = element.split("-")[0];
-        const proPertyValue = element.split("-")[1];
-        valuesName.push(proPertyValue);
-        attributes[proPertyKey] = proPertyValue;
+        // const proPertyKey = element.split("-")[0];
+        // const proPertyValue = element.split("-")[1];
+        // valuesName.push(proPertyValue);
+        // attributes[proPertyKey] = proPertyValue;
+       const [attributeName, attributeValue] = element.split("-");
+        valuesName.push(attributeValue);
+        attributes.push({ attributeName, attributeValue });
+      
       });
 
       const sku = {
@@ -235,25 +239,35 @@ const AddProduct = () => {
       };
 
       console.log(sku);
-
       if (skus.length === 0) {
         setSkus([...skus, { ...sku }]);
         handleRefreshVariantState();
-      } else if (skus.length > 0) {
-        const skusAttributes = skus.map((sku) => sku.attributes);
-        const exist = variantExists(skusAttributes, sku.attributes);
-        if (!exist) {
-          setSkus([...skus, { ...sku }]);
-          handleRefreshVariantState();
-        } else {
-          toast.error("Already exists the variant of the product", {
-            duration: 2000,
-          });
-        }
+      } 
+      // else if (skus.length > 0) {
+      //   const skusAttributes = skus.map((sku) => sku.attributes);
+      //   const exist = variantExists(skusAttributes, sku.attributes);
+      //   if (!exist) {
+      //     setSkus([...skus, { ...sku }]);
+      //     handleRefreshVariantState();
+      //   } else {
+      //     toast.error("Already exists the variant of the product", {
+      //       duration: 2000,
+      //     });
+      //   }
+      // }
+      else if(skus.length > 0) {
+      const isDuplicate = skus.some((existingSku) => existingSku.sku === sku.sku);
+      if (isDuplicate) {
+        toast.error("This variant has already been added.", { id: 9 });
+      } else {
+        setSkus([...skus, { ...sku }]);
+        handleRefreshVariantState();
       }
+    }
     }
   };
 
+  
   const handleRefreshVariantState = () => {
     setPerSku([]);
     setPriceQuantityImage({
@@ -365,7 +379,8 @@ const AddProduct = () => {
         data.wholeSalePrice &&
         data.retailPrice &&
         data.min_stock &&
-        data.max_stock
+        data.max_stock &&
+        data?.sku
       ) {
         const singleProductData = {
           ...modifiedData,
@@ -389,9 +404,9 @@ const AddProduct = () => {
       if (skus.length > 0) {
         const variantProductData = {
           ...modifiedData,
-            attribute_combination: skus.map((sku, index) => ({
+            productVariant: skus.map((sku, index) => ({
             key: index,
-            attributes: sku.attributes,
+            attribute_combination: sku.attributes,
             sku: sku.sku,
             variationId: sku?.variationId,
             variationStock: sku.variationStock,
@@ -515,12 +530,13 @@ const AddProduct = () => {
                 placeholder="Enter product subtitle"
               />
 
-          { productType == 1 &&
+             { productType == 1 &&
                  <ZInputTwo
                  name="sku"
                  type="text"
                  label="SKU"
                  placeholder="Enter SKU"
+                 required
                />     
      
         } 
