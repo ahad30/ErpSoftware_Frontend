@@ -520,12 +520,13 @@ const AddProduct = () => {
                 placeholder="Enter product subtitle"
               />
 
-          { productType == 1 &&
+             { productType == 1 &&
                  <ZInputTwo
                  name="sku"
                  type="text"
                  label="SKU"
                  placeholder="Enter SKU"
+                 required
                />     
      
         } 
