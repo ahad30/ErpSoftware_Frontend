@@ -93,13 +93,10 @@ const EditAttributes = ({ selectedAttribute }) => {
     name: item.name
   }));
 
-    const handleDeleteConfirmation = (valuesData) => {
-      setAttributeValues(valuesData)
-      dispatch(setIsDeleteModalOpen());
-    };
+
   
-    const handleDeleteValue = () => {
-      deleteAttributeValue(attributeValues?.id); 
+    const handleDeleteValue = (id) => {
+      deleteAttributeValue(id); 
     };
   
 
@@ -150,14 +147,14 @@ const EditAttributes = ({ selectedAttribute }) => {
           Previous values
         </h3>
         <div className="grid mb-12 pt-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-          {valuesData?.length > 0
-            ? valuesData?.map((item) => (
+          {previousAttributeValues?.length > 0
+            ? previousAttributeValues?.map((item) => (
                 <div key={item?.id} className="relative">
                   <Alert message={item?.name} type="info" />
                   <span
                     onClick={() =>{ 
-                      handleDeleteConfirmation(item);
-                      // handlePreviousItemDelete(item?.id)
+                      handleDeleteValue(item?.id);
+                      handlePreviousItemDelete(item?.id)
                     }}
                     className="cursor-pointer absolute bg-red-500 p-1 rounded-full -top-2 -right-2 text-white"
                   >
@@ -232,17 +229,6 @@ const EditAttributes = ({ selectedAttribute }) => {
         </div>
 
       </ZFormTwo>
-      <DeleteModal
-        data={dData}
-        // error={dError}
-        isLoading={dIsLoading}
-        isSuccess={dIsSuccess}
-        title="Delete Attribute Value"
-        onDelete={handleDeleteValue}
-        isDeleteModalOpen={isDeleteModalOpen}
-        isError={dIsError}
-        description={"Deleting this attribute will remove all associated data."} 
-      ></DeleteModal>
     </div>
   );
 };
