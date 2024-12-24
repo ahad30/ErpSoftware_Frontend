@@ -64,10 +64,6 @@ const attributesApi = baseApi.injectEndpoints({
       // invalidatesTags: getTagsByModuleName('Attributes'),
     }),
 
-
-
-
-
     // Delete Attributes
     deleteAttributes: builder.mutation({
       query: (id) => ({

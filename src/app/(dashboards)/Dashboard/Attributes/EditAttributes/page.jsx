@@ -4,7 +4,7 @@ import ZFormTwo from "@/components/Form/ZFormTwo";
 import ZInputTwo from "@/components/Form/ZInputTwo";
 import ZSelect from "@/components/Form/ZSelect";
 import { useAppDispatch, useAppSelector } from "@/redux/Hook/Hook";
-import { setIsEditModalOpen } from "@/redux/Modal/ModalSlice";
+import { setIsDeleteModalOpen, setIsEditModalOpen } from "@/redux/Modal/ModalSlice";
 import {
   useDeleteAttributesValuesMutation,
   useUpdateAttributesMutation,
@@ -13,24 +13,22 @@ import {
 import { Alert } from "antd";
 import { CiTrash } from "react-icons/ci";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import DeleteModal from "@/components/Modal/DeleteModal";
+import { useRouter } from "next/navigation";
+
 
 const EditAttributes = ({ selectedAttribute }) => {
   // console.log(selectedAttribute)
-  // const [attributeValues, setAttributeValues] = useState([]);
-  const { isEditModalOpen } = useAppSelector((state) => state.modal);
-  const [previousAttributeValues, setPreviousAttributeValues] = useState([]);
-  const [deletedIds, setDeletedIds] = useState([]);
-  const [addAttributeValue, setAddAttributeValue] = useState([1]);
+  const [attributeValues, setAttributeValues] = useState({}); 
   const dispatch = useAppDispatch();
+  const [previousAttributeValues, setPreviousAttributeValues] = useState([]);
+  const [addAttributeValue, setAddAttributeValue] = useState([1]);
+  const [deletedIds, setDeletedIds] = useState([]);
+  const { isEditModalOpen , isDeleteModalOpen} = useAppSelector((state) => state.modal);
   const [updateAttribute, { isLoading, isError, isSuccess, error, data }] =
     useUpdateAttributesMutation();
-
-  // const [
-  //   updateAttributeValue,
-  //   { isLoading: valueIsLoading, isSuccess: valueIsSuccess , data: valueData },
-  // ] = useUpdateAttributesValueMutation();
-
-  // const [deleteAttributeValue, { isLoading: deleteIsLoading, isSuccess: dIsSuccess, isError: dIsError, data: dData }] = useDeleteAttributesValuesMutation();
+  const [deleteAttributeValue, { isLoading: dIsLoading, isSuccess: dIsSuccess, isError: dIsError, data: dData }] = useDeleteAttributesValuesMutation();
+  const router = useRouter();
 
   // useEffect(() => {
   //   if (selectedAttribute) {
@@ -48,6 +46,12 @@ const EditAttributes = ({ selectedAttribute }) => {
       setAddAttributeValue([1]);
     }
   }, [isEditModalOpen]);
+
+  // useEffect(() => {
+  //   if (dIsSuccess) {
+  //     router.push("/Dashboard/Attributes");
+  //   }
+  // }, [router , dIsSuccess]);
 
   useEffect(() => {
     if (selectedAttribute?.values || !isEditModalOpen || isSuccess) {
@@ -82,6 +86,22 @@ const EditAttributes = ({ selectedAttribute }) => {
     console.log(updatedPages);
     setAddAttributeValue(updatedPages);
   };
+
+  const valuesData = previousAttributeValues.map((item, index) => ({
+    key: index,
+    id: item.id,
+    name: item.name
+  }));
+
+    const handleDeleteConfirmation = (valuesData) => {
+      setAttributeValues(valuesData)
+      dispatch(setIsDeleteModalOpen());
+    };
+  
+    const handleDeleteValue = () => {
+      deleteAttributeValue(attributeValues?.id); 
+    };
+  
 
   const handleSubmit = async (formData) => {
     console.log("Form Data Submitted:", formData);
@@ -130,12 +150,15 @@ const EditAttributes = ({ selectedAttribute }) => {
           Previous values
         </h3>
         <div className="grid mb-12 pt-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-          {previousAttributeValues?.length > 0
-            ? previousAttributeValues?.map((item) => (
+          {valuesData?.length > 0
+            ? valuesData?.map((item) => (
                 <div key={item?.id} className="relative">
                   <Alert message={item?.name} type="info" />
                   <span
-                    onClick={() => handlePreviousItemDelete(item?.id)}
+                    onClick={() =>{ 
+                      handleDeleteConfirmation(item);
+                      // handlePreviousItemDelete(item?.id)
+                    }}
                     className="cursor-pointer absolute bg-red-500 p-1 rounded-full -top-2 -right-2 text-white"
                   >
                     <CiTrash size={20}></CiTrash>
@@ -207,7 +230,19 @@ const EditAttributes = ({ selectedAttribute }) => {
             </div>
           </div>
         </div>
+
       </ZFormTwo>
+      <DeleteModal
+        data={dData}
+        // error={dError}
+        isLoading={dIsLoading}
+        isSuccess={dIsSuccess}
+        title="Delete Attribute Value"
+        onDelete={handleDeleteValue}
+        isDeleteModalOpen={isDeleteModalOpen}
+        isError={dIsError}
+        description={"Deleting this attribute will remove all associated data."} 
+      ></DeleteModal>
     </div>
   );
 };

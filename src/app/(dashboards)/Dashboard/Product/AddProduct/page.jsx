@@ -168,6 +168,7 @@ const AddProduct = () => {
 
   const handleAddPerSkuInSkus = () => {
     const attributes = [];
+    // const attributes = {};
     const valuesName = [];
 
     if (perSku.length === 0) {
