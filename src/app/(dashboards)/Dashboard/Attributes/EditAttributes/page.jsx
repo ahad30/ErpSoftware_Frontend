@@ -6,6 +6,7 @@ import ZSelect from "@/components/Form/ZSelect";
 import { useAppDispatch, useAppSelector } from "@/redux/Hook/Hook";
 import { setIsDeleteModalOpen, setIsEditModalOpen } from "@/redux/Modal/ModalSlice";
 import {
+  useAddAttributesValueMutation,
   useDeleteAttributesValuesMutation,
   useUpdateAttributesMutation,
   useUpdateAttributesValueMutation,
@@ -15,31 +16,26 @@ import { CiTrash } from "react-icons/ci";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import DeleteModal from "@/components/Modal/DeleteModal";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 
 const EditAttributes = ({ selectedAttribute }) => {
-  // console.log(selectedAttribute)
-  const [attributeValues, setAttributeValues] = useState({}); 
+  console.log(selectedAttribute)
+
   const dispatch = useAppDispatch();
   const [previousAttributeValues, setPreviousAttributeValues] = useState([]);
   const [addAttributeValue, setAddAttributeValue] = useState([1]);
   const [deletedIds, setDeletedIds] = useState([]);
-  const { isEditModalOpen , isDeleteModalOpen} = useAppSelector((state) => state.modal);
+  const { isEditModalOpen } = useAppSelector((state) => state.modal);
   const [updateAttribute, { isLoading, isError, isSuccess, error, data }] =
     useUpdateAttributesMutation();
-  const [deleteAttributeValue, { isLoading: dIsLoading, isSuccess: dIsSuccess, isError: dIsError, data: dData }] = useDeleteAttributesValuesMutation();
+  const [updateAttributeValue, { isLoading: vIsLoading, isError: vIsError, isSuccess: vIsSuccess, error: vError ,data : vData }] =
+    useUpdateAttributesValueMutation();
+  const [deleteAttributeValue] = useDeleteAttributesValuesMutation();
+    const [addAttributesValue , {   data: valueData }] = useAddAttributesValueMutation();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (selectedAttribute) {
-  //     setAttributeValues(
-  //       selectedAttribute?.values?.map((value) => ({
-  //         label: value.name,
-  //         value: value.id,
-  //       })) || []
-  //     );
-  //   }
-  // }, [selectedAttribute]);
+  
 
   useEffect(() => {
     if (!isEditModalOpen) {
@@ -47,11 +43,6 @@ const EditAttributes = ({ selectedAttribute }) => {
     }
   }, [isEditModalOpen]);
 
-  // useEffect(() => {
-  //   if (dIsSuccess) {
-  //     router.push("/Dashboard/Attributes");
-  //   }
-  // }, [router , dIsSuccess]);
 
   useEffect(() => {
     if (selectedAttribute?.values || !isEditModalOpen || isSuccess) {
@@ -65,7 +56,6 @@ const EditAttributes = ({ selectedAttribute }) => {
   ]);
 
   const handlePreviousItemDelete = async (id) => {
-    // const result = await deleteAttributeValue(id);
     setDeletedIds([...deletedIds, id]);
     const filterData = previousAttributeValues.filter((item) => item.id !== id);
     setPreviousAttributeValues([...filterData]);
@@ -83,62 +73,116 @@ const EditAttributes = ({ selectedAttribute }) => {
   const handleInputChange = (index, value) => {
     const updatedPages = [...addAttributeValue];
     updatedPages[index] = value;
-    console.log(updatedPages);
+    // console.log(updatedPages);
     setAddAttributeValue(updatedPages);
   };
-
-  const valuesData = previousAttributeValues.map((item, index) => ({
-    key: index,
-    id: item.id,
-    name: item.name
-  }));
-
-
+   
+ 
   
-    const handleDeleteValue = (id) => {
-      deleteAttributeValue(id); 
+    const handleDeleteValue = async(id) => {
+   
+      const response = await deleteAttributeValue(id); 
+      const message = response?.data?.message;
+      if(message){
+        toast.success(message);
+      }    
     };
+
   
 
-  const handleSubmit = async (formData) => {
-    console.log("Form Data Submitted:", formData);
 
-    try {
-      // const updatedData = {
-      //   attributeName: formData.attributeName,
-      //   values: previousAttributeValues.map((item) => ({
-      //     id: item.id,
-      //     name: item.name,
-      //   })),
-      // };
 
-      const valuesData = formData?.attributeValue?.filter(
-        (item) => item !== undefined && item !== ""
-      );
-
-      const updatedData = {
-        attributeName: formData.attributeName,
-        attributeValue: valuesData || [],
-        value_ids: deletedIds || [],
-      };
-
-      console.log("Updated Data to Submit:", updatedData);
-
-      await updateAttribute({
-        id: selectedAttribute?.id,
-        data: updatedData,
-      }).unwrap();
-
-      setAddAttributeValue([""]);
-      console.log("Attribute updated successfully!");
-    } catch (err) {
-      console.error("Error updating attribute:", err);
-    }
-  };
+    const handleSubmit = async (formData) => {
+      console.log("Form Data Submitted:", formData);
+    
+      try {
+        // Update attribute name
+        await updateAttribute({
+          id: selectedAttribute?.id,
+          data: {
+            attributeName: formData.attributeName,
+          },
+        });
+    
+        // Combine previous and new values
+        const updatedValues = [
+          ...previousAttributeValues,
+          ...addAttributeValue
+            .filter((value) => value && typeof value === "string")
+            .map((value) => ({
+              id: null, // New values won't have an ID yet
+              name: value,
+            })),
+        ];
+    
+        // Update the attribute values
+        await Promise.all(
+          updatedValues.map((value) => {
+            if (!value.id) {
+              // Add new attribute value
+              return addAttributesValue({
+                // data: {
+                  attributeID: selectedAttribute?.id,
+                  attributeValue: value.name,
+                // },
+              });
+            }
+           
+            // return updateAttributeValue({
+            //   id: value.id,
+            //   data: {
+            //     attributeValue: value.name,
+            //   },
+            // });
+          })
+        );
+    
+        console.log("Attribute and values updated successfully!");
+      } catch (err) {
+        console.error("Error executing APIs:", err);
+      }
+    };
+    
 
   const handleCloseAndOpen = () => {
     dispatch(setIsEditModalOpen());
   };
+
+  // const handleSubmit = async (formData) => {
+  //   console.log("Form Data Submitted:", formData);
+
+  //   try {
+  //     // const updatedData = {
+  //     //   attributeName: formData.attributeName,
+  //     //   values: previousAttributeValues.map((item) => ({
+  //     //     id: item.id,
+  //     //     name: item.name,
+  //     //   })),
+  //     // };
+
+  //     const valuesData = formData?.attributeValue?.filter(
+  //       (item) => item !== undefined && item !== ""
+  //     );
+
+  //     const updatedData = {
+  //       attributeName: formData.attributeName,
+  //       attributeValue: valuesData || [],
+  //       value_ids: deletedIds || [],
+  //     };
+
+  //     console.log("Updated Data to Submit:", updatedData);
+
+  //     await updateAttribute({
+  //       id: selectedAttribute?.id,
+  //       data: updatedData,
+  //     }).unwrap();
+
+  //     setAddAttributeValue([""]);
+  //     console.log("Attribute updated successfully!");
+  //   } catch (err) {
+  //     console.error("Error updating attribute:", err);
+  //   }
+  // };
 
   return (
     <div>
@@ -153,8 +197,8 @@ const EditAttributes = ({ selectedAttribute }) => {
                   <Alert message={item?.name} type="info" />
                   <span
                     onClick={() =>{ 
-                      handleDeleteValue(item?.id);
                       handlePreviousItemDelete(item?.id)
+                      handleDeleteValue(item?.id);
                     }}
                     className="cursor-pointer absolute bg-red-500 p-1 rounded-full -top-2 -right-2 text-white"
                   >

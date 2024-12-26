@@ -797,6 +797,14 @@ const AddProduct = () => {
                         refresh={refresh}
                       />
                       <ZNumber
+                        name="qrCode"
+                        label="Qr Code No"
+                        placeholder="Enter Qr code"
+                        defaultKey="product"
+                        setPriceQuantityImage={setPriceQuantityImage}
+                        refresh={refresh}
+                      />
+                      <ZNumber
                         name="variationPurchasePrice"
                         label="Purchase Price"
                         placeholder="Enter Purchase Price"
