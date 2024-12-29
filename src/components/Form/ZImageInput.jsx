@@ -2,35 +2,59 @@
 import { Button, Form, Upload } from "antd";
 import { useState, useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { UploadOutlined, InboxOutlined } from "@ant-design/icons";
-// import { useAppSelector } from "../../Redux/hook";
+import { UploadOutlined } from "@ant-design/icons";
+import { useAppSelector } from "@/redux/Hook/Hook";
 
-const ZImageInput = ({ name, label, dragDrop }) => {
+const ZImageInput = ({
+  name,
+  label,
+  defaultKey,
+  setPriceQuantityImage,
+  refresh,
+}) => {
   const [imageList, setImageList] = useState([]);
   const { control, resetField } = useFormContext();
-  // const { isAddModalOpen, isEditModalOpen } = useAppSelector(
-  //   (state) => state.modal
-  // );
+  const { isAddModalOpen, isEditModalOpen } = useAppSelector(
+    (state) => state.modal
+  );
 
-  // useEffect(() => {
-  //   if (!isAddModalOpen || !isEditModalOpen) {
-  //     setImageList([]);
-  //     resetField(name);
-  //   }
-  // }, [isAddModalOpen, isEditModalOpen]);
+  useEffect(() => {
+    if (!isAddModalOpen || !isEditModalOpen) {
+      setImageList([]);
+      resetField(name);
+    }
+  }, [isAddModalOpen, isEditModalOpen]);
+
+  useEffect(() => {
+    if (defaultKey === "product") {
+      setImageList([]);
+    }
+  }, [refresh]);
 
   const handleChange = (info) => {
     const file = info.file;
-    console.log(file);
+    console.log(info);
+    if (
+      setPriceQuantityImage &&
+      defaultKey === "product" &&
+      info?.fileList?.length > 0
+    ) {
+      setPriceQuantityImage((prev) => ({
+        ...prev,
+        image: file,
+      }));
+    } else if (setPriceQuantityImage) {
+      setPriceQuantityImage((prev) => ({
+        ...prev,
+        image: "",
+      }));
+    }
   };
 
   return (
     <Controller
       name={name}
       control={control}
-      // rules={{
-      //   required: "The field is required",
-      // }}
       render={({ field: { onChange }, fieldState: { error } }) => (
         <Form.Item
           label={label}
@@ -65,15 +89,7 @@ const ZImageInput = ({ name, label, dragDrop }) => {
             maxCount={1}
             onChange={handleChange}
           >
-          {dragDrop ? 
-            <Button className="py-8" icon={<InboxOutlined className="text-blue-500 text-[24px]"/>}>
-             Drag & Drop Upload
-            </Button>
-            :
-            <Button icon={<UploadOutlined/>}>
-              Upload
-             </Button>
-           }
+            <Button icon={<UploadOutlined />}>Upload</Button>
           </Upload>
         </Form.Item>
       )}

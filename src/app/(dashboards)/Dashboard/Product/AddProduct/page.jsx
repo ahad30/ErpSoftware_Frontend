@@ -28,7 +28,7 @@ function generateUniqueId(length = 2) {
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return parseInt(result, 10); 
+  return parseInt(result, 10);
 }
 
 const AddProduct = () => {
@@ -54,20 +54,7 @@ const AddProduct = () => {
 
   // image file , price , quantity - 8 for vairant product
   const [priceQuantityImage, setPriceQuantityImage] = useState({
-    // image:"",
-    variationStock: "",
-    variation_min_stock: "",
-    variation_max_stock: "",
-    variationSalePrice: "",
-    variationSerialNo: "",
-    variationPurchasePrice: "",
-    variationWholeSalePrice: "",
-    variationRetailPrice: "",
-  });
-
-  // single -----> image file , price , quantity - 9
-  const [singlePriceQuantityImage, singleSetPriceQuantityImage] = useState({
-    // images:"",
+    // productImage:"",
     stock: "",
     min_stock: "",
     max_stock: "",
@@ -76,6 +63,20 @@ const AddProduct = () => {
     purchasePrice: "",
     wholeSalePrice: "",
     retailPrice: "",
+    qrCode: "",
+  });
+
+  // single -----> image file , price , quantity - 9
+  const [singlePriceQuantityImage, singleSetPriceQuantityImage] = useState({
+    // images:"",
+    // salePrice: "",
+    // serialNo: "",
+    productInitialQty: "",
+    productMinQty: "",
+    productMaxQty: "",
+    productPurchasePrice: "",
+    productWholeSalesPrice: "",
+    productRetailPrice: "",
   });
 
   const router = useRouter();
@@ -178,64 +179,68 @@ const AddProduct = () => {
         position: "top-right",
       });
     }
-    if (priceQuantityImage.variationStock === "") {
+    if (priceQuantityImage.stock === "") {
       toast.error("Enter variation stock", { id: 1 });
     }
-    if (priceQuantityImage.variation_min_stock === "") {
+    if (priceQuantityImage.min_stock === "") {
       toast.error("Enter minimum variation stock", { id: 2 });
     }
-    if (priceQuantityImage.variation_max_stock === "") {
+    if (priceQuantityImage.max_stock === "") {
       toast.error("Enter maximum variation stock", { id: 3 });
     }
-    if (priceQuantityImage.variationSalePrice === "") {
+    if (priceQuantityImage.salePrice === "") {
       toast.error("Enter variation sale price", { id: 4 });
     }
-    if (priceQuantityImage.variationSerialNo === "") {
+    if (priceQuantityImage.serialNo === "") {
       toast.error("Enter variation serial number", { id: 5 });
     }
-    if (priceQuantityImage.variationPurchasePrice === "") {
+    if (priceQuantityImage.purchasePrice === "") {
       toast.error("Enter variation purchase price", { id: 6 });
     }
-    if (priceQuantityImage.variationWholeSalePrice === "") {
+    if (priceQuantityImage.wholeSalePrice === "") {
       toast.error("Enter variation wholesale price", { id: 7 });
     }
-    if (priceQuantityImage.variationRetailPrice === "") {
+    if (priceQuantityImage.retailPrice === "") {
       toast.error("Enter variation retail price", { id: 8 });
+    }
+    if (priceQuantityImage.qrCode === "") {
+      toast.error("Enter variation qr Code", { id: 9 });
     }
 
     if (
       perSku.length > 0 &&
-      priceQuantityImage.variationStock &&
-      priceQuantityImage.variation_min_stock &&
-      priceQuantityImage.variation_max_stock &&
-      priceQuantityImage.variationSalePrice &&
-      priceQuantityImage.variationSerialNo &&
-      priceQuantityImage.variationPurchasePrice &&
-      priceQuantityImage.variationWholeSalePrice &&
-      priceQuantityImage.variationRetailPrice
+      priceQuantityImage.stock &&
+      priceQuantityImage.min_stock &&
+      priceQuantityImage.max_stock &&
+      priceQuantityImage.salePrice &&
+      priceQuantityImage.serialNo &&
+      priceQuantityImage.purchasePrice &&
+      priceQuantityImage.wholeSalePrice &&
+      priceQuantityImage.retailPrice &&
+      priceQuantityImage.qrCode
     ) {
       perSku.forEach((element) => {
         // const proPertyKey = element.split("-")[0];
         // const proPertyValue = element.split("-")[1];
         // valuesName.push(proPertyValue);
         // attributes[proPertyKey] = proPertyValue;
-       const [attributeName, attributeValue] = element.split("-");
+        const [attributeName, attributeValue] = element.split("-");
         valuesName.push(attributeValue);
         attributes.push({ attributeName, attributeValue });
-      
       });
 
       const sku = {
-        variationId:generateUniqueId(),
+        // variationId:generateUniqueId(),
         sku: `${valuesName.join("-")}`,
-        variationStock: priceQuantityImage.variationStock,
-        variation_min_stock: priceQuantityImage.variation_min_stock,
-        variation_max_stock: priceQuantityImage.variation_max_stock,
-        variationSalePrice: priceQuantityImage.variationSalePrice,
-        variationSerialNo: priceQuantityImage.variationSerialNo,
-        variationPurchasePrice: priceQuantityImage.variationPurchasePrice,
-        variationWholeSalePrice: priceQuantityImage.variationWholeSalePrice,
-        variationRetailPrice: priceQuantityImage.variationRetailPrice,
+        stock: priceQuantityImage.stock,
+        min_stock: priceQuantityImage.min_stock,
+        max_stock: priceQuantityImage.max_stock,
+        salePrice: priceQuantityImage.salePrice,
+        serialNo: priceQuantityImage.serialNo,
+        purchasePrice: priceQuantityImage.purchasePrice,
+        wholeSalePrice: priceQuantityImage.wholeSalePrice,
+        retailPrice: priceQuantityImage.retailPrice,
+        qrCode: priceQuantityImage.qrCode,
         attributes,
       };
 
@@ -243,7 +248,7 @@ const AddProduct = () => {
       if (skus.length === 0) {
         setSkus([...skus, { ...sku }]);
         handleRefreshVariantState();
-      } 
+      }
       // else if (skus.length > 0) {
       //   const skusAttributes = skus.map((sku) => sku.attributes);
       //   const exist = variantExists(skusAttributes, sku.attributes);
@@ -256,50 +261,48 @@ const AddProduct = () => {
       //     });
       //   }
       // }
-      else if(skus.length > 0) {
-      const isDuplicate = skus.some((existingSku) => existingSku.sku === sku.sku);
-      if (isDuplicate) {
-        toast.error("This variant has already been added.", { id: 9 });
-      } else {
-        setSkus([...skus, { ...sku }]);
-        handleRefreshVariantState();
+      else if (skus.length > 0) {
+        const isDuplicate = skus.some(
+          (existingSku) => existingSku.sku === sku.sku
+        );
+        if (isDuplicate) {
+          toast.error("This variant has already been added.", { id: 9 });
+        } else {
+          setSkus([...skus, { ...sku }]);
+          handleRefreshVariantState();
+        }
       }
-    }
     }
   };
 
-  
   const handleRefreshVariantState = () => {
     setPerSku([]);
     setPriceQuantityImage({
-      variationStock: "",
-      variation_min_stock: "",
-      variation_max_stock: "",
-      variationSalePrice: "",
-      variationSerialNo: "",
-      variationPurchasePrice: "",
-      variationWholeSalePrice: "",
-      variationRetailPrice: "",
+      stock: "",
+      min_stock: "",
+      max_stock: "",
+      salePrice: "",
+      serialNo: "",
+      purchasePrice: "",
+      wholeSalePrice: "",
+      retailPrice: "",
+      qrCode: "",
     });
     setRefresh(!refresh);
   };
 
   const handleSubmit = (data) => {
-
     const modifiedData = {
       is_single_product: Number(data.is_single_product),
       branchIDs: data.branchIDs,
       brandID: data.brandID,
       businessID: data.businessID,
       erpCategoryID: data.erpCategoryID,
-      expiryDate: data.expiryDate,
       isActive: data.isActive,
       notAvailableBranchIDs: data.notAvailableBranchIDs,
       productDescription: data.productDescription,
-      // productImage: data.productImage,
       productSubtitle: data.productSubtitle,
       productTitle: data.productTitle,
-
     };
 
     // Check if product is single
@@ -313,57 +316,57 @@ const AddProduct = () => {
         });
       }
 
-      if (data.salePrice === "") {
-        toast.error("Single product sale price required", {
-          id: 10,
-          duration: 1000,
-          position: "top-right",
-        });
-      }
+      // if (data.salePrice === "") {
+      //   toast.error("Single product sale price required", {
+      //     id: 10,
+      //     duration: 1000,
+      //     position: "top-right",
+      //   });
+      // }
 
-      if (data.stock === "") {
+      if (data.productInitialQty === "") {
         toast.error("Single product stock required", {
           id: 2,
           duration: 1000,
           position: "top-right",
         });
       }
-      if (data.min_stock === "") {
+      if (data.productMinQty === "") {
         toast.error("Single product min stock required", {
           id: 2,
           duration: 1000,
           position: "top-right",
         });
       }
-      if (data.max_stock === "") {
+      if (data.productMaxQty === "") {
         toast.error("Single product max stock required", {
           id: 2,
           duration: 1000,
           position: "top-right",
         });
       }
-      if (data.serialNo === "") {
-        toast.error("Single product serial number required", {
-          id: 3,
-          duration: 1000,
-          position: "top-right",
-        });
-      }
-      if (data.purchasePrice === "") {
+      // if (data.serialNo === "") {
+      //   toast.error("Single product serial number required", {
+      //     id: 3,
+      //     duration: 1000,
+      //     position: "top-right",
+      //   });
+      // }
+      if (data.productPurchasePrice === "") {
         toast.error("Single product purchase price required", {
           id: 4,
           duration: 1000,
           position: "top-right",
         });
       }
-      if (data.wholeSalePrice === "") {
+      if (data.productWholeSalesPrice === "") {
         toast.error("Single product wholesale price required", {
           id: 5,
           duration: 1000,
           position: "top-right",
         });
       }
-      if (data.retailPrice === "") {
+      if (data.productRetailPrice === "") {
         toast.error("Single product retail price required", {
           id: 6,
           duration: 1000,
@@ -373,31 +376,32 @@ const AddProduct = () => {
 
       // Only proceed if all required fields are filled
       if (
-        data.salePrice &&
-        data.stock &&
-        data.serialNo &&
-        data.purchasePrice &&
-        data.wholeSalePrice &&
-        data.retailPrice &&
-        data.min_stock &&
-        data.max_stock &&
+        // data.salePrice &&
+        data.productInitialQty &&
+        // data.serialNo &&
+        data.productPurchasePrice &&
+        data.productWholeSalesPrice &&
+        data.productRetailPrice &&
+        data.productMinQty &&
+        data.productMaxQty &&
         data?.sku
       ) {
         const singleProductData = {
           ...modifiedData,
-          sku:data?.sku,
-          stock: data.stock,
-          min_stock: data.min_stock,
-          max_stock: data.max_stock,
-          salePrice: data.salePrice,
-          serialNo: data.serialNo,
-          purchasePrice: data.purchasePrice,
-          wholeSalePrice: data.wholeSalePrice,
-          retailPrice: data.retailPrice,
+          sku: data?.sku,
+          // salePrice: data.salePrice,
+          // serialNo: data.serialNo,
+          productInitialQty: data.productInitialQty, 
+          productMinQty: data.productMinQty,
+          productMaxQty: data.productMaxQty,
+          productPurchasePrice: data.productPurchasePrice,
+          productWholeSalesPrice: data.productWholeSalesPrice,
+          productRetailPrice: data.productRetailPrice,
+          productVariant: [],
         };
 
         console.log(singleProductData);
-        // createProduct(singleProductData);
+        createProduct(singleProductData);
       }
     }
     // Check if the product is a variant product
@@ -405,23 +409,25 @@ const AddProduct = () => {
       if (skus.length > 0) {
         const variantProductData = {
           ...modifiedData,
-            productVariant: skus.map((sku, index) => ({
+          sku: "",
+          productVariant: skus.map((sku, index) => ({
             key: index,
             attribute_combination: sku.attributes,
             sku: sku.sku,
-            variationId: sku?.variationId,
-            variationStock: sku.variationStock,
-            variation_min_stock: sku.variation_min_stock,
-            variation_max_stock: sku.variation_max_stock,
-            variationSalePrice: sku.variationSalePrice,
-            variationSerialNo: sku.variationSerialNo,
-            variationPurchasePrice: sku.variationPurchasePrice,
-            variationWholeSalePrice: sku.variationWholeSalePrice,
-            variationRetailPrice: sku?.variationRetailPrice,
+            // variationId: sku?.variationId,
+            stock: sku.stock,
+            min_stock: sku.min_stock,
+            max_stock: sku.max_stock,
+            salePrice: sku.salePrice,
+            serialNo: sku.serialNo,
+            purchasePrice: sku.purchasePrice,
+            wholeSalePrice: sku.wholeSalePrice,
+            retailPrice: sku?.retailPrice,
+            qrCode: sku?.qrCode,
           })),
         };
         console.log(variantProductData);
-        // createProduct(variantProductData);
+        createProduct(variantProductData);
       } else {
         toast.error("Missing variant attribute", {
           id: 1,
@@ -531,16 +537,15 @@ const AddProduct = () => {
                 placeholder="Enter product subtitle"
               />
 
-             { productType == 1 &&
-                 <ZInputTwo
-                 name="sku"
-                 type="text"
-                 label="SKU"
-                 placeholder="Enter SKU"
-                 required
-               />     
-     
-        } 
+              {productType == 1 && (
+                <ZInputTwo
+                  name="sku"
+                  type="text"
+                  label="SKU"
+                  placeholder="Enter SKU"
+                  required
+                />
+              )}
               <ZSelect
                 name="erpCategoryID"
                 isLoading={eLoading}
@@ -592,7 +597,7 @@ const AddProduct = () => {
                 isLoading={branchIsLoading}
               />
 
-              <ZInputTwo
+              {/* <ZInputTwo
                 name="expiryDate"
                 type="date"
                 label="Expiry Date"
@@ -602,7 +607,7 @@ const AddProduct = () => {
               <ZImageInput
                 label="Product Image"
                 name="productImage"
-              ></ZImageInput>
+              ></ZImageInput> */}
 
               <ZSelect
                 name="isActive"
@@ -638,7 +643,7 @@ const AddProduct = () => {
               {productType === "1" && (
                 <>
                   <ZNumber
-                    name="stock"
+                    name="productInitialQty"
                     label="Stock Quantity"
                     placeholder="Enter Stock Quantity"
                     refresh={refresh}
@@ -647,7 +652,7 @@ const AddProduct = () => {
                   />
 
                   <ZNumber
-                    name="min_stock"
+                    name="productMinQty"
                     label="Minimum Stock"
                     placeholder="Enter Minimum Stock"
                     refresh={refresh}
@@ -655,14 +660,14 @@ const AddProduct = () => {
                     setPriceQuantityImage={singleSetPriceQuantityImage}
                   />
                   <ZNumber
-                    name="max_stock"
+                    name="productMaxQty"
                     label="Maximum Stock"
                     placeholder="Enter Maximum Stock"
                     refresh={refresh}
                     defaultKey="singleProduct"
                     setPriceQuantityImage={singleSetPriceQuantityImage}
                   />
-                  <ZNumber
+                  {/* <ZNumber
                     name="salePrice"
                     label="Sale Price"
                     placeholder="Enter Sale Price"
@@ -678,10 +683,10 @@ const AddProduct = () => {
                     refresh={refresh}
                     defaultKey="singleProduct"
                     setPriceQuantityImage={singleSetPriceQuantityImage}
-                  />
+                  /> */}
 
                   <ZNumber
-                    name="purchasePrice"
+                    name="productPurchasePrice"
                     label="Purchase Price"
                     placeholder="Enter Purchase Price"
                     refresh={refresh}
@@ -689,7 +694,7 @@ const AddProduct = () => {
                     setPriceQuantityImage={singleSetPriceQuantityImage}
                   />
                   <ZNumber
-                    name="wholeSalePrice"
+                    name="productWholeSalesPrice"
                     label="Wholesale Price"
                     placeholder="Enter Wholesale Price"
                     refresh={refresh}
@@ -697,7 +702,7 @@ const AddProduct = () => {
                     setPriceQuantityImage={singleSetPriceQuantityImage}
                   />
                   <ZNumber
-                    name="retailPrice"
+                    name="productRetailPrice"
                     label="Retail Price"
                     placeholder="Enter Retail Price"
                     refresh={refresh}
@@ -755,7 +760,7 @@ const AddProduct = () => {
                   <div className="grid grid-cols-1 items-center gap-x-2 lg:grid-cols-3">
                     <>
                       <ZNumber
-                        name="variationStock"
+                        name="stock"
                         label="Stock Quantity"
                         placeholder="Enter Stock Quantity"
                         defaultKey="product"
@@ -764,7 +769,7 @@ const AddProduct = () => {
                       />
 
                       <ZNumber
-                        name="variation_min_stock"
+                        name="min_stock"
                         label="Minimum Stock"
                         placeholder="Enter Minimum Stock"
                         defaultKey="product"
@@ -772,7 +777,7 @@ const AddProduct = () => {
                         refresh={refresh}
                       />
                       <ZNumber
-                        name="variation_max_stock"
+                        name="max_stock"
                         label="Maximum Stock"
                         placeholder="Enter Maximum Stock"
                         defaultKey="product"
@@ -780,7 +785,7 @@ const AddProduct = () => {
                         refresh={refresh}
                       />
                       <ZNumber
-                        name="variationSalePrice"
+                        name="salePrice"
                         label="Sale Price"
                         placeholder="Enter Sale Price"
                         defaultKey="product"
@@ -789,7 +794,7 @@ const AddProduct = () => {
                       />
 
                       <ZNumber
-                        name="variationSerialNo"
+                        name="serialNo"
                         label="Serial No"
                         placeholder="Enter Serial No"
                         defaultKey="product"
@@ -805,7 +810,7 @@ const AddProduct = () => {
                         refresh={refresh}
                       />
                       <ZNumber
-                        name="variationPurchasePrice"
+                        name="purchasePrice"
                         label="Purchase Price"
                         placeholder="Enter Purchase Price"
                         defaultKey="product"
@@ -813,7 +818,7 @@ const AddProduct = () => {
                         refresh={refresh}
                       />
                       <ZNumber
-                        name="variationWholeSalePrice"
+                        name="wholeSalePrice"
                         type="number"
                         label="Wholesale Price"
                         placeholder="Enter Wholesale Price"
@@ -822,7 +827,7 @@ const AddProduct = () => {
                         refresh={refresh}
                       />
                       <ZNumber
-                        name="variationRetailPrice"
+                        name="retailPrice"
                         type="number"
                         label="Retail Price"
                         placeholder="Enter Retail Price"
