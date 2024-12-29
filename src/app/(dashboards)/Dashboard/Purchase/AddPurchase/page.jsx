@@ -14,7 +14,7 @@ import { toast } from "sonner";
 const { Search, TextArea } = Input;
 const AddPurchase = () => {
   const [startDate, setStartDate] = useState(dayjs());
-  const [productData, setProductData] = useState([]);
+  // const [productData, setProductData] = useState([]);
   const [productSearch, setProductSearch] = useState("");
   const [addedProducts, setAddedProducts] = useState([]);
   const [searchedProducts, setSearchedProducts] = useState([]);
@@ -35,19 +35,19 @@ const AddPurchase = () => {
   const { data: warehouseData, isLoading: wIsLoading } =
     useGetWarehousesQuery();
   const { data: supplierData, isLoading: sIsLoading } = useGetSuppliersQuery();
-  // const { data: productData, isLoading: pIsLoading } = useGetProductsQuery();
+  const { data: productData, isLoading: pIsLoading } = useGetProductsQuery();
 
-  useEffect(() => {
-    async function fetchProducts() {
-      const res = await fetch(
-        "https://b137cd07-c1f9-4016-801c-109f5e326aeb.mock.pstmn.io/product"
-      );
-      const data = await res.json();
-      console.log(data);
-      setProductData(data);
-    }
-    fetchProducts();
-  }, []);
+  // useEffect(() => {
+  //   async function fetchProducts() {
+  //     const res = await fetch(
+  //       "https://b137cd07-c1f9-4016-801c-109f5e326aeb.mock.pstmn.io/product"
+  //     );
+  //     const data = await res.json();
+  //     console.log(data);
+  //     setProductData(data);
+  //   }
+  //   fetchProducts();
+  // }, []);
 
   const wData = warehouseData?.data?.map((warehouse) => ({
     label: warehouse.warehouseName,
@@ -62,8 +62,8 @@ const AddPurchase = () => {
   const pData = productData?.data?.map((product) => ({
     label: product?.productTitle,
     value: product?.productID,
-    attribute_combination: product?.attribute_combination
-      ? product?.attribute_combination
+    productVariant: product?.productVariant
+      ? product?.productVariant
       : "This is a without variation product",
   }));
   console.log(addedProducts);
@@ -228,7 +228,7 @@ const AddPurchase = () => {
     }
   };
 
-  if (!productData) return <div>Loading...</div>;
+  if (!productData) return <div className="text-center">Loading...</div>;
 
   // const [
   //   createNewPos,
@@ -317,7 +317,7 @@ const AddPurchase = () => {
               onChange={(e) => setProductSearch(e.target.value)}
               allowClear
               enterButton={<CiSearch size={20} />}
-              // loading={pIsLoading}
+              loading={pIsLoading}
             />
           </div>
 

@@ -4,8 +4,9 @@ import ZFormTwo from "@/components/Form/ZFormTwo";
 import ZInputTwo from "@/components/Form/ZInputTwo";
 import ZSelect from "@/components/Form/ZSelect";
 import { useAppDispatch, useAppSelector } from "@/redux/Hook/Hook";
-import { setIsEditModalOpen } from "@/redux/Modal/ModalSlice";
+import { setIsDeleteModalOpen, setIsEditModalOpen } from "@/redux/Modal/ModalSlice";
 import {
+  useAddAttributesValueMutation,
   useDeleteAttributesValuesMutation,
   useUpdateAttributesMutation,
   useUpdateAttributesValueMutation,
@@ -13,41 +14,35 @@ import {
 import { Alert } from "antd";
 import { CiTrash } from "react-icons/ci";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import DeleteModal from "@/components/Modal/DeleteModal";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 
 const EditAttributes = ({ selectedAttribute }) => {
-  // console.log(selectedAttribute)
-  // const [attributeValues, setAttributeValues] = useState([]);
-  const { isEditModalOpen } = useAppSelector((state) => state.modal);
-  const [previousAttributeValues, setPreviousAttributeValues] = useState([]);
-  const [deletedIds, setDeletedIds] = useState([]);
-  const [addAttributeValue, setAddAttributeValue] = useState([1]);
+  console.log(selectedAttribute)
+
   const dispatch = useAppDispatch();
+  const [previousAttributeValues, setPreviousAttributeValues] = useState([]);
+  const [addAttributeValue, setAddAttributeValue] = useState([1]);
+  const [deletedIds, setDeletedIds] = useState([]);
+  const { isEditModalOpen } = useAppSelector((state) => state.modal);
   const [updateAttribute, { isLoading, isError, isSuccess, error, data }] =
     useUpdateAttributesMutation();
+  const [updateAttributeValue, { isLoading: vIsLoading, isError: vIsError, isSuccess: vIsSuccess, error: vError ,data : vData }] =
+    useUpdateAttributesValueMutation();
+  const [deleteAttributeValue] = useDeleteAttributesValuesMutation();
+    const [addAttributesValue , {   data: valueData }] = useAddAttributesValueMutation();
+  const router = useRouter();
 
-  // const [
-  //   updateAttributeValue,
-  //   { isLoading: valueIsLoading, isSuccess: valueIsSuccess , data: valueData },
-  // ] = useUpdateAttributesValueMutation();
-
-  // const [deleteAttributeValue, { isLoading: deleteIsLoading, isSuccess: dIsSuccess, isError: dIsError, data: dData }] = useDeleteAttributesValuesMutation();
-
-  // useEffect(() => {
-  //   if (selectedAttribute) {
-  //     setAttributeValues(
-  //       selectedAttribute?.values?.map((value) => ({
-  //         label: value.name,
-  //         value: value.id,
-  //       })) || []
-  //     );
-  //   }
-  // }, [selectedAttribute]);
+  
 
   useEffect(() => {
     if (!isEditModalOpen) {
       setAddAttributeValue([1]);
     }
   }, [isEditModalOpen]);
+
 
   useEffect(() => {
     if (selectedAttribute?.values || !isEditModalOpen || isSuccess) {
@@ -61,7 +56,6 @@ const EditAttributes = ({ selectedAttribute }) => {
   ]);
 
   const handlePreviousItemDelete = async (id) => {
-    // const result = await deleteAttributeValue(id);
     setDeletedIds([...deletedIds, id]);
     const filterData = previousAttributeValues.filter((item) => item.id !== id);
     setPreviousAttributeValues([...filterData]);
@@ -79,49 +73,116 @@ const EditAttributes = ({ selectedAttribute }) => {
   const handleInputChange = (index, value) => {
     const updatedPages = [...addAttributeValue];
     updatedPages[index] = value;
-    console.log(updatedPages);
+    // console.log(updatedPages);
     setAddAttributeValue(updatedPages);
   };
+   
+ 
+  
+    const handleDeleteValue = async(id) => {
+   
+      const response = await deleteAttributeValue(id); 
+      const message = response?.data?.message;
+      if(message){
+        toast.success(message);
+      }    
+    };
 
-  const handleSubmit = async (formData) => {
-    console.log("Form Data Submitted:", formData);
+  
 
-    try {
-      // const updatedData = {
-      //   attributeName: formData.attributeName,
-      //   values: previousAttributeValues.map((item) => ({
-      //     id: item.id,
-      //     name: item.name,
-      //   })),
-      // };
 
-      const valuesData = formData?.attributeValue?.filter(
-        (item) => item !== undefined && item !== ""
-      );
 
-      const updatedData = {
-        attributeName: formData.attributeName,
-        attributeValue: valuesData || [],
-        value_ids: deletedIds || [],
-      };
-
-      console.log("Updated Data to Submit:", updatedData);
-
-      await updateAttribute({
-        id: selectedAttribute?.id,
-        data: updatedData,
-      }).unwrap();
-
-      setAddAttributeValue([""]);
-      console.log("Attribute updated successfully!");
-    } catch (err) {
-      console.error("Error updating attribute:", err);
-    }
-  };
+    const handleSubmit = async (formData) => {
+      console.log("Form Data Submitted:", formData);
+    
+      try {
+        // Update attribute name
+        await updateAttribute({
+          id: selectedAttribute?.id,
+          data: {
+            attributeName: formData.attributeName,
+          },
+        });
+    
+        // Combine previous and new values
+        const updatedValues = [
+          ...previousAttributeValues,
+          ...addAttributeValue
+            .filter((value) => value && typeof value === "string")
+            .map((value) => ({
+              id: null, // New values won't have an ID yet
+              name: value,
+            })),
+        ];
+    
+        // Update the attribute values
+        await Promise.all(
+          updatedValues.map((value) => {
+            if (!value.id) {
+              // Add new attribute value
+              return addAttributesValue({
+                // data: {
+                  attributeID: selectedAttribute?.id,
+                  attributeValue: value.name,
+                // },
+              });
+            }
+           
+            // return updateAttributeValue({
+            //   id: value.id,
+            //   data: {
+            //     attributeValue: value.name,
+            //   },
+            // });
+          })
+        );
+    
+        console.log("Attribute and values updated successfully!");
+      } catch (err) {
+        console.error("Error executing APIs:", err);
+      }
+    };
+    
 
   const handleCloseAndOpen = () => {
     dispatch(setIsEditModalOpen());
   };
+
+  // const handleSubmit = async (formData) => {
+  //   console.log("Form Data Submitted:", formData);
+
+  //   try {
+  //     // const updatedData = {
+  //     //   attributeName: formData.attributeName,
+  //     //   values: previousAttributeValues.map((item) => ({
+  //     //     id: item.id,
+  //     //     name: item.name,
+  //     //   })),
+  //     // };
+
+  //     const valuesData = formData?.attributeValue?.filter(
+  //       (item) => item !== undefined && item !== ""
+  //     );
+
+  //     const updatedData = {
+  //       attributeName: formData.attributeName,
+  //       attributeValue: valuesData || [],
+  //       value_ids: deletedIds || [],
+  //     };
+
+  //     console.log("Updated Data to Submit:", updatedData);
+
+  //     await updateAttribute({
+  //       id: selectedAttribute?.id,
+  //       data: updatedData,
+  //     }).unwrap();
+
+  //     setAddAttributeValue([""]);
+  //     console.log("Attribute updated successfully!");
+  //   } catch (err) {
+  //     console.error("Error updating attribute:", err);
+  //   }
+  // };
 
   return (
     <div>
@@ -135,7 +196,10 @@ const EditAttributes = ({ selectedAttribute }) => {
                 <div key={item?.id} className="relative">
                   <Alert message={item?.name} type="info" />
                   <span
-                    onClick={() => handlePreviousItemDelete(item?.id)}
+                    onClick={() =>{ 
+                      handlePreviousItemDelete(item?.id)
+                      handleDeleteValue(item?.id);
+                    }}
                     className="cursor-pointer absolute bg-red-500 p-1 rounded-full -top-2 -right-2 text-white"
                   >
                     <CiTrash size={20}></CiTrash>
@@ -207,6 +271,7 @@ const EditAttributes = ({ selectedAttribute }) => {
             </div>
           </div>
         </div>
+
       </ZFormTwo>
     </div>
   );

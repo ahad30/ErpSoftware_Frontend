@@ -45,7 +45,7 @@ const Brand = () => {
   };
 
   const handleDeleteBrand = () => {
-    deleteBrand(selectedBrand?.id); // Call the delete mutation with selected brandID
+    deleteBrand(selectedBrand?.id); 
   };
 
   // Columns for brand data
