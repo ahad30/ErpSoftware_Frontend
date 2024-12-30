@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import BreadCrumb from "@/components/BreadCrumb/BreadCrumb";
-import { Button, Image, Modal, Tag } from "antd";
+import { Alert, Button, Image, Modal, Tag } from "antd";
 import DashboardTable from "@/components/Table/DashboardTable";
 import { Space, Tooltip, message } from "antd";
 import { CiEdit } from "react-icons/ci";
@@ -13,6 +13,8 @@ import { setIsDeleteModalOpen, setIsEditModalOpen } from "@/redux/Modal/ModalSli
 import DeleteModal from "@/components/Modal/DeleteModal";
 import { useDeleteProductMutation, useGetProductsQuery } from "@/redux/Feature/Admin/product/productApi";
 import EditProduct from "./EditProduct/page";
+import { FaEye } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const Product = () => {
   const dispatch = useAppDispatch();
@@ -22,34 +24,23 @@ const Product = () => {
   );
   const [selectedProduct, setSelectedProduct] = useState({});
   const [deleteProduct, { isLoading: dCIsloading, isError, isSuccess, data: dCData, error: dError }] = useDeleteProductMutation();
+  const router = useRouter();
   console.log(data)
 
-  const productData = data?.data?.map((product, index) => {
-    const {
-      productID,
-      erpCategoryID,
-      productTitle,
-      productSubtitle,
-      description,
-      sku,
-      brandID,
-      businessID,
-      isActive,
-    } = product;
-
-    return {
+  const productData = data?.data?.map((product, index) => ({
       key: index,
-      productID,
-      productTitle,
-      erpCategoryID,
-      brandID,
-      businessID,
-      productSubtitle,
-      description,
-      sku,
-      isActive,
-    };
-  });
+      id: product?.productID,
+      category: product?.erpCategoryID,
+      title: product?.productTitle,
+      subtitle: product?.productSubtitle,
+      description: product?.description,
+      sku: product?.sku,
+      brand: product?.brandID,
+      business:product?.businessID,
+      status: product?.isActive,
+      variant: product?.productVariant
+  }));
+
   // console.log(productData);
   const handledl = (productData) => {
     setSelectedProduct(productData);
@@ -57,12 +48,16 @@ const Product = () => {
   };
 
   const handleDeleteProduct = () => {
-    deleteProduct(selectedProduct?.productID);
+    deleteProduct(selectedProduct?.id);
   };
 
   const handleEditProduct = (productData) => {
     setSelectedProduct(productData);
     dispatch(setIsEditModalOpen());
+  };
+
+  const handleViewProduct = (id) => {
+    router.push(`/Dashboard/Product/ViewProduct?id=${id}`);
   };
 
   // Define table columns
@@ -74,23 +69,33 @@ const Product = () => {
     // },
     {
       title: "Title",
-      dataIndex: "productTitle",
-      key: "productTitle",
+      dataIndex: "title",
+      key: "title",
     },
     {
       title: "Subtitle",
-      dataIndex: "productSubtitle",
-      key: "productSubtitle",
+      dataIndex: "subtitle",
+      key: "subtitle",
     },
-    // {
-    //   title: "Description",
-    //   dataIndex: "description",
-    //   key: "description",
-    // },
     {
       title: "SKU",
       dataIndex: "sku",
       key: "sku",
+    },
+    {
+      title: "Variant",
+      dataIndex: "variant",
+      render: (values) =>  
+        <div className="flex justify-center gap-2">
+      {
+        values?.map((item) => (
+          <div key={item?.id} className="relative">
+            <Alert message={item?.length} type="info" />
+          </div>
+        ))
+             
+      }
+    </div>
     },
     // {
     //   title: "Category",
@@ -104,11 +109,11 @@ const Product = () => {
     // },
     {
       title: "Status",
-      dataIndex: "isActive",
-      key: "isActive",
+      dataIndex: "status",
+      key: "status",
       render: (status) => (
         <Tag color={status === true ? 'green' : 'red'}>
-          {status === true ? "Active" : "Deactive"}
+          {status === true ? "Active" : "Inactive"}
           </Tag> 
       ),
     },,
@@ -117,6 +122,12 @@ const Product = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
+           <a onClick={() => handleViewProduct(record.id)}>
+          <Tooltip title="Click here to view product details" placement="top">
+          
+          <FaEye size={25}/>
+                  </Tooltip>
+          </a>
           <a onClick={() => handleEditProduct(record)}>
             <Tooltip title="Edit" placement="top">
               <CiEdit size={20} />
