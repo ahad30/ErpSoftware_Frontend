@@ -23,6 +23,13 @@ const productApi = baseApi.injectEndpoints({
       }),
       providesTags: getTagsByModuleName('Product')
     }),
+    // Get Products by Id
+    getProductsById: builder.query({
+      query: (id) => ({
+        url: `/products/${id}`,
+      }),
+      providesTags: getTagsByModuleName('Product')
+    }),
 
     // Update Product
     updateProduct: builder.mutation({
@@ -51,6 +58,7 @@ const productApi = baseApi.injectEndpoints({
 export const {
   useAddProductMutation,
   useGetProductsQuery,
+  useGetProductsByIdQuery,
   useUpdateProductMutation,
   useDeleteProductMutation,
 } = productApi;

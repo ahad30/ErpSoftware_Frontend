@@ -40,7 +40,7 @@ const AddProduct = () => {
   // attribute options for selected options state-3
   const [attributeOptions, setAttributeOptions] = useState([]);
   //  product type state - 4
-  const [productType, setProductType] = useState("");
+  const [typeProduct, setProductType] = useState("");
   // selectedAttribute UnderTheValue - 5
   const [selectedAttributeUnderTheValue, setSelectedAttributeUnderTheValue] =
     useState([]);
@@ -159,7 +159,7 @@ const AddProduct = () => {
 
   useEffect(() => {
     setSkus([]);
-  }, [productType]);
+  }, [typeProduct]);
 
   useEffect(() => {
     if (CIsSuccess) {
@@ -293,7 +293,7 @@ const AddProduct = () => {
 
   const handleSubmit = (data) => {
     const modifiedData = {
-      is_single_product: Number(data.is_single_product),
+      productType: Number(data.productType),
       branchIDs: data.branchIDs,
       brandID: data.brandID,
       businessID: data.businessID,
@@ -306,7 +306,7 @@ const AddProduct = () => {
     };
 
     // Check if product is single
-    if (modifiedData.is_single_product === 1) {
+    if (modifiedData.productType === 1) {
       // Validation for single product fields
       if (data.sku === "") {
         toast.error("Single product sku is required", {
@@ -405,7 +405,7 @@ const AddProduct = () => {
       }
     }
     // Check if the product is a variant product
-    else if (modifiedData.is_single_product === 0) {
+    else if (modifiedData.productType === 0) {
       if (skus.length > 0) {
         const variantProductData = {
           ...modifiedData,
@@ -537,7 +537,7 @@ const AddProduct = () => {
                 placeholder="Enter product subtitle"
               />
 
-              {productType == 1 && (
+              {typeProduct == 1 && (
                 <ZInputTwo
                   name="sku"
                   type="text"
@@ -632,7 +632,7 @@ const AddProduct = () => {
                       value: "0",
                     },
                   ]}
-                  name={"is_single_product"}
+                  name={"productType"}
                   label={"Product type"}
                   setProductType={setProductType}
                 ></ZRadio>
@@ -640,7 +640,7 @@ const AddProduct = () => {
 
               {/* single Product type start */}
 
-              {productType === "1" && (
+              {typeProduct === "1" && (
                 <>
                   <ZNumber
                     name="productInitialQty"
@@ -714,7 +714,7 @@ const AddProduct = () => {
             </div>
 
             {/* variant Product type start */}
-            {productType === "0" && (
+            {typeProduct === "0" && (
               <div className="mb-3">
                 {/* per sku  */}
 

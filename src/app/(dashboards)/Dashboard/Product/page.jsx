@@ -25,7 +25,7 @@ const Product = () => {
   const [selectedProduct, setSelectedProduct] = useState({});
   const [deleteProduct, { isLoading: dCIsloading, isError, isSuccess, data: dCData, error: dError }] = useDeleteProductMutation();
   const router = useRouter();
-  console.log(data)
+  // console.log(data)
 
   const productData = data?.data?.map((product, index) => ({
       key: index,
@@ -41,7 +41,7 @@ const Product = () => {
       variant: product?.productVariant
   }));
 
-  // console.log(productData);
+  console.log(productData);
   const handledl = (productData) => {
     setSelectedProduct(productData);
     dispatch(setIsDeleteModalOpen());
@@ -79,24 +79,37 @@ const Product = () => {
     },
     {
       title: "SKU",
-      dataIndex: "sku",
-      key: "sku",
-    },
+      render: (values, record) => (
+        <div className="flex gap-2 flex-col items-center">
+          {record.variant?.length > 0 ? (
+            record?.variant?.map((item, index) => (
+              <Alert 
+                key={index} 
+                message={`${item?.sku || 'N/A'}`} 
+                type="info" 
+              />
+            ))
+          ) : (
+            <Alert 
+              message={` ${record.sku || 'N/A'}`} 
+              type="info" 
+            />
+          )}
+        </div>
+      ),
+    }
+    
+    ,
     {
       title: "Variant",
       dataIndex: "variant",
-      render: (values) =>  
-        <div className="flex justify-center gap-2">
-      {
-        values?.map((item) => (
-          <div key={item?.id} className="relative">
-            <Alert message={item?.length} type="info" />
-          </div>
-        ))
-             
-      }
-    </div>
+      render: (values) => (
+        <div className="flex justify-center">
+          <Alert message={`Total Variant : ${values?.length || 0}`} type="info" />
+        </div>
+      ),
     },
+    
     // {
     //   title: "Category",
     //   dataIndex: "erpCategoryID",
