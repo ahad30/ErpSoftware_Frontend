@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 import React, { useState, useEffect, useRef } from "react";
@@ -10,11 +11,13 @@ import { CiSearch } from "react-icons/ci";
 import { useGetProductsQuery } from "@/redux/Feature/Admin/product/productApi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "sonner";
+import { useAddPurchaseOrderMutation } from "@/redux/Feature/Admin/purchase/purchaseApi";
+import useShowAsyncMessage from "@/components/UseShowAsyncMessage/useShowAsyncMessage";
+import { UseErrorMessages } from "@/components/UseErrorMessages/UseErrorMessages";
 
 const { Search, TextArea } = Input;
 const AddPurchase = () => {
   const [startDate, setStartDate] = useState(dayjs());
-  // const [productData, setProductData] = useState([]);
   const [productSearch, setProductSearch] = useState("");
   const [addedProducts, setAddedProducts] = useState([]);
   const [searchedProducts, setSearchedProducts] = useState([]);
@@ -36,18 +39,11 @@ const AddPurchase = () => {
     useGetWarehousesQuery();
   const { data: supplierData, isLoading: sIsLoading } = useGetSuppliersQuery();
   const { data: productData, isLoading: pIsLoading } = useGetProductsQuery();
+  const [
+    createNewPurchase,
+    { data: purchaseData, isError: purchaseIsError, isLoading : purchaseIsLoading, isSuccess: purchaseIsSuccess, error: purchaseError },
+  ] = useAddPurchaseOrderMutation();
 
-  // useEffect(() => {
-  //   async function fetchProducts() {
-  //     const res = await fetch(
-  //       "https://b137cd07-c1f9-4016-801c-109f5e326aeb.mock.pstmn.io/product"
-  //     );
-  //     const data = await res.json();
-  //     console.log(data);
-  //     setProductData(data);
-  //   }
-  //   fetchProducts();
-  // }, []);
 
   const wData = warehouseData?.data?.map((warehouse) => ({
     label: warehouse.warehouseName,
@@ -62,6 +58,7 @@ const AddPurchase = () => {
   const pData = productData?.data?.map((product) => ({
     label: product?.productTitle,
     value: product?.productID,
+    productPurchasePrice: product?.productPurchasePrice,
     productVariant: product?.productVariant
       ? product?.productVariant
       : "This is a without variation product",
@@ -79,9 +76,19 @@ const AddPurchase = () => {
     }
   }, [productSearch, productData]);
 
-  const onChange = (date) => {
-    setStartDate(date);
-  };
+  useEffect(() => {
+    if (purchaseIsSuccess) {
+      setAddedProducts([]);
+      setDiscount(0);
+      setTax(0);
+      setShipping(0);
+    }
+  }, [purchaseIsSuccess]);
+
+  useEffect(() => {
+    toast.dismiss(1);
+  }, []);
+
 
   const filterOption = (input, option) =>
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
@@ -109,9 +116,6 @@ const AddPurchase = () => {
     }
   };
 
-  useEffect(() => {
-    toast.dismiss(1);
-  }, []);
 
   const handleQuantityChange = (productID, action) => {
     setAddedProducts((prevProducts) =>
@@ -139,7 +143,7 @@ const AddPurchase = () => {
 
   const addedProductPrice = addedProducts?.reduce(
     (accumulator, currentValue) => {
-      return accumulator + Number(currentValue?.product_sale_price);
+      return accumulator + Number(currentValue?.productPurchasePrice* currentValue?.quantity);
     },
     0
   );
@@ -147,30 +151,41 @@ const AddPurchase = () => {
   useEffect(() => {
     const addedProductPrice = addedProducts?.reduce(
       (accumulator, currentValue) => {
-        return accumulator + Number(currentValue?.product_sale_price);
+        return accumulator + Number(currentValue?.productPurchasePrice* currentValue?.quantity);
       },
       0
     );
     setTotalPrice(addedProductPrice);
   }, [addedProducts]);
 
-  const handleTextAndDiscount = (value, from) => {
-    if (value < 0) {
-      setError(true);
-      return toast.error("Value must be greater than zero");
-    }
+ 
+
+  const createPurchase = () => {
+    createNewPurchase({
+      purchaseItem: addedProducts?.map((item) => item?.id),
+      discountAmount: Number(discount),
+      shippingAmount: Number(shipping),
+      taxAmount: Number(tax),
+    });
+  };
+
+  useShowAsyncMessage(purchaseIsLoading, purchaseIsError, purchaseError, purchaseIsSuccess, purchaseData);
+  UseErrorMessages(purchaseError);
+
+
+
+
+
+  const handleTaxAndDiscount = (value, from) => {
+   
 
     const count =
-      from === "Discount"
+       from === "Discount"
         ? Number(totalPrice) - Number(totalPrice) * (Number(value) / 100)
         : from === "Tax"
         ? Number(totalPrice) + Number(totalPrice) * (Number(value) / 100)
         : 0;
-    if (count < 0) {
-      setError(true);
-      toast.error("Provided Value is too high");
-    } else {
-      setError(false);
+    
       if (from === "Discount") {
         setDiscount(value);
       }
@@ -178,10 +193,9 @@ const AddPurchase = () => {
         setTax(value);
       }
       setTotalPrice(count);
-    }
+    
   };
-  // handleShipping
-  // console.log(temporaryValue);
+  
 
   const handleShipping = (value) => {
     // console.log(temporaryValue)
@@ -230,31 +244,7 @@ const AddPurchase = () => {
 
   if (!productData) return <div className="text-center">Loading...</div>;
 
-  // const [
-  //   createNewPos,
-  //   { data, isError, isLoading, isSuccess, error: posError },
-  // ] = useNewInvoiceMutation();
 
-  // const createPos = () => {
-  //   createNewPos({
-  //     items: addedProduct?.map((item) => item?.id),
-  //     discount: Number(discount),
-  //     shipping: Number(shipping),
-  //     tax: Number(tax),
-  //   });
-  // };
-
-  // useShowAsyncMessage(isLoading, isError, posError, isSuccess, data);
-  // UseErrorMessages(posError);
-
-  // useEffect(() => {
-  //   if (isSuccess) {
-  //     setAddedProduct([]);
-  //     setDiscount(0);
-  //     setTax(0);
-  //     setDiscount(0);
-  //   }
-  // }, [isSuccess]);
 
   return (
     <>
@@ -267,7 +257,7 @@ const AddPurchase = () => {
               <DatePicker
                 style={{ width: "100%", padding: "3px" }}
                 defaultValue={startDate}
-                onChange={onChange}
+                onChange={(e) => setStartDate(e)}
               />
             </Space>
           </div>
@@ -359,12 +349,12 @@ const AddPurchase = () => {
                     Quantity
                   </th>
                   <th className="py-2 text-center text-xs whitespace-nowrap">
-                    Discount
+                    Price
                   </th>
-                  <th className="py-2 text-center text-xs whitespace-nowrap px-4">
+                  {/* <th className="py-2 text-center text-xs whitespace-nowrap px-4">
                     Tax
-                  </th>
-                  <th className="py-2 text-center text-xs px-2 ">Subtotal</th>
+                  </th>  */}
+                  {/* <th className="py-2 text-center text-xs px-2 ">Subtotal</th> */}
                   <th className="py-2 text-xs text-center px-2">Action</th>
                 </tr>
               </thead>
@@ -398,15 +388,15 @@ const AddPurchase = () => {
                         +
                       </button>
                     </td>
-                    <td className="text-center py-2 text-sm text-gray-500 px-2">
-                 
+                     <td className="text-center py-2 text-sm text-gray-500 px-2">
+                      {product?.productPurchasePrice * product.quantity}
                     </td>
-                    <td className="text-center py-2 text-sm text-gray-500 px-2">
-                    </td>
-                    <td className="text-center py-2 text-sm text-gray-500 px-2">
-                    ${100 * product.quantity}
+                    {/* <td className="text-center py-2 text-sm text-gray-500 px-2">
+                    </td>  */}
+                    {/* <td className="text-center py-2 text-sm text-gray-500 px-2">
+                    ${ Number(addedProductPrice)*product.quantity}
                     
-                    </td>
+                    </td> */}
                     <td className="flex justify-center py-2 text-sm text-gray-500">
                       <RiDeleteBin6Line
                         onClick={() => handleRemoveProduct(product.value)}
@@ -427,6 +417,15 @@ const AddPurchase = () => {
                     </td>
                   </tr>
                 )}
+                <tr>
+                <td
+                      colSpan={7}
+                      className="text-center w-full text-lg mt-12 py-4 text-blue-500 font-bold"
+                    >
+                    Sub Total : 
+                    ${ Number(addedProductPrice).toFixed(2)}
+                    </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -446,7 +445,7 @@ const AddPurchase = () => {
                 const value = e.target.value;
                 if (value >= 0) {
                   setTax(value);
-                  handleTextAndDiscount(e.target?.value, "Tax");
+                  handleTaxAndDiscount(e.target?.value, "Tax");
                 }
               }}
             />
@@ -475,7 +474,7 @@ const AddPurchase = () => {
                 const value = e.target.value;
                 if (value >= 0) {
                   setDiscount(value);
-                  handleTextAndDiscount(value, "Discount");
+                  handleTaxAndDiscount(value, "Discount");
                 }
               }}
             />
@@ -577,7 +576,7 @@ const AddPurchase = () => {
             if (error === true) {
               toast.error("you can't create pos");
             } else {
-              createPos();
+              createPurchase();
             }
           }}
           className={`bg-primary w-full lg:w-[20%] py-1 lg:py-2  rounded-lg flex justify-center items-center gap-x-2 text-base font-medium text-white ${

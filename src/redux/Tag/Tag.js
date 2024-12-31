@@ -38,6 +38,10 @@ export const tags = [
     name: 'ProductVariationApi',
     tag: 'productVariationApi',
   },
+  {
+    name: 'PurchaseOrder',
+    tag: 'purchaseOrder',
+  },
 
   {
     name: 'ErpBusinesses',
