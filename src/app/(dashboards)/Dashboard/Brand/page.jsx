@@ -31,7 +31,7 @@ const Brand = () => {
     id: brand.brandID, 
     name: brand.brandName, 
     logo: brand.brandLogo, // Updated to brandLogo
-    status: brand.status ? 'Active' : 'Inactive', // Display status as text
+    status: brand.status  // Display status as text
   }));
 
   const handleEditBrand = (brandData) => {
@@ -68,7 +68,8 @@ const Brand = () => {
       dataIndex: "status",
       key: "status",
       render: (status) => (
-        <Tag color={status === 'Active' ? 'green' : 'red'}>{status}</Tag> // Display status with color
+        <Tag color={status === true ? 'green' : 'red'}>
+          {status === true ? "Active" : "Inactive"}</Tag> // Display status with color
       ),
     },
     {
