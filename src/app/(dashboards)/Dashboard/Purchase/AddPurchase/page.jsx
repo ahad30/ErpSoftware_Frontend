@@ -173,28 +173,42 @@ const AddPurchase = () => {
   UseErrorMessages(purchaseError);
 
 
+  const handleTaxAndDiscount = (value, type) => {
+    const updatedTotal =
+      type === "Discount"
+        ? totalPrice - totalPrice * (value / 100)
+        : totalPrice + totalPrice * (value / 100);
+
+    if (type === "Discount"){ 
+      setDiscount(value)
+    }
+   else if (type === "Tax"){
+      setTax(value);
+    }
+
+    setTotalPrice(updatedTotal);
+  };
 
 
-
-  const handleTaxAndDiscount = (value, from) => {
+  // const handleTaxAndDiscount = (value, from) => {
    
 
-    const count =
-       from === "Discount"
-        ? Number(totalPrice) - Number(totalPrice) * (Number(value) / 100)
-        : from === "Tax"
-        ? Number(totalPrice) + Number(totalPrice) * (Number(value) / 100)
-        : 0;
+  //   const count =
+  //      from === "Discount"
+  //       ? Number(totalPrice) - Number(totalPrice) * (Number(value) / 100)
+  //       : from === "Tax"
+  //       ? Number(totalPrice) + Number(totalPrice) * (Number(value) / 100)
+  //       : 0;
     
-      if (from === "Discount") {
-        setDiscount(value);
-      }
-      if (from === "Tax") {
-        setTax(value);
-      }
-      setTotalPrice(count);
+  //     if (from === "Discount") {
+  //       setDiscount(value);
+  //     }
+  //     if (from === "Tax") {
+  //       setTax(value);
+  //     }
+  //     setTotalPrice(count);
     
-  };
+  // };
   
 
   const handleShipping = (value) => {
