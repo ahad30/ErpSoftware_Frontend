@@ -23,10 +23,9 @@ const AddPurchase = () => {
   const [searchedProducts, setSearchedProducts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [discount, setDiscount] = useState(0);
-  const [quantity, setQuantity] = useState(1);
   const [shipping, setShipping] = useState(0);
-  const [tax, setTax] = useState(0.0);
-  const [error, setError] = useState(false);
+  const [tax, setTax] = useState(0);
+  // const [error, setError] = useState(false);
   const [temporaryValue, setTemporaryValue] = useState({
     TDiscount: 0,
     TShipping: 0,
@@ -41,9 +40,14 @@ const AddPurchase = () => {
   const { data: productData, isLoading: pIsLoading } = useGetProductsQuery();
   const [
     createNewPurchase,
-    { data: purchaseData, isError: purchaseIsError, isLoading : purchaseIsLoading, isSuccess: purchaseIsSuccess, error: purchaseError },
+    {
+      data,
+      isError,
+      isLoading,
+      isSuccess: purchaseIsSuccess,
+      error,
+    },
   ] = useAddPurchaseOrderMutation();
-
 
   const wData = warehouseData?.data?.map((warehouse) => ({
     label: warehouse.warehouseName,
@@ -89,7 +93,6 @@ const AddPurchase = () => {
     toast.dismiss(1);
   }, []);
 
-
   const filterOption = (input, option) =>
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
@@ -115,7 +118,6 @@ const AddPurchase = () => {
       }
     }
   };
-
 
   const handleQuantityChange = (productID, action) => {
     setAddedProducts((prevProducts) =>
@@ -143,7 +145,10 @@ const AddPurchase = () => {
 
   const addedProductPrice = addedProducts?.reduce(
     (accumulator, currentValue) => {
-      return accumulator + Number(currentValue?.productPurchasePrice* currentValue?.quantity);
+      return (
+        accumulator +
+        Number(currentValue?.productPurchasePrice * currentValue?.quantity)
+      );
     },
     0
   );
@@ -151,47 +156,42 @@ const AddPurchase = () => {
   useEffect(() => {
     const addedProductPrice = addedProducts?.reduce(
       (accumulator, currentValue) => {
-        return accumulator + Number(currentValue?.productPurchasePrice* currentValue?.quantity);
+        return (
+          accumulator +
+          Number(currentValue?.productPurchasePrice * currentValue?.quantity)
+        );
       },
       0
     );
     setTotalPrice(addedProductPrice);
   }, [addedProducts]);
 
- 
+  // const handleTaxAndDiscount = (value, type) => {
+  //   let updatedTotal = totalPrice;
 
-  const createPurchase = () => {
-    createNewPurchase({
-      purchaseItem: addedProducts?.map((item) => item?.id),
-      discountAmount: Number(discount),
-      shippingAmount: Number(shipping),
-      taxAmount: Number(tax),
-    });
-  };
+  //   if (type === "Discount") {
+  //     setDiscount(value);
+  //     updatedTotal -= totalPrice * (Number(value)/ 100);
+  //   } else if (type === "Tax") {
+  //     setTax(value);
+  //     updatedTotal += totalPrice * (Number(value) / 100);
+  //   }
 
-  useShowAsyncMessage(purchaseIsLoading, purchaseIsError, purchaseError, purchaseIsSuccess, purchaseData);
-  UseErrorMessages(purchaseError);
+  //   setTotalPrice(updatedTotal);
+  // };
 
+  // const handleShipping = (value) => {
+  //   setShipping(value);
+  //   const updatedTotal = addedProducts.reduce(
+  //     (accumulator, product) =>
+  //       accumulator + product.productPurchasePrice * product.quantity,
+  //     0
+  //   ) + Number(value);
 
-  const handleTaxAndDiscount = (value, type) => {
-    const updatedTotal =
-      type === "Discount"
-        ? totalPrice - totalPrice * (value / 100)
-        : totalPrice + totalPrice * (value / 100);
-
-    if (type === "Discount"){ 
-      setDiscount(value)
-    }
-   else if (type === "Tax"){
-      setTax(value);
-    }
-
-    setTotalPrice(updatedTotal);
-  };
-
+  //   setTotalPrice(updatedTotal);
+  // };
 
   // const handleTaxAndDiscount = (value, from) => {
-   
 
   //   const count =
   //      from === "Discount"
@@ -199,7 +199,7 @@ const AddPurchase = () => {
   //       : from === "Tax"
   //       ? Number(totalPrice) + Number(totalPrice) * (Number(value) / 100)
   //       : 0;
-    
+
   //     if (from === "Discount") {
   //       setDiscount(value);
   //     }
@@ -207,58 +207,147 @@ const AddPurchase = () => {
   //       setTax(value);
   //     }
   //     setTotalPrice(count);
-    
+
   // };
+
+  // const handleShipping = (value) => {
+  //   // console.log(temporaryValue)
+  //   if (temporaryValue.TShipping === 0) {
+  //     setTemporaryValue((prev) => ({
+  //       ...prev,
+  //       IShipping: totalPrice,
+  //     }));
+  //   }
+
+  //   if (value === "") {
+  //     setTotalPrice(temporaryValue.IShipping);
+  //   }
+  //   if (value > temporaryValue.TShipping) {
+  //     setTemporaryValue((prev) => ({
+  //       ...prev,
+  //       TShipping: parseFloat(value),
+  //     }));
+  //     const count = parseFloat(totalPrice) + parseFloat(value);
+  //     if (count < 0) {
+  //       setError(true);
+  //       toast.error("Provided Value is too low");
+  //     } else {
+  //       setError(false);
+  //       setShipping(value);
+  //       setTotalPrice(count);
+  //     }
+  //   }
+  //   if (value < temporaryValue.TShipping) {
+  //     // temporaryValue.TShipping = value;
+  //     const count = parseFloat(totalPrice) - parseFloat(value);
+  //     if (count < 0) {
+  //       setError(true);
+  //       toast.error("Provided Value is too high");
+  //     } else {
+  //       setError(false);
+  //       setShipping(value);
+  //       setTotalPrice(count);
+  //     }
+  //   }
+  // };
+
+  const updateTotalPrice = () => {
+    const productTotal = addedProducts.reduce(
+      (acc, product) => acc + product.productPurchasePrice * product.quantity,
+      0
+    );
+    // const productTotal = 18.85;
+
+    // Ensure shipping is a valid number
+    const shippingCost = Number(shipping) || 0;
+
+    // Correct tax calculation
+    const taxAmount = parseFloat(((productTotal) * (Number(tax) / 100)).toFixed(2)) || 0;
+    console.log(taxAmount);
+
+    // Correct discount calculation
+    const discountAmount = 
+    parseFloat(((productTotal) * (Number(discount) / 100)).toFixed(2))  || 0;
+    console.log(discountAmount);
+
+    // Final total price calculation
+    const finalTotal =   parseFloat((productTotal  - discountAmount + taxAmount + shippingCost).toFixed(2));
+    console.log(finalTotal);
+    setTotalPrice(finalTotal);
+  };
+  useEffect(() => {
+    updateTotalPrice();
+  }, [addedProducts, discount, shipping, tax]);
+
   
 
-  const handleShipping = (value) => {
-    // console.log(temporaryValue)
-    if (temporaryValue.TShipping === 0) {
-      setTemporaryValue((prev) => ({
-        ...prev,
-        IShipping: totalPrice,
-      }));
+  const createPurchase = async () => {
+    const productItems = addedProducts.map((item) => ({
+      productID: item.value,
+      productVariantID: item.productVariantID || null,
+      quantity: item.quantity,
+      purchasePrice: item.productPurchasePrice,
+      totalPrice: item.productPurchasePrice * item.quantity,
+    }));
+  
+    const productTotal = addedProducts.reduce(
+      (acc, product) => acc + product.productPurchasePrice * product.quantity,
+      0
+    );
+  
+    const shippingCost = parseFloat(shipping) || 0;
+    const discountAmount = parseFloat(discount) || 0;
+    const taxAmount = parseFloat(tax) || 0;
+  
+    const finalAmount = parseFloat(
+      (
+        productTotal +
+        shippingCost +
+        (productTotal * taxAmount) / 100 -
+        (productTotal * discountAmount) / 100
+      ).toFixed(2)
+    );
+  
+    const purchaseData = {
+      warehouseID: "", 
+      supplierID: "", 
+      businessID: "", 
+      branchID: "",
+      orderDate: startDate.format("YYYY-MM-DD"),
+      purchaseItem: productItems,
+      discountAmount: Number(discount),
+      shippingAmount: Number(shipping),
+      taxAmount: Number(tax),
+      finalAmount: finalAmount,
+      paidAmount: "",
+      dueAmount: "",
+      status: "pending",
+      notes: "This is a test purchase.",
+    };
+  
+    try {
+      // Adding purchase order via mutation
+      const response = await createNewPurchase({ data: purchaseData });
+      console.log("Response:", response);
+    } catch (error) {
+      console.error("Error:", error);
     }
-
-    // console.log(temporaryValue);
-
-    if (value === "") {
-      // console.log("hello");
-      setTotalPrice(temporaryValue.IShipping);
-    }
-    if (value > temporaryValue.TShipping) {
-      // temporaryValue.TShipping = value;
-      setTemporaryValue((prev) => ({
-        ...prev,
-        TShipping: parseFloat(value),
-      }));
-      const count = parseFloat(totalPrice) + parseFloat(value);
-      if (count < 0) {
-        setError(true);
-        toast.error("Provided Value is too low");
-      } else {
-        setError(false);
-        setShipping(value);
-        setTotalPrice(count);
-      }
-    }
-    if (value < temporaryValue.TShipping) {
-      // temporaryValue.TShipping = value;
-      const count = parseFloat(totalPrice) - parseFloat(value);
-      if (count < 0) {
-        setError(true);
-        toast.error("Provided Value is too high");
-      } else {
-        setError(false);
-        setShipping(value);
-        setTotalPrice(count);
-      }
-    }
+  
+    // Optionally, call createNewPurchase with the necessary data if needed
+    // createNewPurchase(purchaseData);
   };
+  
+
+  useShowAsyncMessage(
+    isLoading,
+    isError,
+    error,
+    purchaseIsSuccess,
+    data
+  );
+  // UseErrorMessages(error);
 
   if (!productData) return <div className="text-center">Loading...</div>;
-
-
 
   return (
     <>
@@ -402,7 +491,7 @@ const AddPurchase = () => {
                         +
                       </button>
                     </td>
-                     <td className="text-center py-2 text-sm text-gray-500 px-2">
+                    <td className="text-center py-2 text-sm text-gray-500 px-2">
                       {product?.productPurchasePrice * product.quantity}
                     </td>
                     {/* <td className="text-center py-2 text-sm text-gray-500 px-2">
@@ -432,18 +521,19 @@ const AddPurchase = () => {
                   </tr>
                 )}
                 <tr>
-                <td
-                      colSpan={7}
-                      className="text-center w-full text-lg mt-12 py-4 text-blue-500 font-bold"
-                    >
-                    Sub Total : 
-                    ${ Number(addedProductPrice).toFixed(2)}
-                    </td>
+                  <td
+                    colSpan={7}
+                    className="text-center w-full text-lg mt-12 py-4 text-blue-500 font-bold"
+                  >
+                    Sub Total : ${addedProductPrice}
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
+
+       
 
         {/* Tax */}
         <div>
@@ -459,7 +549,7 @@ const AddPurchase = () => {
                 const value = e.target.value;
                 if (value >= 0) {
                   setTax(value);
-                  handleTaxAndDiscount(e.target?.value, "Tax");
+                  // handleTaxAndDiscount(e.target?.value, "Tax");
                 }
               }}
             />
@@ -478,17 +568,11 @@ const AddPurchase = () => {
               className="border-0 focus:border-0 w-full focus:ring-0 py-1 outline-none"
               type="number"
               value={Number(discount) == 0 ? "Discount" : discount}
-              // value={Number(tax) == 0 ? "Discount" : discount}
-              // value={
-              //   Number(discount) > 100 || discount === 0
-              //     ? "Discount"
-              //     : discount
-              // }
               onChange={(e) => {
                 const value = e.target.value;
                 if (value >= 0) {
                   setDiscount(value);
-                  handleTaxAndDiscount(value, "Discount");
+                  // handleTaxAndDiscount(value, "Discount");
                 }
               }}
             />
@@ -496,8 +580,8 @@ const AddPurchase = () => {
           </div>
         </div>
 
-        {/*  shipping */}
-        <div>
+         {/*  shipping */}
+         <div>
           <label htmlFor="">Shipping:*</label>
 
           <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
@@ -511,7 +595,7 @@ const AddPurchase = () => {
 
                 if (value >= 0) {
                   setShipping(value);
-                  handleShipping(value);
+                  // handleShipping(value);
                 }
               }}
             />
@@ -552,7 +636,7 @@ const AddPurchase = () => {
             <div>
               <div className="flex justify-between px-5">
                 <span>Tax</span>
-                <span>{tax} $</span>
+                <span>{tax} %</span>
               </div>
             </div>
           </div>

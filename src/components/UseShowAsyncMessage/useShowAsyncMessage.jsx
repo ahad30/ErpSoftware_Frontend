@@ -2,7 +2,8 @@
 "use client"
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
+
 
 
 const useShowAsyncMessage = (
@@ -19,8 +20,8 @@ const useShowAsyncMessage = (
     if (isLoading) {
       toast.loading(<p>Loading...</p>, { id: 1 });
     }
-    if (isError || error) {
-      const errorMsg = error?.data?.message;
+    if (isError) {
+      const errorMsg = error?.data?.errorMessages[0]?.message;
 
       // const errorMessa;
       toast.error(errorMsg, { id: 1 });
