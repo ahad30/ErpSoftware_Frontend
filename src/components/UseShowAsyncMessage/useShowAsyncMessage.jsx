@@ -12,33 +12,23 @@ const useShowAsyncMessage = (
   error,
   isSuccess,
   data,
-  path,
-  setModalIsOpen = false
+  path
 ) => {
   const router = useRouter();
   return useEffect(() => {
     if (isLoading) {
-      toast.loading(<p>Loading...</p>, { id: 1 });
+      toast.loading("Loading...", { id: 1 });
     }
     if (isError) {
       const errorMsg = error?.data?.errorMessages[0]?.message;
-
-      // const errorMessa;
       toast.error(errorMsg, { id: 1 });
     }
-    else if (isSuccess && data?.status) {
-      //   setAddedProduct([]);
-      //   setTax("");
-      //   setDiscount("");
-      //   setShipping("");
+    else if (isSuccess && data) {
+      
       toast.success(data?.message, { id: 1 });
-      if (setModalIsOpen) {
-        setModalIsOpen(false);
-      }
       if (path) {
         router.push(path);
       }
-      // return navigate("/dashboard/product");
     }
   }, [isLoading, isError, error, isSuccess, data, path]);
 };
