@@ -198,6 +198,7 @@ const AddPurchase = () => {
  
 
   const updateTotalPrice = () => {
+    
     const productTotal = addedProducts.reduce(
       (acc, product) => acc + product.productPurchasePrice * product.quantity,
       0
@@ -206,6 +207,7 @@ const AddPurchase = () => {
     // Ensure shipping is a valid number
     const shippingCost = Number(shipping) || 0;
     
+    const paidAmount = Number(paid) || 0;
 
     // Correct tax calculation
     const taxAmount = parseFloat(((productTotal) * (Number(tax) / 100)).toFixed(2)) || 0;
@@ -220,8 +222,14 @@ const AddPurchase = () => {
     const finalTotal =   parseFloat((productTotal  - discountAmount + taxAmount + shippingCost).toFixed(2));
     console.log(finalTotal);
 
-    const paidAmount = Number(paid) || 0;
+   
+
     const dueAmount = parseFloat((finalTotal - paidAmount).toFixed(2));
+
+    if (paidAmount < finalTotal) {
+      
+      return toast.error("Paid amount can't be less than total amount");
+    }
 
     setTotalPrice(finalTotal);
     setDue(dueAmount);

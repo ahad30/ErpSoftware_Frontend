@@ -19,9 +19,9 @@ import moment from "moment";
 
 const PurchaseTable = () => {
   const dispatch = useAppDispatch();
+  const [selectedPurchase, setSelectedPurchase] = useState({});
   const { data, error, isLoading } = useGetPurchaseOrdersQuery();
   const { isEditModalOpen, isDeleteModalOpen } = useAppSelector((state) => state.modal);
-  const [selectedPurchase, setSelectedPurchase] = useState({});
   const [deletePurchase, { isLoading: dCIsloading, isError, isSuccess, data: dCData, error: dError }] = useDeletePurchaseOrderMutation();
   const router = useRouter();
 
@@ -51,9 +51,9 @@ const PurchaseTable = () => {
     deletePurchase(selectedPurchase?.id);
   };
 
-  const handleEditPurchase = (purchaseData) => {
-    setSelectedPurchase(purchaseData);
-    dispatch(setIsEditModalOpen());
+  const handleEditPurchase = (id) => {
+    router.push(`/Dashboard/Purchase/EditPurchase?id=${id}`);
+
   };
 
   const handleViewPurchase = (id) => {
@@ -113,7 +113,7 @@ const PurchaseTable = () => {
               <FaEye size={25} />
             </Tooltip>
           </a>
-          <a onClick={() => handleEditPurchase(record)}>
+          <a onClick={() => handleEditPurchase(record.id)}>
             <Tooltip title="Edit" placement="top">
               <CiEdit size={20} />
             </Tooltip>
