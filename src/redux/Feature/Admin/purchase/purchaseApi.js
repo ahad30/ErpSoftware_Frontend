@@ -7,9 +7,9 @@ const purchaseApi = baseApi.injectEndpoints({
     addPurchaseOrder: builder.mutation({
       query: (data) => ({
         url: "/purchase-order/create",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        // headers: {
+        //   "Content-Type": "application/json",
+        // },
         method: "POST",
         body: data,
       }),

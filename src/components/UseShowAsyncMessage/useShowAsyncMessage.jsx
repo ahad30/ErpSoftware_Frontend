@@ -2,7 +2,8 @@
 "use client"
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
+
 
 
 const useShowAsyncMessage = (
@@ -11,33 +12,23 @@ const useShowAsyncMessage = (
   error,
   isSuccess,
   data,
-  path,
-  setModalIsOpen = false
+  path
 ) => {
   const router = useRouter();
   return useEffect(() => {
     if (isLoading) {
-      toast.loading(<p>Loading...</p>, { id: 1 });
+      toast.loading("Loading...", { id: 1 });
     }
-    if (isError || error) {
-      const errorMsg = error?.data?.message;
-
-      // const errorMessa;
+    if (isError) {
+      const errorMsg = error?.data?.errorMessages[0]?.message;
       toast.error(errorMsg, { id: 1 });
     }
-    else if (isSuccess && data?.status) {
-      //   setAddedProduct([]);
-      //   setTax("");
-      //   setDiscount("");
-      //   setShipping("");
+    else if (isSuccess && data) {
+      
       toast.success(data?.message, { id: 1 });
-      if (setModalIsOpen) {
-        setModalIsOpen(false);
-      }
       if (path) {
         router.push(path);
       }
-      // return navigate("/dashboard/product");
     }
   }, [isLoading, isError, error, isSuccess, data, path]);
 };
