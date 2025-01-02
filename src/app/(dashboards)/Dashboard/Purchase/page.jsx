@@ -108,11 +108,11 @@ const PurchaseTable = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <a onClick={() => handleViewPurchase(record.id)}>
+          {/* <a onClick={() => handleViewPurchase(record.id)}>
             <Tooltip title="View" placement="top">
               <FaEye size={25} />
             </Tooltip>
-          </a>
+          </a> */}
           <a onClick={() => handleEditPurchase(record.id)}>
             <Tooltip title="Edit" placement="top">
               <CiEdit size={20} />
