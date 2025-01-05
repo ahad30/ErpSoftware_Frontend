@@ -21,6 +21,7 @@ const { Search, TextArea } = Input;
 const EditPurchase = () => {
   const searchParams = useSearchParams();
   const purchaseID = searchParams.get('id');
+  const [startDate, setStartDate] = useState("");
   const [description, setDescription] = useState("");
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState("");
@@ -47,16 +48,16 @@ const EditPurchase = () => {
     } = useGetBranchesQuery();
   const { data: productData, isLoading: pIsLoading } = useGetProductsQuery();
   const 
-    {
-      data: singlePurchaseData,
-      isError : singlePurchasesisError,
-      isLoading : singlePurchaseisLoading,
-      isSuccess : singlePurchaseisSuccess,
-      error : singlePurchaseError,
-    } = useGetPurchaseOrderByIdQuery(purchaseID);
-  const purchaseData = singlePurchaseData?.data
+  {
+    data: singlePurchaseData,
+    isError : singlePurchasesIsError,
+    isLoading : singlePurchaseIsLoading,
+    isSuccess : singlePurchaseIsSuccess,
+    error : singlePurchaseError,
+  } = useGetPurchaseOrderByIdQuery(purchaseID);
+const purchaseData = singlePurchaseData?.data
   console.log(purchaseData)
-  const [startDate, setStartDate] = useState(dayjs(purchaseData?.orderDate));
+
   const [
     updateNewPurchase,
     {
@@ -111,15 +112,38 @@ const EditPurchase = () => {
     }
   }, [productSearch, productData]);
 
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     setAddedProducts([]);
+  //     setDiscount(0);
+  //     setTax(0);
+  //     setShipping(0);
+  //     setDescription("");
+  //   }
+  // }, [isSuccess]);
+
   useEffect(() => {
-    if (isSuccess) {
-      setAddedProducts([]);
-      setDiscount(0);
-      setTax(0);
-      setShipping(0);
-      setDescription("");
+    if (singlePurchaseIsSuccess && purchaseData) {
+      setAddedProducts(purchaseData.items.map(item => ({
+        // purchaseItemID: item.purchaseItemID,
+        // purchaseID: item.purchaseID,
+        value: item.productID,
+        productVariantID: item.productVariantID,
+        quantity: item.quantity,
+        productPurchasePrice: item.purchasePrice,
+        totalPrice: parseFloat(item.totalPrice)
+      })));
+      setStartDate(dayjs(purchaseData.orderDate || ""));
+      setDescription(purchaseData.notes || "");
+      setSelectedWarehouse(purchaseData.warehouseID || null);
+      setSelectedSupplier(purchaseData.supplierID || null);
+      setSelectedBusiness(parseInt(purchaseData.businessID )|| null);
+      setSelectedBranch(purchaseData.branchID || null);
+      setSelectedStatus(purchaseData.status || null);
+      setPaid(purchaseData.paidAmount || 0);
+      setDue(purchaseData.dueAmount || 0);
     }
-  }, [isSuccess]);
+  }, [singlePurchaseIsSuccess, purchaseData]);
 
   useEffect(() => {
     toast.dismiss(1);
@@ -186,8 +210,6 @@ const EditPurchase = () => {
   );
 
 
-
- 
 
   const updateTotalPrice = () => {
     
@@ -256,7 +278,8 @@ const EditPurchase = () => {
 
     const dueAmount = parseFloat((finalAmount - parseFloat(paidAmount)).toFixed(2));
   
-    const purchaseData = {
+    const purchaseData ={ 
+      data: {
       warehouseID: selectedWarehouse, 
       supplierID: selectedSupplier, 
       businessID: selectedBusiness, 
@@ -271,20 +294,20 @@ const EditPurchase = () => {
       dueAmount: dueAmount,
       status: selectedStatus,
       notes: description,
-    };
+    }};
     console.log("Purchase Data:", purchaseData);
 
   
-    // try {
-    //   const response = await updateNewPurchase({ data: purchaseData });
-    //   console.log("Response:", response);
-    // } 
-    // catch (error) {
-    //   console.error("Error:", error);
-    // }  
+    try {
+      const response = await updateNewPurchase({ data: purchaseData , id: purchaseID });
+      console.log("Response:", response);
+    } 
+    catch (error) {
+      console.error("Error:", error);
+    }  
   };
   
-  const path =  "/Dashboard/EditPurchase" 
+  const path =  "/Dashboard/Purchase" 
   useShowAsyncMessage(
     isLoading,
     isError,
@@ -307,7 +330,7 @@ const EditPurchase = () => {
             <Space className="w-full" direction="vertical">
               <DatePicker
                 style={{ width: "100%", padding: "3px" }}
-                defaultValue={startDate}
+                value={startDate}
                 onChange={(e) => setStartDate(e)}
               />
             </Space>
@@ -324,7 +347,7 @@ const EditPurchase = () => {
               showSearch
               placeholder={"Choose Warehouse"}
               filterOption={filterOption}
-              value={purchaseData?.warehouseID}
+              value={selectedWarehouse}
               options={wData || []}
               loading={wIsLoading}
               disabled={true}
@@ -343,6 +366,7 @@ const EditPurchase = () => {
               showSearch
               placeholder={"Choose Supplier"}
               filterOption={filterOption}
+              value={selectedSupplier}
               options={sData || []}
               loading={sIsLoading}
               disabled={sIsLoading}
@@ -361,6 +385,7 @@ const EditPurchase = () => {
               showSearch
               placeholder={"Choose Business"}
               filterOption={filterOption}
+              value={selectedBusiness}
               options={businessOptions || []}
               loading={businessIsLoading}
               disabled={businessIsLoading}
@@ -378,6 +403,7 @@ const EditPurchase = () => {
               allowClear={true}
               showSearch
               placeholder={"Choose Branch"}
+              value={selectedBranch}
               filterOption={filterOption}
               options={branchOptions || []}
               loading={branchIsLoading}
@@ -600,7 +626,8 @@ const EditPurchase = () => {
               placeholder="Paid Amount"
               className="border-0  w-full focus:border-0 focus:ring-0 py-1 outline-none"
               type="number"
-              value={Number(paid) == 0 ? "Paid" : paid}
+              // value={Number(paid) == 0 ? "Paid" : paid}
+              value={paid}
               onChange={(e) => {
                 const value = e.target.value;
                 if (value >= 0) {
@@ -638,6 +665,7 @@ const EditPurchase = () => {
           <div className="mt-3">
             <Select
               style={{ width: "100%" }}
+              value={selectedStatus}
               options={[
                 { label: "Received", value: "Received" },
                 { label: "Pending", value: "Pending" },
@@ -655,6 +683,7 @@ const EditPurchase = () => {
 
         <div className="mt-3 mb-5">
           <TextArea 
+           value={description}
           onChange={(e) => setDescription(e.target.value)}
           allowClear />
         </div>
@@ -714,7 +743,7 @@ const EditPurchase = () => {
               : "cursor-pointer bg-[#2FC989] "
           }`}
         >
-          {isLoading ? "Processing..." : "Create Purchase"}
+          {isLoading ? "Processing..." : "Update Purchase"}
         </div>
       </div>
     </>
