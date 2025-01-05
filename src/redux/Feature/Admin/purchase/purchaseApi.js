@@ -35,9 +35,9 @@ const purchaseApi = baseApi.injectEndpoints({
     updatePurchaseOrder: builder.mutation({
       query: ({ id, data }) => ({
         url: `/purchase-order/update/${id}`,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        // headers: {
+        //   "Content-Type": "application/json",
+        // },
         method: "PATCH",
         body: data,
       }),
