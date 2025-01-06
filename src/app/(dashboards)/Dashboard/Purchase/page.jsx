@@ -16,6 +16,7 @@ import { FaEye } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useDeletePurchaseOrderMutation, useGetPurchaseOrdersQuery } from "@/redux/Feature/Admin/purchase/purchaseApi";
 import moment from "moment";
+import AddPurchase from "@/components/AddPurchase";
 
 const PurchaseTable = () => {
   const dispatch = useAppDispatch();
@@ -41,6 +42,8 @@ const PurchaseTable = () => {
     status: purchase?.status,
     items: purchase?.items,
   }));
+
+  // console.log(purchaseData)
 
   const handleDelete = (purchaseData) => {
     setSelectedPurchase(purchaseData);
@@ -98,7 +101,9 @@ const PurchaseTable = () => {
       dataIndex: "status",
       key: "status",
       render: (status) => (
-        <Tag color={status === "pending" ? "orange" : "green"}>
+        <Tag 
+        color={status === "pending" ? "red" : "green"}
+        >
           {status}
         </Tag>
       ),
@@ -159,6 +164,8 @@ const PurchaseTable = () => {
         isError={isError}
         description={"Deleting this purchase will remove all corresponding data."}
       />
+
+      <AddPurchase/>
     </>
   );
 };

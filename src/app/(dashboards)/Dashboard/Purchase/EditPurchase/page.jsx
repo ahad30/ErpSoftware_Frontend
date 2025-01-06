@@ -55,8 +55,6 @@ const EditPurchase = () => {
     isSuccess : singlePurchaseIsSuccess,
     error : singlePurchaseError,
   } = useGetPurchaseOrderByIdQuery(purchaseID);
-const purchaseData = singlePurchaseData?.data
-  console.log(purchaseData)
 
   const [
     updateNewPurchase,
@@ -123,12 +121,14 @@ const purchaseData = singlePurchaseData?.data
   // }, [isSuccess]);
 
   useEffect(() => {
+    const purchaseData = singlePurchaseData?.data
     if (singlePurchaseIsSuccess && purchaseData) {
       setAddedProducts(purchaseData.items.map(item => ({
         // purchaseItemID: item.purchaseItemID,
         // purchaseID: item.purchaseID,
+        label: item.label ? item.label : item.label === undefined && "Not Define",
         value: item.productID,
-        productVariantID: item.productVariantID,
+        productVariantID: item.productVariantID || null,
         quantity: item.quantity,
         productPurchasePrice: item.purchasePrice,
         totalPrice: parseFloat(item.totalPrice)
@@ -139,11 +139,11 @@ const purchaseData = singlePurchaseData?.data
       setSelectedSupplier(purchaseData.supplierID || null);
       setSelectedBusiness(parseInt(purchaseData.businessID )|| null);
       setSelectedBranch(purchaseData.branchID || null);
-      setSelectedStatus(purchaseData.status || null);
+      setSelectedStatus(purchaseData?.status || null);
       setPaid(purchaseData.paidAmount || 0);
       setDue(purchaseData.dueAmount || 0);
     }
-  }, [singlePurchaseIsSuccess, purchaseData]);
+  }, [singlePurchaseIsSuccess]);
 
   useEffect(() => {
     toast.dismiss(1);
@@ -176,7 +176,7 @@ const purchaseData = singlePurchaseData?.data
   };
 
   const handleQuantityChange = (productID, action) => {
-    setAddedProducts((prevProducts) =>
+      setAddedProducts((prevProducts) =>
       prevProducts.map((product) =>
         product.value === productID
           ? {
@@ -460,7 +460,7 @@ const purchaseData = singlePurchaseData?.data
                 <tr className="divide-x divide-gray-300">
                   <th className=" py-2 text-center text-xs px-2">#</th>
                   <th className="py-2 text-center text-xs whitespace-nowrap">
-                    Product
+                    Product Name
                   </th>
                   <th className="py-2 text-center text-xs whitespace-nowrap">
                     Quantity
@@ -666,13 +666,17 @@ const purchaseData = singlePurchaseData?.data
             <Select
               style={{ width: "100%" }}
               value={selectedStatus}
+              filterOption={filterOption}
               options={[
                 { label: "Received", value: "Received" },
                 { label: "Pending", value: "Pending" },
-                { label: "Ordered", value: "Ordered" },
+                // { label: "Ordered", value: "Ordered" },
               ]}
               placeholder="Select Purchase status"
-              onChange={(value) => setSelectedStatus(value)}
+              onChange={(value) => {
+                console.log("Selected value:", value); 
+                setSelectedStatus(value);
+              }}
             />
           </div>
         </div>

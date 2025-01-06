@@ -148,6 +148,43 @@ const AddPurchase = () => {
     }
   };
 
+
+//   const handleAddProduct = (product) => {
+//     // Check if the product has variants
+//     if (product.productVariant?.length > 0) {
+//         product.productVariant.forEach(variant => {
+//             setAddedProducts(prevProducts => [
+//                 ...prevProducts,
+//                 {
+//                     productID: product.productID,
+//                     productTitle: product.productTitle,
+//                     sku: variant.sku,
+//                     salePrice: variant.salePrice,
+//                     purchasePrice: variant.purchasePrice,
+//                     wholeSalePrice: variant.wholeSalePrice,
+//                     retailPrice: variant.retailPrice,
+//                     stock: variant.stock,
+//                     attributeCombination: variant.attribute_combination,
+//                 }
+//             ]);
+//         });
+//     } else {
+//         // If no variants, add the product itself
+//         setAddedProducts(prevProducts => [
+//             ...prevProducts,
+//             {
+//                 productID: product.productID,
+//                 productTitle: product.productTitle,
+//                 salePrice: product.productRetailPrice,
+//                 purchasePrice: product.productPurchasePrice,
+//                 wholeSalePrice: product.productWholeSalesPrice,
+//                 retailPrice: product.productRetailPrice,
+//                 stock: product.productInitialQty,
+//             }
+//         ]);
+//     }
+// };
+
   const handleQuantityChange = (productID, action) => {
     setAddedProducts((prevProducts) =>
       prevProducts.map((product) =>
@@ -236,6 +273,7 @@ const AddPurchase = () => {
 
   const createPurchase = async () => {
     const productItems = addedProducts.map((item) => ({
+      label: item.label,
       productID: item.value,
       productVariantID: item.productVariantID || null,
       quantity: item.quantity,
@@ -441,7 +479,7 @@ const AddPurchase = () => {
                 <tr className="divide-x divide-gray-300">
                   <th className=" py-2 text-center text-xs px-2">#</th>
                   <th className="py-2 text-center text-xs whitespace-nowrap">
-                    Product
+                    Product Name
                   </th>
                   <th className="py-2 text-center text-xs whitespace-nowrap">
                     Quantity
@@ -648,7 +686,7 @@ const AddPurchase = () => {
               options={[
                 { label: "Received", value: "Received" },
                 { label: "Pending", value: "Pending" },
-                { label: "Ordered", value: "Ordered" },
+                // { label: "Ordered", value: "Ordered" },
               ]}
               placeholder="Select Purchase status"
               onChange={(value) => setSelectedStatus(value)}
