@@ -87,14 +87,14 @@ const AddPurchase = () => {
 
 
 
-  const pData = productData?.data?.map((product) => ({
-    label: product?.productTitle,
-    value: product?.productID,
-    productPurchasePrice: product?.productPurchasePrice,
-    productVariant: product?.productVariant
-      ? product?.productVariant
-      : "This is a without variation product",
-  }));
+  // const pData = productData?.data?.map((product) => ({
+  //   label: product?.productTitle,
+  //   value: product?.productID,
+  //   productPurchasePrice: product?.productPurchasePrice,
+  //   productVariant: product?.productVariant
+  //     ? product?.productVariant
+  //     : "This is a without variation product",
+  // }));
   console.log(addedProducts);
 
   useEffect(() => {
@@ -125,20 +125,52 @@ const AddPurchase = () => {
   const filterOption = (input, option) =>
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
+ 
+
   const handleAddProduct = (value) => {
-    const selectedProduct = pData.find((product) => product.value === value);
+    const selectedProduct = productData?.data?.find((product) => product.productID === value);
+    // console.log(selectedProduct);
 
     if (selectedProduct) {
       // Check if the product is already in the addedProducts array
       const isProductAlreadyAdded = addedProducts.some(
-        (product) => product.value === selectedProduct.value
+        (product) => product.productID === selectedProduct.productID
       );
 
       if (!isProductAlreadyAdded) {
-        setAddedProducts((prevProducts) => [
-          ...prevProducts,
-          { ...selectedProduct, quantity: 1 },
-        ]);
+        if (selectedProduct.productVariant.length > 0) {
+          // If the product has variants, add each variant to the table
+           const variants = selectedProduct.productVariant.map((variant) => ({
+            productID: selectedProduct.productID,
+            quantity: 1,
+            productTitle: selectedProduct.productTitle,
+            sku: variant.sku,
+            stock: variant.stock,
+            salePrice: variant.salePrice,
+            purchasePrice: variant.purchasePrice,
+            productVariantID: variant.productVariantID,
+            attributes: variant.attribute_combination.map(
+              (attr) => `${attr.attributeName}: ${attr.attributeValue}`
+            ).join(", "),
+          }));
+    
+          setAddedProducts((prevData) => [...prevData, ...variants]);
+        } 
+        else {
+          // If no variants, add the product itself
+          const productEntry = {
+            productID: selectedProduct.productID,
+            productTitle: selectedProduct.productTitle,
+            sku: selectedProduct.sku || "N/A",
+            stock: selectedProduct.productInitialQty,
+            salePrice: selectedProduct.productRetailPrice,
+            purchasePrice: selectedProduct.productPurchasePrice,
+            attributes: "No Variants",
+            quantity: 1
+          };
+    
+          setAddedProducts((prevData) => [...prevData, productEntry]);
+        }
         setProductSearch("");
         setSearchedProducts([]);
         // toast.success("Product added to table");
@@ -149,63 +181,43 @@ const AddPurchase = () => {
   };
 
 
-//   const handleAddProduct = (product) => {
-//     // Check if the product has variants
-//     if (product.productVariant?.length > 0) {
-//         product.productVariant.forEach(variant => {
-//             setAddedProducts(prevProducts => [
-//                 ...prevProducts,
-//                 {
-//                     productID: product.productID,
-//                     productTitle: product.productTitle,
-//                     sku: variant.sku,
-//                     salePrice: variant.salePrice,
-//                     purchasePrice: variant.purchasePrice,
-//                     wholeSalePrice: variant.wholeSalePrice,
-//                     retailPrice: variant.retailPrice,
-//                     stock: variant.stock,
-//                     attributeCombination: variant.attribute_combination,
-//                 }
-//             ]);
-//         });
-//     } else {
-//         // If no variants, add the product itself
-//         setAddedProducts(prevProducts => [
-//             ...prevProducts,
-//             {
-//                 productID: product.productID,
-//                 productTitle: product.productTitle,
-//                 salePrice: product.productRetailPrice,
-//                 purchasePrice: product.productPurchasePrice,
-//                 wholeSalePrice: product.productWholeSalesPrice,
-//                 retailPrice: product.productRetailPrice,
-//                 stock: product.productInitialQty,
-//             }
-//         ]);
-//     }
-// };
 
-  const handleQuantityChange = (productID, action) => {
+
+  const handleQuantityChange = (productID, action, productVariantID = null) => {
     setAddedProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.value === productID
-          ? {
-              ...product,
-              quantity:
-                action === "increment"
-                  ? product.quantity + 1
-                  : product.quantity > 1
-                  ? product.quantity - 1
-                  : 1,
-            }
-          : product
-      )
+      prevProducts.map((product) => {
+        const isMatch = product.productID === productID && 
+                        (productVariantID ? product.productVariantID === productVariantID : true);
+        
+        if (isMatch) {
+          let newQuantity = product.quantity;
+          if (action === "increment") {
+            newQuantity += 1;
+          } else if (action === "decrement" && newQuantity > 1) {
+            newQuantity -= 1;
+          }
+          return { ...product, quantity: newQuantity };
+        }
+        
+        return product;
+      })
     );
   };
+  
 
-  const handleRemoveProduct = (productID) => {
-    setAddedProducts((prevProducts) =>
-      prevProducts.filter((product) => product.value !== productID)
+  // const handleRemoveProduct = (productID) => {
+  //   setAddedProducts((prevProducts) =>
+  //     prevProducts.filter((product) => product.productID !== productID)
+  //   );
+  // };
+
+  const handleRemoveProduct = (productID, productVariantID = null) => {
+    setAddedProducts((prevData) =>
+      prevData.filter(
+        (item) =>
+          item.productID !== productID ||
+          (productVariantID && item.productVariantID !== productVariantID)
+      )
     );
   };
 
@@ -213,31 +225,19 @@ const AddPurchase = () => {
     (accumulator, currentValue) => {
       return (
         accumulator +
-        Number(currentValue?.productPurchasePrice * currentValue?.quantity)
+        Number(currentValue?.purchasePrice * currentValue?.quantity)
       );
     },
     0
   );
 
-  // useEffect(() => {
-  //   const addedProductPrice = addedProducts?.reduce(
-  //     (accumulator, currentValue) => {
-  //       return (
-  //         accumulator +
-  //         Number(currentValue?.productPurchasePrice * currentValue?.quantity)
-  //       );
-  //     },
-  //     0
-  //   );
-  //   setTotalPrice(addedProductPrice);
-  // }, [addedProducts]);
 
  
 
   const updateTotalPrice = () => {
     
     const productTotal = addedProducts.reduce(
-      (acc, product) => acc + product.productPurchasePrice * product.quantity,
+      (acc, product) => acc + product.purchasePrice * product.quantity,
       0
     );
 
@@ -273,16 +273,16 @@ const AddPurchase = () => {
 
   const createPurchase = async () => {
     const productItems = addedProducts.map((item) => ({
-      label: item.label,
-      productID: item.value,
+      label: item.productTitle,
+      productID: item.productID,
       productVariantID: item.productVariantID || null,
       quantity: item.quantity,
-      purchasePrice: item.productPurchasePrice,
-      totalPrice: item.productPurchasePrice * item.quantity,
+      purchasePrice: item.purchasePrice,
+      totalPrice: item.purchasePrice * item.quantity,
     }));
   
     const productTotal = addedProducts.reduce(
-      (acc, product) => acc + product.productPurchasePrice * product.quantity,
+      (acc, product) => acc + product.purchasePrice * product.quantity,
       0
     );
   
@@ -481,32 +481,36 @@ const AddPurchase = () => {
                   <th className="py-2 text-center text-xs whitespace-nowrap">
                     Product Name
                   </th>
+                  <th className="py-2 text-center text-xs whitespace-nowrap px-4">
+                    Sku
+                  </th> 
                   <th className="py-2 text-center text-xs whitespace-nowrap">
                     Quantity
                   </th>
                   <th className="py-2 text-center text-xs whitespace-nowrap">
                     Price
                   </th>
-                  {/* <th className="py-2 text-center text-xs whitespace-nowrap px-4">
-                    Tax
-                  </th>  */}
                   {/* <th className="py-2 text-center text-xs px-2 ">Subtotal</th> */}
                   <th className="py-2 text-xs text-center px-2">Action</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-300">
                 {addedProducts?.map((product, index) => (
-                  <tr key={product.value} className="whitespace-nowrap w-full">
+                  <tr  key={product.productVariantID || product.productID} className="whitespace-nowrap w-full">
                     <td className="text-center py-2 text-sm text-gray-500">
                       {index + 1}
                     </td>
                     <td className="text-center py-2 px-2 text-sm text-gray-500 font-bold">
-                      {product.label}
+                      {product.productTitle}
+                      <p className="text-sm">({product.attributes})</p>
                     </td>
+                    <td className="text-center py-2 text-sm text-gray-500 px-2">
+                      {product?.sku}
+                    </td> 
                     <td className="text-center py-2 px-2 text-sm text-gray-500">
                       <button
                         onClick={() =>
-                          handleQuantityChange(product.value, "decrement")
+                          handleQuantityChange(product.productID, "decrement" , product.productVariantID)
                         }
                         className="px-3 py-1 bg-gray-200 disabled:bg-gray-500 disabled:cursor-not-allowed text-gray-700 rounded-l focus:outline-none hover:bg-gray-300"
                       >
@@ -517,7 +521,7 @@ const AddPurchase = () => {
                       </span>
                       <button
                         onClick={() =>
-                          handleQuantityChange(product.value, "increment")
+                          handleQuantityChange(product.productID, "increment" , product.productVariantID)
                         }
                         className="px-3 py-1 bg-gray-200 text-gray-700 disabled:bg-gray-500 disabled:cursor-not-allowed rounded-r focus:outline-none hover:bg-gray-300"
                       >
@@ -525,17 +529,16 @@ const AddPurchase = () => {
                       </button>
                     </td>
                     <td className="text-center py-2 text-sm text-gray-500 px-2">
-                      {product?.productPurchasePrice * product.quantity}
+                      {product?.purchasePrice * product.quantity}
                     </td>
-                    {/* <td className="text-center py-2 text-sm text-gray-500 px-2">
-                    </td>  */}
+                  
                     {/* <td className="text-center py-2 text-sm text-gray-500 px-2">
                     Tk{ Number(addedProductPrice)*product.quantity}
                     
                     </td> */}
-                    <td className="flex justify-center py-2 text-sm text-gray-500">
+                    <td className="flex justify-center py-5 text-sm text-gray-500">
                       <RiDeleteBin6Line
-                        onClick={() => handleRemoveProduct(product.value)}
+                        onClick={() => handleRemoveProduct(product.productID, product.productVariantID)}
                         className="text-red-500 cursor-pointer"
                         size={20}
                       ></RiDeleteBin6Line>

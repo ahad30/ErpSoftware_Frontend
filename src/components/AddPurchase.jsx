@@ -370,6 +370,7 @@ const AddPurchase = () => {
       // If the product has variants, add each variant to the table
        const variants = product.productVariant.map((variant) => ({
         productID: product.productID,
+        quantity: 1,
         productTitle: product.productTitle,
         sku: variant.sku,
         stock: variant.stock,
@@ -382,7 +383,8 @@ const AddPurchase = () => {
       }));
 
       setTableData((prevData) => [...prevData, ...variants]);
-    } else {
+    } 
+    else {
       // If no variants, add the product itself
       const productEntry = {
         productID: product.productID,
@@ -392,6 +394,7 @@ const AddPurchase = () => {
         salePrice: product.productRetailPrice,
         purchasePrice: product.productPurchasePrice,
         attributes: "No Variants",
+        quantity: 1
       };
 
       setTableData((prevData) => [...prevData, productEntry]);
@@ -426,23 +429,26 @@ const AddPurchase = () => {
         <thead>
           <tr>
             <th>Product Title</th>
-            <th>SKU</th>
+          
             <th>Stock</th>
             <th>Sale Price</th>
             <th>Purchase Price</th>
-            <th>Attributes</th>
+           
             <th>Delete</th>
           </tr>
         </thead>
         <tbody>
           {tableData.map((item, index) => (
-            <tr key={item.productVariantID || item.productID}>
-              <td>{item.productTitle}</td>
-              <td>{item.sku}</td>
+            <tr className="text-center" key={item.productVariantID || item.productID}>
+              <td>
+                <p>{item.productTitle}</p>
+                <p className="text-sm">({item.attributes})</p>
+              </td>
+            
               <td>{item.stock}</td>
               <td>{item.salePrice}</td>
               <td>{item.purchasePrice}</td>
-              <td>{item.attributes}</td>
+             
               <td>
               <button
                   onClick={() =>
