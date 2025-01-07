@@ -165,7 +165,7 @@ const PurchaseTable = () => {
         description={"Deleting this purchase will remove all corresponding data."}
       />
 
-      <AddPurchase/>
+      {/* <AddPurchase/> */}
     </>
   );
 };
