@@ -55,8 +55,6 @@ const EditPurchase = () => {
     isSuccess : singlePurchaseIsSuccess,
     error : singlePurchaseError,
   } = useGetPurchaseOrderByIdQuery(purchaseID);
-const purchaseData = singlePurchaseData?.data
-  console.log(purchaseData)
 
   const [
     updateNewPurchase,
@@ -91,14 +89,6 @@ const purchaseData = singlePurchaseData?.data
 
 
 
-  const pData = productData?.data?.map((product) => ({
-    label: product?.productTitle,
-    value: product?.productID,
-    productPurchasePrice: product?.productPurchasePrice,
-    productVariant: product?.productVariant
-      ? product?.productVariant
-      : "This is a without variation product",
-  }));
   console.log(addedProducts);
 
   useEffect(() => {
@@ -112,25 +102,19 @@ const purchaseData = singlePurchaseData?.data
     }
   }, [productSearch, productData]);
 
-  // useEffect(() => {
-  //   if (isSuccess) {
-  //     setAddedProducts([]);
-  //     setDiscount(0);
-  //     setTax(0);
-  //     setShipping(0);
-  //     setDescription("");
-  //   }
-  // }, [isSuccess]);
+  
 
   useEffect(() => {
+    const purchaseData = singlePurchaseData?.data
     if (singlePurchaseIsSuccess && purchaseData) {
       setAddedProducts(purchaseData.items.map(item => ({
         // purchaseItemID: item.purchaseItemID,
         // purchaseID: item.purchaseID,
-        value: item.productID,
-        productVariantID: item.productVariantID,
+        productTitle: item?.productTitle ? item.productTitle : item?.productTitle === undefined && "Not Define",
+        productID: item.productID,
+        productVariantID: item.productVariantID || null,
         quantity: item.quantity,
-        productPurchasePrice: item.purchasePrice,
+        purchasePrice: item.purchasePrice,
         totalPrice: parseFloat(item.totalPrice)
       })));
       setStartDate(dayjs(purchaseData.orderDate || ""));
@@ -139,11 +123,11 @@ const purchaseData = singlePurchaseData?.data
       setSelectedSupplier(purchaseData.supplierID || null);
       setSelectedBusiness(parseInt(purchaseData.businessID )|| null);
       setSelectedBranch(purchaseData.branchID || null);
-      setSelectedStatus(purchaseData.status || null);
+      setSelectedStatus(purchaseData?.status || null);
       setPaid(purchaseData.paidAmount || 0);
       setDue(purchaseData.dueAmount || 0);
     }
-  }, [singlePurchaseIsSuccess, purchaseData]);
+  }, [singlePurchaseIsSuccess]);
 
   useEffect(() => {
     toast.dismiss(1);
@@ -153,19 +137,49 @@ const purchaseData = singlePurchaseData?.data
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const handleAddProduct = (value) => {
-    const selectedProduct = pData.find((product) => product.value === value);
+    const selectedProduct = productData?.data?.find((product) => product.productID === value);
+    // console.log(selectedProduct);
 
     if (selectedProduct) {
       // Check if the product is already in the addedProducts array
       const isProductAlreadyAdded = addedProducts.some(
-        (product) => product.value === selectedProduct.value
+        (product) => product.productID === selectedProduct.productID
       );
 
       if (!isProductAlreadyAdded) {
-        setAddedProducts((prevProducts) => [
-          ...prevProducts,
-          { ...selectedProduct, quantity: 1 },
-        ]);
+        if (selectedProduct.productVariant.length > 0) {
+          // If the product has variants, add each variant to the table
+           const variants = selectedProduct.productVariant.map((variant) => ({
+            productID: selectedProduct.productID,
+            quantity: 1,
+            productTitle: selectedProduct.productTitle,
+            sku: variant.sku,
+            stock: variant.stock,
+            salePrice: variant.salePrice,
+            purchasePrice: variant.purchasePrice,
+            productVariantID: variant.productVariantID,
+            attributes: variant.attribute_combination.map(
+              (attr) => `${attr.attributeName}: ${attr.attributeValue}`
+            ).join(", "),
+          }));
+    
+          setAddedProducts((prevData) => [...prevData, ...variants]);
+        } 
+        else {
+          // If no variants, add the product itself
+          const productEntry = {
+            productID: selectedProduct.productID,
+            productTitle: selectedProduct.productTitle,
+            sku: selectedProduct.sku || "N/A",
+            stock: selectedProduct.productInitialQty,
+            salePrice: selectedProduct.productRetailPrice,
+            purchasePrice: selectedProduct.productPurchasePrice,
+            attributes: "No Variants",
+            quantity: 1
+          };
+    
+          setAddedProducts((prevData) => [...prevData, productEntry]);
+        }
         setProductSearch("");
         setSearchedProducts([]);
         // toast.success("Product added to table");
@@ -175,35 +189,45 @@ const purchaseData = singlePurchaseData?.data
     }
   };
 
-  const handleQuantityChange = (productID, action) => {
+
+  const handleQuantityChange = (productID, action, productVariantID = null) => {
     setAddedProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.value === productID
-          ? {
-              ...product,
-              quantity:
-                action === "increment"
-                  ? product.quantity + 1
-                  : product.quantity > 1
-                  ? product.quantity - 1
-                  : 1,
-            }
-          : product
+      prevProducts.map((product) => {
+        const isMatch = product.productID === productID && 
+                        (productVariantID ? product.productVariantID === productVariantID : true);
+        
+        if (isMatch) {
+          let newQuantity = product.quantity;
+          if (action === "increment") {
+            newQuantity += 1;
+          } else if (action === "decrement" && newQuantity > 1) {
+            newQuantity -= 1;
+          }
+          return { ...product, quantity: newQuantity };
+        }
+        
+        return product;
+      })
+    );
+  };
+  
+
+  const handleRemoveProduct = (productID, productVariantID = null) => {
+    setAddedProducts((prevData) =>
+      prevData.filter(
+        (item) =>
+          item.productID !== productID ||
+          (productVariantID && item.productVariantID !== productVariantID)
       )
     );
   };
 
-  const handleRemoveProduct = (productID) => {
-    setAddedProducts((prevProducts) =>
-      prevProducts.filter((product) => product.value !== productID)
-    );
-  };
 
   const addedProductPrice = addedProducts?.reduce(
     (accumulator, currentValue) => {
       return (
         accumulator +
-        Number(currentValue?.productPurchasePrice * currentValue?.quantity)
+        Number(currentValue?.purchasePrice * currentValue?.quantity)
       );
     },
     0
@@ -214,7 +238,7 @@ const purchaseData = singlePurchaseData?.data
   const updateTotalPrice = () => {
     
     const productTotal = addedProducts.reduce(
-      (acc, product) => acc + product.productPurchasePrice * product.quantity,
+      (acc, product) => acc + product.purchasePrice * product.quantity,
       0
     );
 
@@ -250,15 +274,15 @@ const purchaseData = singlePurchaseData?.data
 
   const updatePurchase = async () => {
     const productItems = addedProducts.map((item) => ({
-      productID: item.value,
+      productID: item.productID,
       productVariantID: item.productVariantID || null,
       quantity: item.quantity,
-      purchasePrice: item.productPurchasePrice,
-      totalPrice: item.productPurchasePrice * item.quantity,
+      purchasePrice: item.purchasePrice,
+      totalPrice: item.purchasePrice * item.quantity,
     }));
   
     const productTotal = addedProducts.reduce(
-      (acc, product) => acc + product.productPurchasePrice * product.quantity,
+      (acc, product) => acc + product.purchasePrice * product.quantity,
       0
     );
   
@@ -294,7 +318,8 @@ const purchaseData = singlePurchaseData?.data
       dueAmount: dueAmount,
       status: selectedStatus,
       notes: description,
-    }};
+    }
+  };
     console.log("Purchase Data:", purchaseData);
 
   
@@ -452,100 +477,103 @@ const purchaseData = singlePurchaseData?.data
         </div>
 
         {/* Product table */}
-        <div className="lg:col-span-3">
-          <label htmlFor="">Order Items:*</label>
-          <div className="max-h-[30vh] overflow-y-scroll scrollbar-0 mt-3">
-            <table className="divide-y w-full divide-gray-300 overflow-x-scroll wrapper">
-              <thead className="border bg-green-500 text-white">
-                <tr className="divide-x divide-gray-300">
-                  <th className=" py-2 text-center text-xs px-2">#</th>
-                  <th className="py-2 text-center text-xs whitespace-nowrap">
-                    Product
-                  </th>
-                  <th className="py-2 text-center text-xs whitespace-nowrap">
-                    Quantity
-                  </th>
-                  <th className="py-2 text-center text-xs whitespace-nowrap">
-                    Price
-                  </th>
-                  {/* <th className="py-2 text-center text-xs whitespace-nowrap px-4">
-                    Tax
-                  </th>  */}
-                  {/* <th className="py-2 text-center text-xs px-2 ">Subtotal</th> */}
-                  <th className="py-2 text-xs text-center px-2">Action</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-300">
-                {addedProducts?.map((product, index) => (
-                  <tr key={product.value} className="whitespace-nowrap w-full">
-                    <td className="text-center py-2 text-sm text-gray-500">
-                      {index + 1}
-                    </td>
-                    <td className="text-center py-2 px-2 text-sm text-gray-500 font-bold">
-                      {product.label}
-                    </td>
-                    <td className="text-center py-2 px-2 text-sm text-gray-500">
-                      <button
-                        onClick={() =>
-                          handleQuantityChange(product.value, "decrement")
-                        }
-                        className="px-3 py-1 bg-gray-200 disabled:bg-gray-500 disabled:cursor-not-allowed text-gray-700 rounded-l focus:outline-none hover:bg-gray-300"
-                      >
-                        -
-                      </button>
-                      <span className="px-4 py-1 bg-gray-100 text-gray-700">
-                        {product.quantity}
-                      </span>
-                      <button
-                        onClick={() =>
-                          handleQuantityChange(product.value, "increment")
-                        }
-                        className="px-3 py-1 bg-gray-200 text-gray-700 disabled:bg-gray-500 disabled:cursor-not-allowed rounded-r focus:outline-none hover:bg-gray-300"
-                      >
-                        +
-                      </button>
-                    </td>
-                    <td className="text-center py-2 text-sm text-gray-500 px-2">
-                      {product?.productPurchasePrice * product.quantity}
-                    </td>
-                    {/* <td className="text-center py-2 text-sm text-gray-500 px-2">
-                    </td>  */}
-                    {/* <td className="text-center py-2 text-sm text-gray-500 px-2">
-                    Tk{ Number(addedProductPrice)*product.quantity}
-                    
-                    </td> */}
-                    <td className="flex justify-center py-2 text-sm text-gray-500">
-                      <RiDeleteBin6Line
-                        onClick={() => handleRemoveProduct(product.value)}
-                        className="text-red-500 cursor-pointer"
-                        size={20}
-                      ></RiDeleteBin6Line>
-                    </td>
-                  </tr>
-                ))}
-
-                {addedProducts.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="text-center w-full text-xl mt-12 py-4 text-red-500 font-bold"
-                    >
-                      No data Found
-                    </td>
-                  </tr>
-                )}
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="text-center w-full text-lg mt-12 py-4 text-blue-500 font-bold"
-                  >
-                    Sub Total : {addedProductPrice} Tk
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+            <div className="lg:col-span-3">
+                   <label htmlFor="">Order Items:*</label>
+                   <div className="max-h-[30vh] overflow-y-scroll scrollbar-0 mt-3">
+                     <table className="divide-y w-full divide-gray-300 overflow-x-scroll wrapper">
+                       <thead className="border bg-green-500 text-white">
+                         <tr className="divide-x divide-gray-300">
+                           <th className=" py-2 text-center text-xs px-2">#</th>
+                           <th className="py-2 text-center text-xs whitespace-nowrap">
+                             Product Name
+                           </th>
+                           {/* <th className="py-2 text-center text-xs whitespace-nowrap px-4">
+                             Sku
+                           </th>  */}
+                           <th className="py-2 text-center text-xs whitespace-nowrap">
+                             Quantity
+                           </th>
+                           <th className="py-2 text-center text-xs whitespace-nowrap">
+                             Price
+                           </th>
+                           {/* <th className="py-2 text-center text-xs px-2 ">Subtotal</th> */}
+                           <th className="py-2 text-xs text-center px-2">Action</th>
+                         </tr>
+                       </thead>
+                       <tbody className="bg-white divide-y divide-gray-300">
+                         {addedProducts?.map((product, index) => (
+                           <tr  key={product.productVariantID || product.productID} className="whitespace-nowrap w-full">
+                             <td className="text-center py-2 text-sm text-gray-500">
+                               {index + 1}
+                             </td>
+                             <td className="text-center py-2 px-2 text-sm text-gray-500 font-bold">
+                               {product.productTitle}
+                               <p className="text-sm">({product.attributes})</p>
+                             </td>
+                             {/* <td className="text-center py-2 text-sm text-gray-500 px-2">
+                               {product?.sku}
+                             </td>  */}
+                             <td className="text-center py-2 px-2 text-sm text-gray-500">
+                               <button
+                                 onClick={() =>
+                                   handleQuantityChange(product.productID, "decrement" , product.productVariantID)
+                                 }
+                                 className="px-3 py-1 bg-gray-200 disabled:bg-gray-500 disabled:cursor-not-allowed text-gray-700 rounded-l focus:outline-none hover:bg-gray-300"
+                               >
+                                 -
+                               </button>
+                               <span className="px-4 py-1 bg-gray-100 text-gray-700">
+                                 {product.quantity}
+                               </span>
+                               <button
+                                 onClick={() =>
+                                   handleQuantityChange(product.productID, "increment" , product.productVariantID)
+                                 }
+                                 className="px-3 py-1 bg-gray-200 text-gray-700 disabled:bg-gray-500 disabled:cursor-not-allowed rounded-r focus:outline-none hover:bg-gray-300"
+                               >
+                                 +
+                               </button>
+                             </td>
+                             <td className="text-center py-2 text-sm text-gray-500 px-2">
+                               {product?.purchasePrice * product.quantity}
+                             </td>
+                           
+                             {/* <td className="text-center py-2 text-sm text-gray-500 px-2">
+                             Tk{ Number(addedProductPrice)*product.quantity}
+                             
+                             </td> */}
+                             <td className="flex justify-center py-5 text-sm text-gray-500">
+                               <RiDeleteBin6Line
+                                 onClick={() => handleRemoveProduct(product.productID, product.productVariantID)}
+                                 className="text-red-500 cursor-pointer"
+                                 size={20}
+                               ></RiDeleteBin6Line>
+                             </td>
+                           </tr>
+                         ))}
+         
+                         {addedProducts.length === 0 && (
+                           <tr>
+                             <td
+                               colSpan={7}
+                               className="text-center w-full text-xl mt-12 py-4 text-red-500 font-bold"
+                             >
+                               No data Found
+                             </td>
+                           </tr>
+                         )}
+                         <tr>
+                           <td
+                             colSpan={7}
+                             className="text-center w-full text-lg mt-12 py-4 text-blue-500 font-bold"
+                           >
+                             Sub Total : {addedProductPrice} Tk
+                           </td>
+                         </tr>
+                       </tbody>
+                     </table>
+                   </div>
+                 </div>
 
        
 
@@ -666,13 +694,17 @@ const purchaseData = singlePurchaseData?.data
             <Select
               style={{ width: "100%" }}
               value={selectedStatus}
+              filterOption={filterOption}
               options={[
                 { label: "Received", value: "Received" },
                 { label: "Pending", value: "Pending" },
-                { label: "Ordered", value: "Ordered" },
+                // { label: "Ordered", value: "Ordered" },
               ]}
               placeholder="Select Purchase status"
-              onChange={(value) => setSelectedStatus(value)}
+              onChange={(value) => {
+                console.log("Selected value:", value); 
+                setSelectedStatus(value);
+              }}
             />
           </div>
         </div>
