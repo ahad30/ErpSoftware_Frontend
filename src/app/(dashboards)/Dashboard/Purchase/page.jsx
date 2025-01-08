@@ -39,6 +39,7 @@ const PurchaseTable = () => {
     shipping: purchase?.shippingAmount,
     total: purchase?.finalAmount,
     due: purchase?.dueAmount,
+    paid: purchase?.paidAmount,
     status: purchase?.status,
     items: purchase?.items,
   }));
@@ -90,6 +91,11 @@ const PurchaseTable = () => {
       title: "Total Amount",
       dataIndex: "total",
       key: "total",
+    },
+    {
+      title: "Paid Amount",
+      dataIndex: "paid",
+      key: "paid",
     },
     {
       title: "Due Amount",
