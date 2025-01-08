@@ -90,6 +90,7 @@ const EditPurchase = () => {
 
 
   console.log(addedProducts);
+  console.log(singlePurchaseData?.data);
 
   useEffect(() => {
     if (productSearch && productData) {
@@ -126,6 +127,9 @@ const EditPurchase = () => {
       setSelectedStatus(purchaseData?.status || null);
       setPaid(purchaseData.paidAmount || 0);
       setDue(purchaseData.dueAmount || 0);
+      setShipping(purchaseData.shippingAmount);
+      setDiscount(purchaseData.discountAmount);
+      setTax(purchaseData.taxAmount);
     }
   }, [singlePurchaseIsSuccess]);
 
@@ -235,43 +239,42 @@ const EditPurchase = () => {
 
 
 
-  const updateTotalPrice = () => {
-    
+  const calculateAmounts = () => {
     const productTotal = addedProducts.reduce(
       (acc, product) => acc + product.purchasePrice * product.quantity,
       0
     );
-
-    // Ensure shipping is a valid number
-    const shippingCost = Number(shipping) || 0;
-    
-    const paidAmount = Number(paid) || 0;
-
-    // Correct tax calculation
+  
+    const shippingCost = parseFloat(shipping) || 0;
+    const discountAmount = parseFloat(((productTotal) * (Number(discount) / 100)).toFixed(2)) || 0;
     const taxAmount = parseFloat(((productTotal) * (Number(tax) / 100)).toFixed(2)) || 0;
-    console.log(taxAmount);
-
-    // Correct discount calculation
-    const discountAmount = 
-    parseFloat(((productTotal) * (Number(discount) / 100)).toFixed(2))  || 0;
-    console.log(discountAmount);
-
-    // Final total price calculation
-    const finalTotal =   parseFloat((productTotal  - discountAmount + taxAmount + shippingCost).toFixed(2));
-    console.log(finalTotal);
-
+    const paidAmount = parseFloat(paid) || 0;
+  
+    const finalTotal = parseFloat((productTotal - discountAmount + taxAmount + shippingCost).toFixed(2));
     const dueAmount = parseFloat((finalTotal - paidAmount).toFixed(2));
-
+  
+    return {
+      productTotal,
+      shippingCost,
+      discountAmount,
+      taxAmount,
+      finalTotal,
+      paidAmount,
+      dueAmount
+    };
+  };
+  
+  const updateTotalPrice = () => {
+    const { finalTotal, dueAmount } = calculateAmounts();
+  
     setTotalPrice(finalTotal);
     setDue(dueAmount);
   };
-
+  
   useEffect(() => {
     updateTotalPrice();
-  }, [addedProducts, discount, shipping, tax , paid]);
-
+  }, [addedProducts, discount, shipping, tax, paid]);
   
-
   const updatePurchase = async () => {
     const productItems = addedProducts.map((item) => ({
       productID: item.productID,
@@ -281,56 +284,38 @@ const EditPurchase = () => {
       totalPrice: item.purchasePrice * item.quantity,
     }));
   
-    const productTotal = addedProducts.reduce(
-      (acc, product) => acc + product.purchasePrice * product.quantity,
-      0
-    );
+    const { finalTotal, dueAmount } = calculateAmounts();
   
-    const shippingCost = parseFloat(shipping) || 0;
-    const discountAmount = parseFloat(discount) || 0;
-    const taxAmount = parseFloat(tax) || 0;
-    const paidAmount = parseFloat(paid) || 0;
-  
-    const finalAmount = parseFloat(
-      (
-        productTotal +
-        shippingCost +
-        (productTotal * taxAmount) / 100 -
-        (productTotal * discountAmount) / 100
-      ).toFixed(2)
-    );
-
-    const dueAmount = parseFloat((finalAmount - parseFloat(paidAmount)).toFixed(2));
-  
-    const purchaseData ={ 
+    const purchaseData = { 
       data: {
-      warehouseID: selectedWarehouse, 
-      supplierID: selectedSupplier, 
-      businessID: selectedBusiness, 
-      branchID: selectedBranch,
-      orderDate: startDate.format("YYYY-MM-DD"),
-      purchaseItem: productItems,
-      discountAmount: Number(discount),
-      shippingAmount: Number(shipping),
-      taxAmount: Number(tax),
-      finalAmount: finalAmount,
-      paidAmount: Number(paid),
-      dueAmount: dueAmount,
-      status: selectedStatus,
-      notes: description,
-    }
-  };
+        warehouseID: selectedWarehouse,
+        supplierID: selectedSupplier,
+        businessID: selectedBusiness,
+        branchID: selectedBranch,
+        orderDate: startDate.format("YYYY-MM-DD"),
+        purchaseItem: productItems,
+        discountAmount: Number(discount),
+        shippingAmount: Number(shipping),
+        taxAmount: Number(tax),
+        finalAmount: finalTotal,
+        paidAmount: Number(paid),
+        dueAmount: dueAmount,
+        status: selectedStatus,
+        notes: description,
+      }
+    };
+  
     console.log("Purchase Data:", purchaseData);
-
   
     try {
-      const response = await updateNewPurchase({ data: purchaseData , id: purchaseID });
+      const response = await updateNewPurchase({ data: purchaseData, id: purchaseID });
       console.log("Response:", response);
     } 
     catch (error) {
       console.error("Error:", error);
-    }  
+    }
   };
+  
   
   const path =  "/Dashboard/Purchase" 
   useShowAsyncMessage(
@@ -586,12 +571,11 @@ const EditPurchase = () => {
               placeholder="Tax"
               className="border-0  w-full focus:border-0 focus:ring-0 py-1 outline-none"
               type="number"
-              value={Number(tax) == 0 ? "Tax" : tax}
+              value={tax}
               onChange={(e) => {
                 const value = e.target.value;
                 if (value >= 0) {
                   setTax(value);
-                  // handleTaxAndDiscount(e.target?.value, "Tax");
                 }
               }}
             />
@@ -609,12 +593,11 @@ const EditPurchase = () => {
               placeholder="Discount"
               className="border-0 focus:border-0 w-full focus:ring-0 py-1 outline-none"
               type="number"
-              value={Number(discount) == 0 ? "Discount" : discount}
+              value={discount}
               onChange={(e) => {
                 const value = e.target.value;
                 if (value >= 0) {
                   setDiscount(value);
-                  // handleTaxAndDiscount(value, "Discount");
                 }
               }}
             />
@@ -631,13 +614,12 @@ const EditPurchase = () => {
               placeholder="Shipping"
               className="border-0 w-full focus:border-0 focus:ring-0 py-1 outline-none"
               type="number"
-              value={Number(shipping) == 0 ? "Shipping" : shipping}
+              value={shipping}
               onChange={(e) => {
                 const value = e.target.value;
 
                 if (value >= 0) {
                   setShipping(value);
-                  // handleShipping(value);
                 }
               }}
             />
