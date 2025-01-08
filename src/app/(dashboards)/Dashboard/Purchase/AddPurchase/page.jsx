@@ -86,16 +86,8 @@ const AddPurchase = () => {
   }));
 
 
-
-  // const pData = productData?.data?.map((product) => ({
-  //   label: product?.productTitle,
-  //   value: product?.productID,
-  //   productPurchasePrice: product?.productPurchasePrice,
-  //   productVariant: product?.productVariant
-  //     ? product?.productVariant
-  //     : "This is a without variation product",
-  // }));
   console.log(addedProducts);
+  
 
   useEffect(() => {
     if (productSearch && productData) {
@@ -181,8 +173,6 @@ const AddPurchase = () => {
   };
 
 
-
-
   const handleQuantityChange = (productID, action, productVariantID = null) => {
     setAddedProducts((prevProducts) =>
       prevProducts.map((product) => {
@@ -204,12 +194,6 @@ const AddPurchase = () => {
     );
   };
   
-
-  // const handleRemoveProduct = (productID) => {
-  //   setAddedProducts((prevProducts) =>
-  //     prevProducts.filter((product) => product.productID !== productID)
-  //   );
-  // };
 
   const handleRemoveProduct = (productID, productVariantID = null) => {
     setAddedProducts((prevData) =>
@@ -273,12 +257,12 @@ const AddPurchase = () => {
 
   const createPurchase = async () => {
     const productItems = addedProducts.map((item) => ({
-      label: item.productTitle,
-      productID: item.productID,
-      productVariantID: item.productVariantID || null,
-      quantity: item.quantity,
-      purchasePrice: item.purchasePrice,
-      totalPrice: item.purchasePrice * item.quantity,
+      productTitle: item?.productTitle,
+      productID: item?.productID,
+      productVariantID: item?.productVariantID || null,
+      quantity: item?.quantity,
+      purchasePrice: item?.purchasePrice,
+      totalPrice: item?.purchasePrice * item?.quantity,
     }));
   
     const productTotal = addedProducts.reduce(
