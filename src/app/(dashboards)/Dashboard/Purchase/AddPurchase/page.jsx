@@ -35,15 +35,8 @@ const AddPurchase = () => {
   const [tax, setTax] = useState(0);
   const [paid, setPaid] = useState(0);
   const [due, setDue] = useState(0);
-  // const [error, setError] = useState(false);
-  // const [temporaryValue, setTemporaryValue] = useState({
-  //   TDiscount: 0,
-  //   TShipping: 0,
-  //   TTax: 0,
-  //   IShipping: 0,
-  //   IDiscount: 0,
-  //   ITax: 0,
-  // });
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+
   const { data: warehouseData, isLoading: wIsLoading } =
     useGetWarehousesQuery();
   const { data: supplierData, isLoading: sIsLoading } = useGetSuppliersQuery();
@@ -301,6 +294,7 @@ const AddPurchase = () => {
       dueAmount: dueAmount,
       status: selectedStatus,
       notes: description,
+      paymentMethod: selectedPaymentMethod,
     };
     console.log("Purchase Data:", purchaseData);
 
@@ -661,6 +655,24 @@ const AddPurchase = () => {
             />
 
             <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2"> Tk</span>
+          </div>
+        </div>
+
+        {/* Payment Method */}
+        <div>
+          <label htmlFor="">Payment Method:*</label>
+          <div className="mt-3">
+            <Select
+              style={{ width: "100%" }}
+              options={[
+                { label: "Cash", value: "cash" },
+                { label: "Credit Card", value: "credit_card" },
+                { label: "Debit Card", value: "debit_card" },
+                { label: "Bank Transfer", value: "bank_transfer" },
+              ]}
+              placeholder="Select Payment Method"
+              onChange={(value) => setSelectedPaymentMethod(value)}
+            />
           </div>
         </div>
 

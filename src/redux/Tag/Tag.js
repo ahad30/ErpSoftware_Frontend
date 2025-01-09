@@ -42,6 +42,10 @@ export const tags = [
     name: 'PurchaseOrder',
     tag: 'purchaseOrder',
   },
+  {
+    name: 'SalesOrder',
+    tag: 'salesOrder',
+  },
 
   {
     name: 'ErpBusinesses',

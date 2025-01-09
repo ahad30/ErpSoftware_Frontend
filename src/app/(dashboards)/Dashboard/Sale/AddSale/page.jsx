@@ -1,63 +1,78 @@
-/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { DatePicker, Input, Select, Space } from "antd";
 import dayjs from "dayjs";
 import BreadCrumb from "@/components/BreadCrumb/BreadCrumb";
 import { useGetWarehousesQuery } from "@/redux/Feature/User/warehouses/warehousesApi";
-import { useGetSuppliersQuery } from "@/redux/Feature/User/suppliers/suppliersApi";
 import { CiSearch } from "react-icons/ci";
 import { useGetProductsQuery } from "@/redux/Feature/Admin/product/productApi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { toast } from "sonner";
+import { useAddSalesOrderMutation } from "@/redux/Feature/Admin/sales/salesApi";
+import useShowAsyncMessage from "@/components/UseShowAsyncMessage/useShowAsyncMessage";
+import { useGetBusinessesQuery } from "@/redux/Feature/Admin/businesses/businesses";
+import { useGetBranchesQuery } from "@/redux/Feature/Admin/branch/branchesApi";
+import { useGetCustomersQuery } from "@/redux/Feature/User/customersApi";
 
-const { Search , TextArea} = Input;
+const { Search, TextArea } = Input;
+
 const AddSale = () => {
   const [startDate, setStartDate] = useState(dayjs());
+  const [description, setDescription] = useState("");
+  const [selectedWarehouse, setSelectedWarehouse] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [selectedBusiness, setSelectedBusiness] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState(""); 
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [productSearch, setProductSearch] = useState("");
   const [addedProducts, setAddedProducts] = useState([]);
   const [searchedProducts, setSearchedProducts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [discount, setDiscount] = useState(0);
-  const [quantity, setQuantity] = useState(1);
   const [shipping, setShipping] = useState(0);
-  const [tax, setTax] = useState(0.0);
-  const [error, setError] = useState(false);
-  const [temporaryValue, setTemporaryValue] = useState({
-    TDiscount: 0,
-    TShipping: 0,
-    TTax: 0,
-    IShipping: 0,
-    IDiscount: 0,
-    ITax: 0,
-  });
-  const [paymentStatus, setPaymentStatus] = useState(null);
+  const [tax, setTax] = useState(0);
+  const [paid, setPaid] = useState(0);
+  const [due, setDue] = useState(0);
 
-
-  const { data: warehouseData, isLoading: wIsLoading } =
-    useGetWarehousesQuery();
-  const { data: supplierData, isLoading: sIsLoading } = useGetSuppliersQuery();
+  const { data: warehouseData, isLoading: wIsLoading } = useGetWarehousesQuery();
+  const { data: customerData, isLoading: cIsLoading } = useGetCustomersQuery();
+  const { data: businessData, isLoading: businessIsLoading } = useGetBusinessesQuery();
+  const { data: branchData, isLoading: branchIsLoading } = useGetBranchesQuery();
   const { data: productData, isLoading: pIsLoading } = useGetProductsQuery();
-
+  
+  const [
+    createNewSale,
+    {
+      data,
+      isError,
+      isLoading,
+      isSuccess,
+      error,
+    },
+  ] = useAddSalesOrderMutation();
 
   const wData = warehouseData?.data?.map((warehouse) => ({
     label: warehouse.warehouseName,
     value: warehouse.warehouseID,
   }));
 
-  const sData = supplierData?.data?.map((supplier) => ({
-    label: supplier.supplierName,
-    value: supplier.supplierID,
+  const cData = customerData?.data?.map((customer) => ({
+    label: customer.customerName,
+    value: customer.customerID,
   }));
 
-  const pData = productData?.data?.map((product) => ({
-    label: product.productTitle,
-    value: product.productID,
+  const businessOptions = businessData?.data?.map((business) => ({
+    label: business.businessName,
+    value: business.businessID,
   }));
 
-  const handlePaymentStatusChange = (value) => {
-    setPaymentStatus(value);
-  };
+  const branchOptions = branchData?.data?.map((branch) => ({
+    label: branch.branchName,
+    value: branch.branchID,
+  }));
 
   useEffect(() => {
     if (productSearch && productData) {
@@ -70,187 +85,175 @@ const AddSale = () => {
     }
   }, [productSearch, productData]);
 
-  const onChange = (date) => {
-    setStartDate(date);
-  };
-
   const filterOption = (input, option) =>
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const handleAddProduct = (value) => {
-    const selectedProduct = pData.find((product) => product.value === value);
-  
+    const selectedProduct = productData?.data?.find((product) => product.productID === value);
+
     if (selectedProduct) {
-      // Check if the product is already in the addedProducts array
       const isProductAlreadyAdded = addedProducts.some(
-        (product) => product.value === selectedProduct.value
+        (product) => product.productID === selectedProduct.productID
       );
-  
+
       if (!isProductAlreadyAdded) {
-        setAddedProducts((prevProducts) => [
-          ...prevProducts,
-          { ...selectedProduct, quantity: 1 },
-        ]);
-        setProductSearch("");  
+        if (selectedProduct.productVariant.length > 0) {
+          const variants = selectedProduct.productVariant.map((variant) => ({
+            productID: selectedProduct.productID,
+            quantity: 1,
+            productTitle: selectedProduct.productTitle,
+            sku: variant.sku,
+            stock: variant.stock,
+            salePrice: variant.salePrice,
+            productVariantID: variant.productVariantID,
+            attributes: variant.attribute_combination.map(
+              (attr) => `${attr.attributeName}: ${attr.attributeValue}`
+            ).join(", "),
+          }));
+    
+          setAddedProducts((prevData) => [...prevData, ...variants]);
+        } 
+        else {
+          const productEntry = {
+            productID: selectedProduct.productID,
+            productTitle: selectedProduct.productTitle,
+            sku: selectedProduct.sku || "N/A",
+            stock: selectedProduct.productInitialQty,
+            salePrice: selectedProduct.productRetailPrice,
+            attributes: "No Variants",
+            quantity: 1
+          };
+    
+          setAddedProducts((prevData) => [...prevData, productEntry]);
+        }
+        setProductSearch("");
         setSearchedProducts([]);
-        // toast.success("Product added to table");
       } else {
         toast.error("Product is already added");
       }
     }
   };
-  
-  useEffect(() => {
-    toast.dismiss(1);
-  }, []);
 
-  const handleQuantityChange = (productID, action) => {
+  const handleQuantityChange = (productID, action, productVariantID = null) => {
     setAddedProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.value === productID
-          ? {
-              ...product,
-              quantity:
-                action === "increment"
-                  ? product.quantity + 1
-                  : product.quantity > 1
-                  ? product.quantity - 1
-                  : 1,
-            }
-          : product
+      prevProducts.map((product) => {
+        const isMatch = product.productID === productID && 
+                        (productVariantID ? product.productVariantID === productVariantID : true);
+        
+        if (isMatch) {
+          let newQuantity = product.quantity;
+          if (action === "increment") {
+            newQuantity += 1;
+          } else if (action === "decrement" && newQuantity > 1) {
+            newQuantity -= 1;
+          }
+          return { ...product, quantity: newQuantity };
+        }
+        
+        return product;
+      })
+    );
+  };
+
+  const handleRemoveProduct = (productID, productVariantID = null) => {
+    setAddedProducts((prevData) =>
+      prevData.filter(
+        (item) =>
+          item.productID !== productID ||
+          (productVariantID && item.productVariantID !== productVariantID)
       )
     );
   };
 
-  const handleRemoveProduct = (productID) => {
-    setAddedProducts((prevProducts) =>
-      prevProducts.filter((product) => product.value !== productID)
-    );
-  };
-
-const addedProductPrice = addedProducts?.reduce(
-    (accumulator, currentValue) => {
-      return accumulator + Number(currentValue?.product_sale_price);
-    },
-    0
-  );
-
-  useEffect(() => {
-    const addedProductPrice = addedProducts?.reduce(
-      (accumulator, currentValue) => {
-        return accumulator + Number(currentValue?.product_sale_price);
-      },
+  const calculateAmounts = () => {
+    const productTotal = addedProducts.reduce(
+      (acc, product) => acc + product.salePrice * product.quantity,
       0
     );
-    setTotalPrice(addedProductPrice);
-  }, [addedProducts]);
-
-  const handleTextAndDiscount = (value, from) => {
-    if (value < 0) {
-      setError(true);
-      return toast.error("Value must be greater than zero");
-    }
-
-    const count =
-      from === "Discount"
-        ? Number(totalPrice) - Number(totalPrice) * (Number(value) / 100)
-        : from === "Tax"
-        ? Number(totalPrice) + Number(totalPrice) * (Number(value) / 100)
-        : 0;
-    if (count < 0) {
-      setError(true);
-      toast.error("Provided Value is too high");
-    } else {
-      setError(false);
-      if (from === "Discount") {
-        setDiscount(value);
-      }
-      if (from === "Tax") {
-        setTax(value);
-      }
-      setTotalPrice(count);
-    }
+  
+    const shippingCost = parseFloat(shipping) || 0;
+    const discountAmount = parseFloat(((productTotal) * (Number(discount) / 100)).toFixed(2)) || 0;
+    const taxAmount = parseFloat(((productTotal) * (Number(tax) / 100)).toFixed(2)) || 0;
+    const paidAmount = parseFloat(paid) || 0;
+  
+    const finalTotal = parseFloat((productTotal - discountAmount + taxAmount + shippingCost).toFixed(2));
+    const dueAmount = parseFloat((finalTotal - paidAmount).toFixed(2));
+  
+    return {
+      productTotal,
+      shippingCost,
+      discountAmount,
+      taxAmount,
+      finalTotal,
+      paidAmount,
+      dueAmount
+    };
   };
-  // handleShipping
-  // console.log(temporaryValue);
 
-  const handleShipping = (value) => {
-    // console.log(temporaryValue)
-    if (temporaryValue.TShipping === 0) {
-      setTemporaryValue((prev) => ({
-        ...prev,
-        IShipping: totalPrice,
-      }));
-    }
+  const updateTotalPrice = () => {
+    const { finalTotal, dueAmount } = calculateAmounts();
+    setTotalPrice(finalTotal);
+    setDue(dueAmount);
+  };
 
-    // console.log(temporaryValue);
+  useEffect(() => {
+    updateTotalPrice();
+  }, [addedProducts, discount, shipping, tax, paid]);
 
-    if (value === "") {
-      // console.log("hello");
-      setTotalPrice(temporaryValue.IShipping);
-    }
-    if (value > temporaryValue.TShipping) {
-      // temporaryValue.TShipping = value;
-      setTemporaryValue((prev) => ({
-        ...prev,
-        TShipping: parseFloat(value),
-      }));
-      const count = parseFloat(totalPrice) + parseFloat(value);
-      if (count < 0) {
-        setError(true);
-        toast.error("Provided Value is too low");
-      } else {
-        setError(false);
-        setShipping(value);
-        setTotalPrice(count);
-      }
-    }
-    if (value < temporaryValue.TShipping) {
-      // temporaryValue.TShipping = value;
-      const count = parseFloat(totalPrice) - parseFloat(value);
-      if (count < 0) {
-        setError(true);
-        toast.error("Provided Value is too high");
-      } else {
-        setError(false);
-        setShipping(value);
-        setTotalPrice(count);
-      }
+  const createSale = async () => {
+    const saleItems = addedProducts.map((item) => ({
+      productID: item.productID,
+      productVariantID: item.productVariantID || null,
+      quantity: item.quantity,
+      salePrice: item.salePrice,
+      totalPrice: item.salePrice * item.quantity,
+    }));
+  
+    const { finalTotal, dueAmount } = calculateAmounts();
+  
+    const saleData = {
+      warehouseID: selectedWarehouse,
+      customerID: selectedCustomer,
+      businessID: selectedBusiness,
+      branchID: selectedBranch,
+      orderDate: startDate.format("YYYY-MM-DD"),
+      saleItems: saleItems,
+      discountAmount: Number(discount),
+      shippingAmount: Number(shipping),
+      taxAmount: Number(tax),
+      totalAmount: finalTotal,
+      paidAmount: Number(paid),
+      dueAmount: dueAmount,
+      status: selectedStatus,
+      paymentStatus: selectedPaymentStatus,
+      paymentMethod: selectedPaymentMethod,
+      notes: description,
+    };
+  
+    try {
+      const response = await createNewSale({ data: saleData });
+      console.log("Response:", response);
+    } 
+    catch (error) {
+      console.error("Error:", error);
     }
   };
 
-  // const [
-  //   createNewPos,
-  //   { data, isError, isLoading, isSuccess, error: posError },
-  // ] = useNewInvoiceMutation();
-
-  // const createPos = () => {
-  //   createNewPos({
-  //     items: addedProduct?.map((item) => item?.id),
-  //     discount: Number(discount),
-  //     shipping: Number(shipping),
-  //     tax: Number(tax),
-  //   });
-  // };
-
-  // useShowAsyncMessage(isLoading, isError, posError, isSuccess, data);
-  // UseErrorMessages(posError);
-
-  // useEffect(() => {
-  //   if (isSuccess) {
-  //     setAddedProduct([]);
-  //     setDiscount(0);
-  //     setTax(0);
-  //     setDiscount(0);
-  //   }
-  // }, [isSuccess]);
-
-
+  const path = "/Dashboard/Sale";
+  useShowAsyncMessage(
+    isLoading,
+    isError,
+    error,
+    isSuccess,
+    data,
+    path
+  );
 
   return (
     <>
       <BreadCrumb />
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 items-center gap-x-6 gap-y-10 mb-10">
+        {/* Date */}
         <div>
           <label htmlFor="">Date:*</label>
           <div className="mt-3">
@@ -258,12 +261,13 @@ const addedProductPrice = addedProducts?.reduce(
               <DatePicker
                 style={{ width: "100%", padding: "3px" }}
                 defaultValue={startDate}
-                onChange={onChange}
+                onChange={(e) => setStartDate(e)}
               />
             </Space>
           </div>
         </div>
 
+        {/* Warehouse */}
         <div>
           <label htmlFor="">Warehouse:*</label>
           <div className="mt-3">
@@ -277,35 +281,76 @@ const addedProductPrice = addedProducts?.reduce(
               options={wData || []}
               loading={wIsLoading}
               disabled={wIsLoading}
+              onChange={(value) => setSelectedWarehouse(value)}
             />
           </div>
         </div>
 
+        {/* Customer */}
         <div>
-          <label htmlFor="">Supplier:*</label>
+          <label htmlFor="">Customer:*</label>
           <div className="mt-3">
             <Select
               style={{ width: "100%" }}
               virtual={true}
               allowClear={true}
               showSearch
-              placeholder={"Choose Supplier"}
+              placeholder={"Choose Customer"}
               filterOption={filterOption}
-              options={sData || []}
-              loading={sIsLoading}
-              disabled={sIsLoading}
+              options={cData || []}
+              loading={cIsLoading}
+              disabled={cIsLoading}
+              onChange={(value) => setSelectedCustomer(value)}
             />
           </div>
         </div>
 
+        {/* Business */}
+        <div>
+          <label htmlFor="">Business:*</label>
+          <div className="mt-3">
+            <Select
+              style={{ width: "100%" }}
+              virtual={true}
+              allowClear={true}
+              showSearch
+              placeholder={"Choose Business"}
+              filterOption={filterOption}
+              options={businessOptions || []}
+              loading={businessIsLoading}
+              disabled={businessIsLoading}
+              onChange={(value) => setSelectedBusiness(value)}
+            />
+          </div>
+        </div>
 
-      <div className='lg:col-span-3 relative'>
+        {/* Branch */}
+        <div>
+          <label htmlFor="">Branch:*</label>
+          <div className="mt-3">
+            <Select
+              style={{ width: "100%" }}
+              virtual={true}
+              allowClear={true}
+              showSearch
+              placeholder={"Choose Branch"}
+              filterOption={filterOption}
+              options={branchOptions || []}
+              loading={branchIsLoading}
+              disabled={branchIsLoading}
+              onChange={(value) => setSelectedBranch(value)}
+            />
+          </div>
+        </div>
+
+        {/* Product Search */}
+        <div className="lg:col-span-3 relative">
           <label htmlFor="">Product:*</label>
-          <div className='mt-3'>
+          <div className="mt-3">
             <Search
-              value={productSearch} 
-              placeholder="Search Product by Code Name"
-              onSearch={(value) => setProductSearch(value)} 
+              value={productSearch}
+              placeholder="Search Product by Name"
+              onSearch={(value) => setProductSearch(value)}
               onChange={(e) => setProductSearch(e.target.value)}
               allowClear
               enterButton={<CiSearch size={20} />}
@@ -313,58 +358,63 @@ const addedProductPrice = addedProducts?.reduce(
             />
           </div>
 
-      {
-        productSearch &&   <div className="mt-3 absolute bg-white rounded-md w-full overflow-hidden text-left whitespace-nowrap border border-gray-200 z-40" >
-           
-           {searchedProducts?.length > 0 ? (
-           <ul className="text-[#6c757d]">
-             {searchedProducts.map((product) => (
-               <li className="hover:bg-[#6571FF] px-3 py-1 hover:text-white text-base" 
-               key={product.productID} onClick={() => handleAddProduct(product.productID)}>
-             {product.productTitle}
-               </li>
-             ))}
-           </ul>
-         ) : (
-           <p className="text-center text-red-500 font-bold py-2">No Product found</p>
-         )}
-       
-       </div>
-      }
+          {productSearch && (
+            <div className="mt-3 absolute bg-white rounded-md w-full overflow-hidden text-left whitespace-nowrap border border-gray-200 z-40">
+              {searchedProducts?.length > 0 ? (
+                <ul className="text-[#6c757d]">
+                  {searchedProducts.map((product) => (
+                    <li
+                      className="hover:bg-[#6571FF] px-3 py-1 hover:text-white text-base"
+                      key={product.productID}
+                      onClick={() => handleAddProduct(product.productID)}
+                    >
+                      {product.productTitle}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-center text-red-500 font-bold py-2">
+                  No Product found
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
-
-         {/* Product table */}
+        {/* Product Table */}
         <div className="lg:col-span-3">
           <label htmlFor="">Order Items:*</label>
           <div className="max-h-[30vh] overflow-y-scroll scrollbar-0 mt-3">
             <table className="divide-y w-full divide-gray-300 overflow-x-scroll wrapper">
               <thead className="border bg-green-500 text-white">
                 <tr className="divide-x divide-gray-300">
-                  <th className=" py-2 text-center text-xs px-2">#</th>
+                  <th className="py-2 text-center text-xs px-2">#</th>
                   <th className="py-2 text-center text-xs whitespace-nowrap">
-                    Product
+                    Product Name
                   </th>
                   <th className="py-2 text-center text-xs whitespace-nowrap">
                     Quantity
                   </th>
-                  <th className="py-2 text-center text-xs px-2">Subtotal</th>
+                  <th className="py-2 text-center text-xs whitespace-nowrap">
+                    Price
+                  </th>
                   <th className="py-2 text-xs text-center px-2">Action</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-300">
                 {addedProducts?.map((product, index) => (
-                  <tr key={product.value} className="whitespace-nowrap w-full">
+                  <tr key={product.productVariantID || product.productID} className="whitespace-nowrap w-full">
                     <td className="text-center py-2 text-sm text-gray-500">
                       {index + 1}
                     </td>
-                    <td className="text-center py-2 px-2 text-sm text-gray-500">
-                      {product.label}
+                    <td className="text-center py-2 px-2 text-sm text-gray-500 font-bold">
+                      {product.productTitle}
+                      <p className="text-sm">({product.attributes})</p>
                     </td>
                     <td className="text-center py-2 px-2 text-sm text-gray-500">
                       <button
                         onClick={() =>
-                          handleQuantityChange(product.value, "decrement")
+                          handleQuantityChange(product.productID, "decrement", product.productVariantID)
                         }
                         className="px-3 py-1 bg-gray-200 disabled:bg-gray-500 disabled:cursor-not-allowed text-gray-700 rounded-l focus:outline-none hover:bg-gray-300"
                       >
@@ -375,7 +425,7 @@ const addedProductPrice = addedProducts?.reduce(
                       </span>
                       <button
                         onClick={() =>
-                          handleQuantityChange(product.value, "increment")
+                          handleQuantityChange(product.productID, "increment", product.productVariantID)
                         }
                         className="px-3 py-1 bg-gray-200 text-gray-700 disabled:bg-gray-500 disabled:cursor-not-allowed rounded-r focus:outline-none hover:bg-gray-300"
                       >
@@ -383,14 +433,14 @@ const addedProductPrice = addedProducts?.reduce(
                       </button>
                     </td>
                     <td className="text-center py-2 text-sm text-gray-500 px-2">
-                      ${100 * product.quantity}
+                      {product?.salePrice * product.quantity}
                     </td>
-                    <td className="flex justify-center py-2 text-sm text-gray-500">
+                    <td className="flex justify-center py-5 text-sm text-gray-500">
                       <RiDeleteBin6Line
-                        onClick={() => handleRemoveProduct(product.value)}
+                        onClick={() => handleRemoveProduct(product.productID, product.productVariantID)}
                         className="text-red-500 cursor-pointer"
                         size={20}
-                      ></RiDeleteBin6Line>
+                      />
                     </td>
                   </tr>
                 ))}
@@ -405,225 +455,220 @@ const addedProductPrice = addedProducts?.reduce(
                     </td>
                   </tr>
                 )}
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="text-center w-full text-lg mt-12 py-4 text-blue-500 font-bold"
+                  >
+                    Sub Total : {totalPrice} Tk
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-
-              {/* Tax */}
+        {/* Tax */}
         <div>
-        <label htmlFor="">Order Tax:*</label>
-
-        <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
-        
-        <input
-          placeholder="Tax"
-          className="border-0  w-full focus:border-0 focus:ring-0 py-1 outline-none"
-          type="number"
-          value={Number(tax) == 0 ? "Tax" : tax}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (value >= 0) {
-              setTax(value);
-              handleTextAndDiscount(e.target?.value, "Tax");
-            }
-          }}
-        />
-
-        <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2"> $</span>
-      </div>
-        </div>
-
-            {/*  Discount */}
-            <div>
-        <label htmlFor="">Discount:*</label>
-
-            <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
-              <input
-                placeholder="Discount"
-                className="border-0 focus:border-0 w-full focus:ring-0 py-1 outline-none"
-                type="number"
-                value={Number(discount) == 0 ? "Discount" : discount}
-                // value={Number(tax) == 0 ? "Discount" : discount}
-                // value={
-                //   Number(discount) > 100 || discount === 0
-                //     ? "Discount"
-                //     : discount
-                // }
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value >= 0) {
-                    setDiscount(value);
-                    handleTextAndDiscount(value, "Discount");
-                  }
-                }}
-              />
-        <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">%</span>
-              
-            </div>
-           </div>
-
-
-            {/*  shipping */}
-            <div>
-        <label htmlFor="">Shipping:*</label>
-            
-            <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
-              <input
-                placeholder="Shipping"
-                className="border-0 w-full focus:border-0 focus:ring-0 py-1 outline-none"
-                type="number"
-                value={Number(shipping) == 0 ? "Shipping" : shipping}
-                onChange={(e) => {
-                  const value = e.target.value;
-
-                  if (value >= 0) {
-                    setShipping(value);
-                    handleShipping(value);
-                  }
-                }}
-              />
-         <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">$</span>
-
-            </div>
-       </div>
-
-           {/* Sale Status */}
-        <div>
-        <label htmlFor="">Status:*</label>
-            <div className="mt-3">
-            <Select
-            name="saleStatus"
-            style={{ width: '100%'}}
-            options={[
-              { label: "Completed", value: "Completed" },
-              { label: "Pending", value: "Pending" },
-              { label: "Ordered", value: "Ordered" },
-            ]}
-            placeholder="Select Sale status"
-            
-          />
-            </div>
-        </div>
-
-           {/* Payment Status */}
-        <div>
-        <label htmlFor="">Payment Status:*</label>
-            <div className="mt-3">
-            <Select
-            name="paymentStatus"
-            style={{ width: '100%'}}
-            options={[
-
-              { label: "Paid", value: "Paid" },
-              { label: "Unpaid", value: "Unpaid" },
-             
-            ]}
-            placeholder="Select Payment status"
-            onChange={handlePaymentStatusChange}
-            
-          />
-            </div>
-        </div>
-
-        {paymentStatus === 'Paid' && (
-          <div>
-          <label htmlFor="">Payment Method:</label>
-          <div className="mt-3">
-          <Select
-            name="paymentMethod"
-            style={{ width: '100%' }}
-            options={[
-              { label: 'Credit Card', value: 'Credit Card' },
-              { label: 'Bank Transfer', value: 'Bank Transfer' },
-              { label: 'PayPal', value: 'PayPal' },
-            ]}
-            placeholder="Select Payment Method"
-          />
-        </div>
-        </div>
-      )}
-
-
-
-
-      </div>
-            {/* Description */}
-            <div>
-           <label htmlFor="">Note:*</label>
- 
- <div className="mt-3 mb-5">
-
-   <TextArea  allowClear/>
- </div>
-           </div>
-
-           {/* Order Summary */}
-     <div className="flex justify-end">
-     <div className="flex w-full lg:w-[35%]  flex-col  bg-white  space-y-4 divide-y border border-gray-300  lg:mt-5">
-	
-
-	<div className="pt-4 space-y-2">
-		<div>
-			<div className="flex justify-between px-5">
-				<span>Tax</span>
-				<span>{tax} $</span>
-			</div>
-		</div>
-
-	</div>
-	<div className="pt-4 space-y-2">
-		<div className="space-y-6">
-			<div className="flex justify-between px-5">
-				<span>Discount</span>
-				<span className="">{discount} %</span>
-			</div>
-
-		</div>
-	</div>
-	<div className="pt-4 space-y-2">
-		<div className="space-y-6">
-			<div className="flex justify-between px-5">
-				<span>Shipping</span>
-				<span className="">{shipping} $</span>
-			</div>
-
-		</div>
-	</div>
-	<div className="pt-4 pb-4 space-y-2">
-		<div className="space-y-6">
-			<div className="flex justify-between px-5">
-				<span className="text-[#6571FF]">Grand Total</span>
-				<span className="text-[#6571FF]">{totalPrice} $</span>
-			</div>
-
-		</div>
-	</div>
-   
-       </div>
-     </div>
-
-     {/* Submit button */}
-     <div className="flex justify-end mt-10 mb-8">
-     <div     
-            onClick={() => {
-              if (error === true) {
-                toast.error("you can't create pos");
-              } else {
-                createPos();
-              }
-            }}
-            className={`bg-primary w-full lg:w-[20%] py-1 lg:py-2  rounded-lg flex justify-center items-center gap-x-2 text-base font-medium text-white ${
-              error === true
-                ? "disabled:cursor-none bg-green-200"
-                : "cursor-pointer bg-[#2FC989] "
-            }`}
-          >
-            <p>Submit</p>
+          <label htmlFor="">Order Tax:*</label>
+          <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
+            <input
+              placeholder="Tax"
+              className="border-0 w-full focus:border-0 focus:ring-0 py-1 outline-none"
+              type="number"
+              value={tax}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value >= 0) {
+                  setTax(value);
+                }
+              }}
+            />
+            <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">%</span>
           </div>
-     </div>
+        </div>
 
+        {/* Discount */}
+        <div>
+          <label htmlFor="">Discount:*</label>
+          <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
+            <input
+              placeholder="Discount"
+              className="border-0 focus:border-0 w-full focus:ring-0 py-1 outline-none"
+              type="number"
+              value={discount}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value >= 0) {
+                  setDiscount(value);
+                }
+              }}
+            />
+            <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">%</span>
+          </div>
+        </div>
+
+        {/* Shipping */}
+        <div>
+          <label htmlFor="">Shipping:*</label>
+          <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
+            <input
+              placeholder="Shipping"
+              className="border-0 w-full focus:border-0 focus:ring-0 py-1 outline-none"
+              type="number"
+              value={shipping}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value >= 0) {
+                  setShipping(value);
+                }
+              }}
+            />
+            <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">Tk</span>
+          </div>
+        </div>
+
+        {/* Paid Amount */}
+        <div>
+          <label htmlFor="">Paid Amount:*</label>
+          <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
+            <input
+              placeholder="Paid Amount"
+              className="border-0 w-full focus:border-0 focus:ring-0 py-1 outline-none"
+              type="number"
+              value={paid}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value >= 0) {
+                  setPaid(value);
+                }
+              }}
+            />
+            <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">Tk</span>
+          </div>
+        </div>
+
+        {/* Due Amount */}
+        <div>
+          <label htmlFor="">Due Amount:*</label>
+          <div className="border border-gray-300 flex justify-between w-full items-center px-2 rounded-lg mt-3">
+            <input
+              readOnly
+              placeholder="Due Amount"
+              className="border-0 w-full focus:border-0 focus:ring-0 py-1 outline-none"
+              type="number"
+              value={due}
+            />
+            <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2">Tk</span>
+          </div>
+        </div>
+
+        {/* Status */}
+        <div>
+          <label htmlFor="">Status:*</label>
+          <div className="mt-3">
+            <Select
+              style={{ width: "100%" }}
+              options={[
+                { label: "Pending", value: "pending" },
+                { label: "Shipped", value: "shipped" },
+                { label: "Completed", value: "completed" },
+                { label: "Cancelled", value: "cancelled" },
+                { label: "Returned", value: "returned" },
+              ]}
+              placeholder="Select Sale status"
+              onChange={(value) => setSelectedStatus(value)}
+            />
+          </div>
+        </div>
+
+        {/* Payment Status */}
+        <div>
+          <label htmlFor="">Payment Status:*</label>
+          <div className="mt-3">
+            <Select
+              style={{ width: "100%" }}
+              options={[
+                { label: "Pending", value: "pending" },
+                { label: "Paid", value: "paid" },
+                { label: "Failed", value: "failed" },
+                { label: "Refunded", value: "refunded" },
+              ]}
+              placeholder="Select Payment status"
+              onChange={(value) => setSelectedPaymentStatus(value)}
+            />
+          </div>
+        </div>
+
+        {/* Payment Method */}
+        <div>
+          <label htmlFor="">Payment Method:*</label>
+          <div className="mt-3">
+            <Select
+              style={{ width: "100%" }}
+              options={[
+                { label: "Cash", value: "cash" },
+                { label: "Credit Card", value: "credit_card" },
+                { label: "Debit Card", value: "debit_card" },
+                { label: "Bank Transfer", value: "bank_transfer" },
+              ]}
+              placeholder="Select Payment Method"
+              onChange={(value) => setSelectedPaymentMethod(value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Description */}
+      <div>
+        <label htmlFor="">Note:*</label>
+        <div className="mt-3 mb-5">
+          <TextArea
+            onChange={(e) => setDescription(e.target.value)}
+            allowClear
+          />
+        </div>
+      </div>
+
+      {/* Order Summary */}
+      <div className="flex justify-end">
+        <div className="flex w-full lg:w-[35%] flex-col bg-white space-y-4 divide-y border border-gray-300 lg:mt-5">
+          <div className="pt-4 space-y-2">
+            <div className="flex justify-between px-5">
+              <span>Tax</span>
+              <span>{tax} %</span>
+            </div>
+          </div>
+          <div className="pt-4 space-y-2">
+            <div className="flex justify-between px-5">
+              <span>Discount</span>
+              <span>{discount} %</span>
+            </div>
+          </div>
+          <div className="pt-4 space-y-2">
+            <div className="flex justify-between px-5">
+              <span>Shipping</span>
+              <span>{shipping} Tk</span>
+            </div>
+          </div>
+          <div className="pt-4 pb-4 space-y-2">
+            <div className="flex justify-between px-5">
+              <span className="text-[#6571FF]">Grand Total</span>
+              <span className="text-[#6571FF]">{totalPrice} Tk</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Submit button */}
+      <div className="flex justify-end mt-10 mb-8">
+        <div
+          onClick={createSale}
+          className="bg-[#2FC989] w-full lg:w-[20%] py-1 lg:py-2 rounded-lg flex justify-center items-center gap-x-2 text-base font-medium text-white cursor-pointer"
+        >
+          {isLoading ? "Processing..." : "Create Sale"}
+        </div>
+      </div>
     </>
   );
 };

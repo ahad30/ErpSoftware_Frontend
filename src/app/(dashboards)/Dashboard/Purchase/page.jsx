@@ -42,6 +42,7 @@ const PurchaseTable = () => {
     paid: purchase?.paidAmount,
     status: purchase?.status,
     items: purchase?.items,
+    paymentMethod: purchase?.paymentMethod,
   }));
 
   // console.log(purchaseData)
@@ -112,6 +113,16 @@ const PurchaseTable = () => {
         >
           {status}
         </Tag>
+      ),
+    },
+    {
+      title: "Payment Method",
+      dataIndex: "paymentMethod",
+      key: "paymentMethod",
+      render: (method) => (
+        <span style={{ textTransform: 'capitalize' }}>
+          {method?.replace(/_/g, ' ')}
+        </span>
       ),
     },
     {
