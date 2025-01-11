@@ -37,6 +37,7 @@ const EditPurchase = () => {
   const [tax, setTax] = useState(0);
   const [paid, setPaid] = useState(0);
   const [due, setDue] = useState(0);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const { data: warehouseData, isLoading: wIsLoading } =
     useGetWarehousesQuery();
   const { data: supplierData, isLoading: sIsLoading } = useGetSuppliersQuery();
@@ -130,6 +131,7 @@ const EditPurchase = () => {
       setShipping(purchaseData.shippingAmount);
       setDiscount(purchaseData.discountAmount);
       setTax(purchaseData.taxAmount);
+      setSelectedPaymentMethod(purchaseData.paymentMethod || "");
     }
   }, [singlePurchaseIsSuccess]);
 
@@ -302,6 +304,7 @@ const EditPurchase = () => {
         dueAmount: dueAmount,
         status: selectedStatus,
         notes: description,
+        paymentMethod: selectedPaymentMethod,
       }
     };
   
@@ -666,6 +669,25 @@ const EditPurchase = () => {
             />
 
             <span className="bg-gray-300 rounded-r-md px-2 py-1 -me-2"> Tk</span>
+          </div>
+        </div>
+
+        {/* Payment Method */}
+        <div>
+          <label htmlFor="">Payment Method:*</label>
+          <div className="mt-3">
+            <Select
+              style={{ width: "100%" }}
+              value={selectedPaymentMethod}
+              options={[
+                { label: "Cash", value: "cash" },
+                { label: "Credit Card", value: "credit_card" },
+                { label: "Debit Card", value: "debit_card" },
+                { label: "Bank Transfer", value: "bank_transfer" },
+              ]}
+              placeholder="Select Payment Method"
+              onChange={(value) => setSelectedPaymentMethod(value)}
+            />
           </div>
         </div>
 
