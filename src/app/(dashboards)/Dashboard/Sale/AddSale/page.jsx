@@ -203,6 +203,7 @@ const AddSale = () => {
   const createSale = async () => {
     const saleItems = addedProducts.map((item) => ({
       productID: item.productID,
+      productTitle: item.productTitle,
       productVariantID: item.productVariantID || null,
       quantity: item.quantity,
       salePrice: item.salePrice,
@@ -210,8 +211,16 @@ const AddSale = () => {
     }));
   
     const { finalTotal, dueAmount } = calculateAmounts();
+
+
+   if(selectedCustomer === "" || selectedWarehouse === "" || selectedBusiness === "" || selectedBranch === "" || selectedPaymentMethod === "" || selectedPaymentStatus === "" || selectedStatus === "" || addedProducts.length === 0){
+    toast.error("Please fill all the required* fields");
+    return;
+   }
+
+
   
-    const saleData = {
+    const saleData =  {
       warehouseID: selectedWarehouse,
       customerID: selectedCustomer,
       businessID: selectedBusiness,
