@@ -427,6 +427,7 @@ const EditPurchase = () => {
           </div>
         </div>
 
+        {/* Product Search */}
         <div className="lg:col-span-3 relative">
           <label htmlFor="">Product:*</label>
           <div className="mt-3">

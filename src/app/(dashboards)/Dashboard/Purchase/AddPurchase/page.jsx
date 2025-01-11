@@ -278,6 +278,11 @@ const AddPurchase = () => {
     );
 
     const dueAmount = parseFloat((finalAmount - parseFloat(paidAmount)).toFixed(2));
+
+    if(selectedWarehouse === "" || selectedSupplier === "" || selectedBusiness === "" || selectedBranch === "" || selectedPaymentMethod === "" || selectedStatus === "" || addedProducts.length === 0){
+      toast.error("Please fill all the required* fields");
+      return;
+    }
   
     const purchaseData = {
       warehouseID: selectedWarehouse, 
