@@ -3,6 +3,7 @@ export const VariantProductTable = ({
   skus,
   setSkus,
 }) => {
+  console.log(skus);
   const handleDeleteTheVariant = (id) => {
     const filterTheVariant = skus.filter((item) => item.variationId !== id);
     setSkus([...filterTheVariant]);

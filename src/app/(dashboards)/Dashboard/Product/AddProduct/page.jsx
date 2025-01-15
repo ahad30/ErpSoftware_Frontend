@@ -230,7 +230,7 @@ const AddProduct = () => {
       });
 
       const sku = {
-        // variationId:generateUniqueId(),
+        variationId:generateUniqueId(),
         sku: `${valuesName.join("-")}`,
         stock: priceQuantityImage.stock,
         min_stock: priceQuantityImage.min_stock,
@@ -409,7 +409,7 @@ const AddProduct = () => {
       if (skus.length > 0) {
         const variantProductData = {
           ...modifiedData,
-          sku: "",
+           sku: "",
           productVariant: skus.map((sku, index) => ({
             key: index,
             attribute_combination: sku.attributes,

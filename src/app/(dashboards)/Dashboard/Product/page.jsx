@@ -37,11 +37,12 @@ const Product = () => {
       sku: product?.sku,
       brand: product?.brandID,
       business:product?.businessID,
+      type: product?.productType,
       status: product?.isActive,
       variant: product?.productVariant
   }));
 
-  console.log(productData);
+  // console.log(productData);
   const handledl = (productData) => {
     setSelectedProduct(productData);
     dispatch(setIsDeleteModalOpen());
@@ -51,14 +52,15 @@ const Product = () => {
     deleteProduct(selectedProduct?.id);
   };
 
-  const handleEditProduct = (productData) => {
-    setSelectedProduct(productData);
-    dispatch(setIsEditModalOpen());
+  const handleEditProduct = (id) => {
+     router.push(`/Dashboard/Product/EditProduct?id=${id}`);
   };
 
   const handleViewProduct = (id) => {
     router.push(`/Dashboard/Product/ViewProduct?id=${id}`);
   };
+
+
 
   // Define table columns
   const columns = [
@@ -78,28 +80,34 @@ const Product = () => {
       key: "subtitle",
     },
     {
-      title: "SKU",
+      title: "Type",
       render: (values, record) => (
-        <div className="flex gap-2 flex-col items-center">
-          {record.variant?.length > 0 ? (
-            record?.variant?.map((item, index) => (
-              <Alert 
-                key={index} 
-                message={`${item?.sku || 'N/A'}`} 
-                type="info" 
-              />
-            ))
-          ) : (
-            <Alert 
-              message={` ${record.sku || 'N/A'}`} 
-              type="info" 
-            />
-          )}
+        <div className="flex justify-center">
+          <Alert message={`${record.type === "0" ? "Variant Product" : "Single Product"}`} type="info" />
         </div>
       ),
-    }
-    
-    ,
+    },
+    // {
+    //   title: "SKU",
+    //   render: (values, record) => (
+    //     <div className="flex gap-2 flex-col items-center">
+    //       {record.variant?.length > 0 ? (
+    //         record?.variant?.map((item, index) => (
+    //           <Alert 
+    //             key={index} 
+    //             message={`${item?.sku || 'N/A'}`} 
+    //             type="info" 
+    //           />
+    //         ))
+    //       ) : (
+    //         <Alert 
+    //           message={` ${record.sku || 'N/A'}`} 
+    //           type="info" 
+    //         />
+    //       )}
+    //     </div>
+    //   ),
+    // },
     {
       title: "Variant",
       dataIndex: "variant",
@@ -141,7 +149,7 @@ const Product = () => {
           <FaEye size={25}/>
                   </Tooltip>
           </a>
-          <a onClick={() => handleEditProduct(record)}>
+          <a onClick={() => handleEditProduct(record.id)}>
             <Tooltip title="Edit" placement="top">
               <CiEdit size={20} />
             </Tooltip>
