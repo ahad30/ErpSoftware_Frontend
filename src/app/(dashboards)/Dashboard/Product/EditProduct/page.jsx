@@ -313,7 +313,7 @@ const EditProduct = () => {
         isActive: values.isActive,
         productType: typeProduct,
       };
-
+                         
       // For single product
       if (typeProduct === "1") {
         formData.sku = values.sku;
