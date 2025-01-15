@@ -253,6 +253,7 @@ const EditSale = () => {
   const updateSaleOrder = async () => {
     const saleItems = addedProducts.map((item) => ({
       productID: item.productID,
+      productTitle: item.productTitle,
       productVariantID: item.productVariantID || null,
       quantity: item.quantity,
       salePrice: item.salePrice,

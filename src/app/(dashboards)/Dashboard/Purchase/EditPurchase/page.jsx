@@ -280,6 +280,7 @@ const EditPurchase = () => {
   const updatePurchase = async () => {
     const productItems = addedProducts.map((item) => ({
       productID: item.productID,
+      productTitle: item.productTitle,
       productVariantID: item.productVariantID || null,
       quantity: item.quantity,
       purchasePrice: item.purchasePrice,

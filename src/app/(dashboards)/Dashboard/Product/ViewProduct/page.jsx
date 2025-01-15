@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useGetProductsByIdQuery } from '@/redux/Feature/Admin/product/productApi';
 import { Table } from 'antd';
 import Skeleton from '@/components/Skeleton/Skeleton';
+import BreadCrumb from '@/components/BreadCrumb/BreadCrumb';
 
 const ViewProduct = () => {
   const searchParams = useSearchParams();
@@ -74,8 +75,9 @@ const ViewProduct = () => {
 
   return (
     <section>
-      <h1 className="font-semibold text-2xl mb-7 text-center">View Product Details</h1>
-      <div className="mb-4 space-y-5">
+      <BreadCrumb/>
+
+      <div className="mt-7 mb-4 space-y-5">
         <h2 className="text-lg font-semibold mb-4 underline">Product Information</h2>
         <p><strong>Title:</strong> {product.productTitle}</p>
         <p><strong>Subtitle:</strong> {product.productSubtitle}</p>
