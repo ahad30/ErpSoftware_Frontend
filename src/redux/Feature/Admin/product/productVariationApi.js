@@ -3,57 +3,57 @@ import { getTagsByModuleName } from "@/redux/Tag/Tag";
 
 const productVariationApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Add Product Unit
+    // Add Product Variation
     addProductVariationApi: builder.mutation({
       query: (data) => ({
         url: "/product-variant/create",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        // headers: {
+        //   "Content-Type": "application/json",
+        // },
         method: "POST",
         body: data,
       }),
-      invalidatesTags: getTagsByModuleName('ProductVariationApi')
+      invalidatesTags: getTagsByModuleName('ProductVariation')
     }),
 
-    // Get Product Units
+    // Get Product Variations
     getProductVariationApi: builder.query({
       query: () => ({
         url: "/product-variant",
       }),
-      providesTags: getTagsByModuleName('ProductVariationApi')
+      providesTags: getTagsByModuleName('ProductVariation')
     }),
 
-    // Get Single Product Unit by ID
+    // Get Single Product Variation by ID
     getProductVariationApiById: builder.query({
       query: (id) => ({
         url: `/product-variant/${id}`,
       }),
-      providesTags: getTagsByModuleName('ProductVariationApi')
+      providesTags: getTagsByModuleName('ProductVariation')
 
     }),
 
-    // Update Product Unit
+    // Update Product Variation
     updateProductVariationApi: builder.mutation({
       query: ({ id, data }) => ({
         url: `/product-variant/update/${id}`,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        // headers: {
+        //   "Content-Type": "application/json",
+        // },
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: getTagsByModuleName('ProductVariationApi')
+      invalidatesTags: getTagsByModuleName('ProductVariation')
 
     }),
 
-    // Delete Product Unit
+    // Delete Product Variation
     deleteProductVariationApi: builder.mutation({
       query: (id) => ({
         url: `/product-variant/delete/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: getTagsByModuleName('ProductVariationApi')
+      invalidatesTags: getTagsByModuleName('ProductVariation')
 
     }),
   }),

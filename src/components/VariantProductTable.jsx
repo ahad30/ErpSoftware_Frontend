@@ -1,55 +1,90 @@
+import { useDeleteProductVariationApiMutation } from "@/redux/Feature/Admin/product/productVariationApi";
+import { CiEdit, CiTrash } from "react-icons/ci";
+import { toast } from "sonner";
+import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/redux/Hook/Hook";
+import { setIsVariantModalOpen } from "@/redux/Modal/ModalSlice";
+import { usePathname } from "next/navigation";
+import { Modal } from "antd";
+import { IoMdClose } from "react-icons/io";
+import EditVariation from "@/app/(dashboards)/Dashboard/Product/EditVariation/EditVariation";
 
-export const VariantProductTable = ({
-  skus,
-  setSkus,
-}) => {
-  console.log(skus);
-  const handleDeleteTheVariant = (id) => {
-    const filterTheVariant = skus.filter((item) => item.variationId !== id);
-    setSkus([...filterTheVariant]);
+export const VariantProductTable = ({ skus, setSkus }) => {
+  const pathName = usePathname();
+  const dispatch = useAppDispatch();
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const { isVariantModalOpen } = useAppSelector(
+    (state) => state.modal
+  );
+  const [deleteVariation] = useDeleteProductVariationApiMutation();
+  
+  const handleDeleteTheVariant = async (id) => {
+    try {
+      // Remove from local state
+      const filterTheVariant = skus.filter((item) => item.variationId !== id);
+      setSkus([...filterTheVariant]);
+      // Delete from API if it exists and not on AddProduct page
+      if (id && pathName !== "/Dashboard/Product/AddProduct") {
+        await deleteVariation(id).unwrap();
+        toast.success("Variant deleted successfully");
+      }
+    } catch (error) {
+      toast.error("Failed to delete variant");
+      console.error(error);
+    }
   };
 
-  // console.log(skus)
+  
+  const handleEditVariant = (variant) => {
+    setSelectedVariant(variant);
+    dispatch(setIsVariantModalOpen());
+  };
+
+  const handleCancel = () => {
+    dispatch(setIsVariantModalOpen());
+  };
+  
+  console.log(skus);
   return (
-    skus.length > 0 && (
-      <div>
-        <h1 className="text-center lg:text-xl mt-9 mb-5 font-bold">
-          Check your added Variant of The Product
-        </h1>
-        <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-xl bg-clip-border">
-          <table className="w-full text-center table-auto min-w-max">
-            <thead>
-              <tr>
-                <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
-                  <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    Serial
-                  </p>
-                </th>
-                <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
-                  <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    Attributes Value
-                  </p>
-                </th>
-                <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
-                  <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                   Purchase Price
-                  </p>
-                </th>
-                <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
-                  <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    Stock
-                  </p>
-                </th>
-                <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
-                  <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    Action
-                  </p>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {skus.map((item, index) => {
-                return (
+    <>
+      {skus.length > 0 && (
+        <div>
+          <h1 className="text-center lg:text-xl mt-9 mb-5 font-bold">
+            Check your added Variant of The Product
+          </h1>
+          <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-xl bg-clip-border">
+            <table className="w-full text-center table-auto min-w-max">
+              <thead>
+                <tr>
+                  <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+                    <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                      Serial
+                    </p>
+                  </th>
+                  <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+                    <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                      Attributes Value
+                    </p>
+                  </th>
+                  <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+                    <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                      Purchase Price
+                    </p>
+                  </th>
+                  <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+                    <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                      Stock
+                    </p>
+                  </th>
+                  <th className="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+                    <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                      Action
+                    </p>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {skus.map((item, index) => (
                   <tr key={item?.variationId} className="">
                     <td className="p-4 border-b border-blue-gray-50">
                       <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
@@ -71,23 +106,47 @@ export const VariantProductTable = ({
                         {item?.stock}
                       </p>
                     </td>
-                    <td className="p-4  border-b border-blue-gray-50">
-                      <p
-                        onClick={() => handleDeleteTheVariant(item.variationId)}
-                        className="block cursor-pointer bg-red-500 text-white px-1 py-2  mx-auto text-center font-sans text-sm antialiased font-normal leading-normal rounded-md"
-                      >
-                        Delete
-                      </p>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <div className="flex gap-2 justify-center">
+                        <button
+                          onClick={() => handleEditVariant(item)}
+                          className={`cursor-pointer bg-blue-500 text-white px-3 py-2 rounded-md ${pathName === "/Dashboard/Product/AddProduct" ? "hidden" : ""}`}
+                        >
+                          <CiEdit size={20} />
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleDeleteTheVariant(item.variationId)
+                          }
+                          className="cursor-pointer bg-red-500 text-white px-3 py-2 rounded-md"
+                        >
+                          <CiTrash size={20} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    )
+      )}
+
+      <Modal
+        centered
+        open={isVariantModalOpen}
+        width={700}
+        onCancel={handleCancel}
+        closeIcon={<IoMdClose  style={{ fontSize: '24px', color: 'white' , backgroundColor:"red", padding:"2px" ,borderRadius:"100%"}} />}
+        okButtonProps={{ style: { display: "none" , color:"white" } }}
+        cancelButtonProps={{ style: { display: "none" } }}
+      >
+        <EditVariation
+          selectedVariant={selectedVariant}
+          setSkus={setSkus}
+          skus={skus}
+        />
+      </Modal>
+    </>
   );
 };
-
-
