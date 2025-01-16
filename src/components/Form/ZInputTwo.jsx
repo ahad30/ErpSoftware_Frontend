@@ -14,6 +14,7 @@ const ZInputTwo = ({
   required,
   reset,
   onChange,
+  readOnly,
 }) => {
   const { control, setValue, resetField } = useFormContext();
   const { isEditModalOpen } = useAppSelector((state) => state.modal);
@@ -46,6 +47,8 @@ const ZInputTwo = ({
           help={error?.message}
         >
           <Input
+            disabled={readOnly}
+            readOnly={readOnly}
             className={defaultKey ? `${defaultKey}` : ``}
             {...field}
             type={type}

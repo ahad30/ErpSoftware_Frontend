@@ -512,7 +512,7 @@ const Dashboard = ({ view, toggle }) => {
           </ListItem>
           </Link>
 
-          <Link href={'/Dashboard/Purchase-return'}>
+          {/* <Link href={'/Dashboard/Purchase-return'}>
                 <ListItem 
                 className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("purchase-return")}`}
                 selected={activeItem === "purchase-return"}
@@ -528,7 +528,7 @@ const Dashboard = ({ view, toggle }) => {
                   Purchases Returns
                   </Typography>
                 </ListItem>
-          </Link>
+          </Link> */}
       </List>
             </AccordionBody>
             
@@ -596,7 +596,7 @@ const Dashboard = ({ view, toggle }) => {
           </ListItem>
           </Link>
 
-          <Link href={'/Dashboard/Sale-return'}>
+          {/* <Link href={'/Dashboard/Sale-return'}>
                 <ListItem 
                 className={`hover:bg-[#6c5ce7]  hover:!rounded-none  ${getActiveClass("sale-return")}`}
                 selected={activeItem === "sale-return"}
@@ -612,7 +612,7 @@ const Dashboard = ({ view, toggle }) => {
                   Sales Returns
                   </Typography>
                 </ListItem>
-          </Link>
+          </Link> */}
       </List>
             </AccordionBody>
             

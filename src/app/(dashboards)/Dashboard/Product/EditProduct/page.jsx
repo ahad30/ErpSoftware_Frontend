@@ -19,6 +19,7 @@ import { useGetBranchesQuery } from "@/redux/Feature/Admin/branch/branchesApi";
 import { useGetAttributesQuery } from "@/redux/Feature/Admin/product/attributesApi";
 import BreadCrumb from "@/components/BreadCrumb/BreadCrumb";
 import { toast } from "sonner";
+import { useAddProductVariationApiMutation } from "@/redux/Feature/Admin/product/productVariationApi";
 
 function generateUniqueId(length = 2) {
   const chars = "123456789";
@@ -109,8 +110,9 @@ const EditProduct = () => {
       error: pError,
     },
   ] = useUpdateProductMutation();
+  const [addVariation, { isLoading: addVariationLoading }] = useAddProductVariationApiMutation();
 
-
+console.log(productData?.data)
   useEffect(() => {
     const product = productData?.data;
     if (isSuccess &&  product) {
@@ -175,9 +177,8 @@ const EditProduct = () => {
 
 
 
-  const handleAddPerSkuInSkus = () => {
+  const handleAddVariant = async () => {
     const attributes = [];
-    // const attributes = {};
     const valuesName = [];
 
     if (perSku.length === 0) {
@@ -228,56 +229,83 @@ const EditProduct = () => {
       priceQuantityImage.qrCode
     ) {
       perSku.forEach((element) => {
-        // const proPertyKey = element.split("-")[0];
-        // const proPertyValue = element.split("-")[1];
-        // valuesName.push(proPertyValue);
-        // attributes[proPertyKey] = proPertyValue;
         const [attributeName, attributeValue] = element.split("-");
         valuesName.push(attributeValue);
         attributes.push({ attributeName, attributeValue });
       });
 
       const sku = {
-        variationId:generateUniqueId(),
+        variationId: generateUniqueId(),
         sku: `${valuesName.join("-")}`,
         stock: priceQuantityImage.stock,
         min_stock: priceQuantityImage.min_stock,
         max_stock: priceQuantityImage.max_stock,
         salePrice: priceQuantityImage.salePrice,
-        serialNo: priceQuantityImage.serialNo,
+        serialNo: String(priceQuantityImage.serialNo),
         purchasePrice: priceQuantityImage.purchasePrice,
         wholeSalePrice: priceQuantityImage.wholeSalePrice,
         retailPrice: priceQuantityImage.retailPrice,
-        qrCode: priceQuantityImage.qrCode,
+        qrCode: String(priceQuantityImage.qrCode),
         attributes,
       };
 
-      console.log(sku);
       if (skus.length === 0) {
-        setSkus([...skus, { ...sku }]);
-        handleRefreshVariantState();
-      }
-      // else if (skus.length > 0) {
-      //   const skusAttributes = skus.map((sku) => sku.attributes);
-      //   const exist = variantExists(skusAttributes, sku.attributes);
-      //   if (!exist) {
-      //     setSkus([...skus, { ...sku }]);
-      //     handleRefreshVariantState();
-      //   } else {
-      //     toast.error("Already exists the variant of the product", {
-      //       duration: 2000,
-      //     });
-      //   }
-      // }
-      else if (skus.length > 0) {
+        try {
+          const response = await addVariation({
+            productID: productId,
+            sku: sku.sku,
+            stock: Number(sku.stock),
+            min_stock: Number(sku.min_stock),
+            max_stock: Number(sku.max_stock),
+            salePrice: Number(sku.salePrice),
+            serialNo: String(sku.serialNo),
+            purchasePrice: Number(sku.purchasePrice),
+            wholeSalePrice: Number(sku.wholeSalePrice),
+            retailPrice: Number(sku.retailPrice),
+            qrCode: sku.qrCode,
+            
+          }).unwrap();
+
+          if (response) {
+            setSkus([...skus, { ...sku, variationId: response.data.id }]);
+            handleRefreshVariantState();
+            toast.success("Variant added successfully");
+          }
+        } catch (error) {
+          toast.error(error?.data?.message || "Failed to add variant");
+          console.error(error);
+        }
+      } else if (skus.length > 0) {
         const isDuplicate = skus.some(
           (existingSku) => existingSku.sku === sku.sku
         );
         if (isDuplicate) {
           toast.error("This variant has already been added.", { id: 9 });
         } else {
-          setSkus([...skus, { ...sku }]);
-          handleRefreshVariantState();
+          try {
+            const response = await addVariation({
+              productID: productId,
+              sku: sku.sku,
+              stock: Number(sku.stock),
+              min_stock: Number(sku.min_stock),
+              max_stock: Number(sku.max_stock),
+              salePrice: Number(sku.salePrice),
+              serialNo: String(sku.serialNo),
+              purchasePrice: Number(sku.purchasePrice),
+              wholeSalePrice: Number(sku.wholeSalePrice),
+              retailPrice: Number(sku.retailPrice),
+              qrCode: sku.qrCode
+            }).unwrap();
+
+            if (response) {
+              setSkus([...skus, { ...sku, variationId: response.data.id }]);
+              handleRefreshVariantState();
+              toast.success("Variant added successfully");
+            }
+          } catch (error) {
+            toast.error(error?.data?.message || "Failed to add variant");
+            console.error(error);
+          }
         }
       }
     }
@@ -376,6 +404,7 @@ const EditProduct = () => {
   return (
     <div>
       <BreadCrumb/>
+      <p className="text-2xl font-bold text-center mt-5 mb-5">Type: {typeProduct === "0" ? "Variant" : "Single"}</p>
       <ZFormTwo
         isLoading={pIsLoading}
         isSuccess={pIsSuccess}
@@ -733,7 +762,7 @@ const EditProduct = () => {
                   <div className="flex justify-end">
                     <Button
                       htmlType="button"
-                      onClick={() => handleAddPerSkuInSkus()}
+                      onClick={() => handleAddVariant()}
                       style={{ backgroundColor: "#162447", color: "white" }}
                     >
                       + Add Variant
